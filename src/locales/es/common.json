@@ -1,0 +1,51 @@
+{
+  "app": {
+    "name": "Arxatec Academy",
+    "tagline": "Cursos de derecho, en claro."
+  },
+  "actions": {
+    "retry": "Volver a intentarlo",
+    "go_to_catalog": "Ir al catálogo",
+    "go_back": "Volver",
+    "sign_in": "Iniciar sesión"
+  },
+  "states": {
+    "loading": "Cargando",
+    "loading_session": "Comprobando tu sesión"
+  },
+  "theme": {
+    "label": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Según el sistema"
+  },
+  "language": {
+    "label": "Idioma",
+    "es": "Español",
+    "en": "English",
+    "pt": "Português",
+    "short": {
+      "es": "ES",
+      "en": "EN",
+      "pt": "PT"
+    }
+  },
+  "catalog": {
+    "title": "Catálogo de cursos",
+    "subtitle": "Aquí va el catálogo. Por ahora entra a tu cuenta y vuelve: te devolvemos justo a esta pantalla.",
+    "sign_in": "Iniciar sesión",
+    "register": "Crear cuenta"
+  },
+  "errors": {
+    "not_found": {
+      "title": "Esta página no existe",
+      "description": "El enlace que abriste no lleva a ningún sitio. Desde el catálogo llegas a todo.",
+      "action": "Ir al catálogo"
+    },
+    "unexpected": {
+      "title": "Algo se rompió",
+      "description": "No pudimos pintar esta pantalla. Vuelve a cargarla y, si sigue igual, escríbenos a hola@arxatec.pe.",
+      "action": "Volver a intentarlo"
+    }
+  }
+}

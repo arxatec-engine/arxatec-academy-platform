@@ -1,0 +1,51 @@
+{
+  "app": {
+    "name": "Arxatec Academy",
+    "tagline": "Law courses, in plain words."
+  },
+  "actions": {
+    "retry": "Try again",
+    "go_to_catalog": "Go to the catalog",
+    "go_back": "Go back",
+    "sign_in": "Sign in"
+  },
+  "states": {
+    "loading": "Loading",
+    "loading_session": "Checking your session"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "Match the system"
+  },
+  "language": {
+    "label": "Language",
+    "es": "Español",
+    "en": "English",
+    "pt": "Português",
+    "short": {
+      "es": "ES",
+      "en": "EN",
+      "pt": "PT"
+    }
+  },
+  "catalog": {
+    "title": "Course catalog",
+    "subtitle": "The catalog goes here. For now sign in and come back: we bring you right to this screen.",
+    "sign_in": "Sign in",
+    "register": "Create account"
+  },
+  "errors": {
+    "not_found": {
+      "title": "This page does not exist",
+      "description": "The link you opened leads nowhere. From the catalog you reach everything.",
+      "action": "Go to the catalog"
+    },
+    "unexpected": {
+      "title": "Something broke",
+      "description": "We could not paint this screen. Load it again and, if it stays the same, write to us at hola@arxatec.pe.",
+      "action": "Try again"
+    }
+  }
+}

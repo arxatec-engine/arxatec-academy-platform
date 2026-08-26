@@ -1,0 +1,19 @@
+@import "arxatec-ui/styles.css";
+
+@source "../index.html";
+@source "./**/*.{ts,tsx}";
+@source "../node_modules/arxatec-ui/dist/**/*.js";
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  body {
+    min-height: 100svh;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
