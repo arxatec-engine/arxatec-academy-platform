@@ -26,7 +26,10 @@ describe("Guest", () => {
   });
 
   it("saca de las pantallas de auth a quien ya tiene sesion", () => {
-    renderWithProviders(tree, { route: RouteHelpers.login(), user: buildApiUser() });
+    renderWithProviders(tree, {
+      route: RouteHelpers.login(),
+      user: buildApiUser(),
+    });
 
     expect(screen.getByText("catalogo")).toBeInTheDocument();
   });

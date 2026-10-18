@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { API_ERROR_CODES } from "@/constants/api_error_codes";
 import { isApiError } from "@/interceptors/api_error";
@@ -16,7 +16,6 @@ export interface AuthState {
   isError: boolean;
   isSessionExpired: boolean;
   error: unknown;
-  retry: () => void;
 }
 
 const isSessionExpiredError = (error: unknown): boolean =>
@@ -40,12 +39,6 @@ export const useAuth = (): AuthState => {
     setUser(fetchedUser);
   }, [fetchedUser, setUser]);
 
-  const { refetch } = query;
-
-  const retry = useCallback(() => {
-    void refetch();
-  }, [refetch]);
-
   const user = useMemo(() => {
     const source = fetchedUser ?? storedUser;
     return source === null || source === undefined ? null : toUserUI(source);
@@ -58,6 +51,5 @@ export const useAuth = (): AuthState => {
     isError: query.isError,
     isSessionExpired: isSessionExpiredError(query.error),
     error: query.error,
-    retry,
   };
 };

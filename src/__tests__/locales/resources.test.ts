@@ -16,13 +16,21 @@ describe("locales", () => {
     expect(DEFAULT_LANGUAGE).toBe("es");
   });
 
-  it.each(NAMESPACES)("mantiene las mismas claves en los tres idiomas para %s", (namespace) => {
-    const reference = collectKeys(resources[DEFAULT_LANGUAGE][namespace], "").sort();
+  it.each(NAMESPACES)(
+    "mantiene las mismas claves en los tres idiomas para %s",
+    (namespace) => {
+      const reference = collectKeys(
+        resources[DEFAULT_LANGUAGE][namespace],
+        "",
+      ).sort();
 
-    for (const language of LANGUAGES) {
-      expect(collectKeys(resources[language][namespace], "").sort()).toEqual(reference);
-    }
-  });
+      for (const language of LANGUAGES) {
+        expect(collectKeys(resources[language][namespace], "").sort()).toEqual(
+          reference,
+        );
+      }
+    },
+  );
 
   it("cubre los doce codigos de error del contrato", () => {
     const keys = collectKeys(resources[DEFAULT_LANGUAGE].auth.errors, "");

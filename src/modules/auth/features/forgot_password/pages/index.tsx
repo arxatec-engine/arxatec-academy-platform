@@ -1,11 +1,16 @@
 import { useState } from "react";
-
+import { useTranslation } from "react-i18next";
+import { useTitle } from "@/hooks";
+import { NS } from "@/locales/namespaces";
+import { forgotPassword } from "@/modules/auth/features/forgot_password/i18n";
 import { ForgotPasswordForm } from "../components/forgot_password_form";
 import { ForgotPasswordSent } from "../components/forgot_password_sent";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [isSent, setIsSent] = useState(false);
+  const { t } = useTranslation(NS.auth);
+  useTitle(t(isSent ? forgotPassword.sent.title : forgotPassword.title));
 
   const handleSent = (value: string): void => {
     setEmail(value);

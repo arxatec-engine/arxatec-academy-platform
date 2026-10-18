@@ -1,34 +1,22 @@
 import { useTranslation } from "react-i18next";
-
+import { useTitle } from "@/hooks";
 import { NS } from "@/locales/namespaces";
-import { AuthCard } from "@/modules/auth/components/auth_card";
-import { AuthDivider } from "@/modules/auth/components/auth_divider";
-import { AuthFooterLink } from "@/modules/auth/components/auth_footer_link";
-import { GoogleButton } from "@/modules/auth/components/google_button";
+import { AuthBackButton } from "@/modules/auth/components/auth_back_button";
+import { Header } from "@/modules/auth/components/header";
+import { login } from "@/modules/auth/features/login/i18n";
 import { startGoogleAuthorize } from "@/modules/auth/utils/google_authorize";
-import { RouteHelpers } from "@/routes/routes";
-
 import { LoginForm } from "../components/login_form";
 
 const LoginPage = () => {
   const { t } = useTranslation(NS.auth);
+  useTitle(t(login.pageTitle));
 
   return (
-    <AuthCard
-      title={t("login.title")}
-      subtitle={t("login.subtitle")}
-      footer={
-        <AuthFooterLink
-          question={t("login.footer.question")}
-          label={t("login.footer.link")}
-          to={RouteHelpers.register()}
-        />
-      }
-    >
-      <GoogleButton label={t("shared.google_button")} onClick={startGoogleAuthorize} />
-      <AuthDivider label={t("shared.divider")} />
+    <>
+      <AuthBackButton />
+      <Header title={t(login.title)} description={t(login.subtitle)} />
       <LoginForm onGoogleLogin={startGoogleAuthorize} />
-    </AuthCard>
+    </>
   );
 };
 

@@ -25,7 +25,9 @@ describe("redirect_to", () => {
     expect(rememberReturnPath("/curso/fundamentos/leccion/3")).toBe(true);
     expect(stored()).toBe("/curso/fundamentos/leccion/3");
     expect(readReturnPath()).toBe("/curso/fundamentos/leccion/3");
-    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO)).toBeNull();
+    expect(
+      window.localStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO),
+    ).toBeNull();
   });
 
   it.each([
@@ -45,7 +47,10 @@ describe("redirect_to", () => {
   });
 
   it("rechaza tambien lo que ya estaba guardado si alguien lo manipulo", () => {
-    window.sessionStorage.setItem(LOCAL_STORAGE_KEYS.REDIRECT_TO, "https://malo.pe");
+    window.sessionStorage.setItem(
+      LOCAL_STORAGE_KEYS.REDIRECT_TO,
+      "https://malo.pe",
+    );
 
     expect(readReturnPath()).toBeNull();
   });
@@ -69,7 +74,9 @@ describe("redirect_to", () => {
     const search = `?${RETURN_PATH_QUERY_PARAM}=${encodeURIComponent("/curso/x")}&otro=1`;
 
     expect(readReturnPathFromSearch(search)).toBe("/curso/x");
-    expect(readReturnPathFromSearch(`?${RETURN_PATH_QUERY_PARAM}=https://malo.pe`)).toBeNull();
+    expect(
+      readReturnPathFromSearch(`?${RETURN_PATH_QUERY_PARAM}=https://malo.pe`),
+    ).toBeNull();
     expect(readReturnPathFromSearch("?vacio=1")).toBeNull();
   });
 
@@ -78,6 +85,8 @@ describe("redirect_to", () => {
 
     rememberReturnPath("/guardado");
     expect(resolveReturnPath("?vacio=1", "/")).toBe("/guardado");
-    expect(resolveReturnPath(`?${RETURN_PATH_QUERY_PARAM}=/de-la-url`, "/")).toBe("/de-la-url");
+    expect(
+      resolveReturnPath(`?${RETURN_PATH_QUERY_PARAM}=/de-la-url`, "/"),
+    ).toBe("/de-la-url");
   });
 });

@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { NS } from "@/locales/namespaces";
+import { checkEmail } from "@/modules/auth/features/verify_email/i18n";
+import { shared } from "@/modules/auth/i18n";
 import { authErrorMessage } from "@/modules/auth/utils/auth_error_message";
 import { cn } from "@/utilities/cn";
 
@@ -21,7 +23,7 @@ export const ResendVerificationButton = ({
   const { resend, isPending, isBlocked, seconds } = useResendVerificationEmail({
     initialCooldownSeconds,
     onSent: () => {
-      toast.success(t("check_email.resend_sent"));
+      toast.success(t(checkEmail.resendSent));
     },
     onFailed: (error) => {
       toast.error(authErrorMessage(error, t));
@@ -29,9 +31,9 @@ export const ResendVerificationButton = ({
   });
 
   const label = (): string => {
-    if (isPending) return t("shared.sending");
-    if (seconds > 0) return t("check_email.resend_countdown", { seconds });
-    return t("check_email.resend_action");
+    if (isPending) return t(shared.sending);
+    if (seconds > 0) return t(checkEmail.resendCountdown, { seconds });
+    return t(checkEmail.resendAction);
   };
 
   return (
@@ -44,7 +46,9 @@ export const ResendVerificationButton = ({
       aria-busy={isPending}
       onClick={resend}
     >
-      {isPending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : null}
+      {isPending ? (
+        <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+      ) : null}
       {label()}
     </Button>
   );

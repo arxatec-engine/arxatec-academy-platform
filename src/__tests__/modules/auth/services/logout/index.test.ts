@@ -4,7 +4,10 @@ import { ApiError } from "@/interceptors/api_error";
 import { AUTH_ENDPOINTS } from "@/modules/auth/constants";
 import { logout } from "@/modules/auth/services/logout";
 
-import { axiosInstanceMock, resetInterceptorsMock } from "../../../../mocks/interceptors";
+import {
+  axiosInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../mocks/interceptors";
 
 vi.mock("@/interceptors", async () => {
   const module = await import("../../../../mocks/interceptors");

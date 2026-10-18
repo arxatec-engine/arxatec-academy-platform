@@ -18,7 +18,11 @@ const collectPaths = (routes: readonly RouteNode[]): string[] =>
 
 describe("arboles de rutas", () => {
   it("registra todos los paths declarados en ROUTES", () => {
-    const registered = collectPaths([...appRoutes, ...authRoutes, ...errorRoutes]);
+    const registered = collectPaths([
+      ...appRoutes,
+      ...authRoutes,
+      ...errorRoutes,
+    ]);
 
     for (const path of Object.values(ROUTES)) {
       expect(registered).toContain(path);
@@ -26,7 +30,11 @@ describe("arboles de rutas", () => {
   });
 
   it("no repite ningun path", () => {
-    const registered = collectPaths([...appRoutes, ...authRoutes, ...errorRoutes]);
+    const registered = collectPaths([
+      ...appRoutes,
+      ...authRoutes,
+      ...errorRoutes,
+    ]);
 
     expect(new Set(registered).size).toBe(registered.length);
   });

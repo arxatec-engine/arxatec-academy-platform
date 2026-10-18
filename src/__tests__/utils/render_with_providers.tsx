@@ -23,14 +23,23 @@ export interface ProvidersOptions {
 export const createTestQueryClient = (): QueryClient =>
   new QueryClient({
     defaultOptions: {
-      queries: { staleTime: QUERY_STALE_TIME, refetchOnWindowFocus: false, retry: false },
+      queries: {
+        staleTime: QUERY_STALE_TIME,
+        refetchOnWindowFocus: false,
+        retry: false,
+      },
       mutations: { retry: false },
     },
   });
 
-export const createWrapper = ({ route = "/", routeState, queryClient }: ProvidersOptions = {}) => {
+export const createWrapper = ({
+  route = "/",
+  routeState,
+  queryClient,
+}: ProvidersOptions = {}) => {
   const client = queryClient ?? createTestQueryClient();
-  const entry = routeState === undefined ? route : { pathname: route, state: routeState };
+  const entry =
+    routeState === undefined ? route : { pathname: route, state: routeState };
 
   return ({ children }: { children: ReactNode }) => (
     <I18nextProvider i18n={i18n}>
@@ -48,7 +57,8 @@ export const renderWithProviders = (
   resetStores();
 
   if (options.user !== undefined) useUserStore.setState({ user: options.user });
-  if (options.themeMode !== undefined) useThemeStore.setState({ mode: options.themeMode });
+  if (options.themeMode !== undefined)
+    useThemeStore.setState({ mode: options.themeMode });
 
   return render(ui, { wrapper: createWrapper(options) });
 };

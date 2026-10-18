@@ -15,9 +15,4 @@ export interface ResendVerificationEmailResult {
 }
 
 export type VerifyEmailStatus =
-  | "missing_token"
-  | "loading"
-  | "success"
-  | "already"
-  | "expired"
-  | "failed";
+  "missing_token" | "loading" | "success" | "already" | "expired" | "failed";

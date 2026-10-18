@@ -6,12 +6,12 @@ Es una **pantalla de paso**, no una pantalla con la que se interactúe: canjea e
 por una sesión, la guarda y se aparta. Solo tiene dos estados visibles, carga y error, y ninguno
 se entrega sin su acción.
 
-| Cosa | Dónde |
-| --- | --- |
-| Ruta | `ROUTES.oauth_callback` · `RouteHelpers.oauthCallback(code?)` · árbol `auth_routes`, **sin** `<Guest>` (`routes/auth_routes/index.tsx:38-41`) |
-| Endpoint | `POST /auth/google/exchange` (contrato §4, endpoint 11) con `axiosPublicInstance` |
-| Query key | `authKeys.googleExchange(code)` (`src/modules/auth/keys/index.ts:5`) |
-| Claves i18n | `auth.oauth_callback.*` y `auth.errors.*` |
+| Cosa        | Dónde                                                                                                                                         |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ruta        | `ROUTES.oauth_callback` · `RouteHelpers.oauthCallback(code?)` · árbol `auth_routes`, **sin** `<Guest>` (`routes/auth_routes/index.tsx:38-41`) |
+| Endpoint    | `POST /auth/google/exchange` (contrato §4, endpoint 11) con `axiosPublicInstance`                                                             |
+| Query key   | `authKeys.googleExchange(code)` (`src/modules/auth/keys/index.ts:5`)                                                                          |
+| Claves i18n | `auth.oauth_callback.*` y `auth.errors.*`                                                                                                     |
 
 ## El flujo, en orden
 
@@ -71,10 +71,10 @@ sobrevive a una recarga, así que aquí no hay atajo posible y lo correcto es co
 
 Hay **dos** motivos de error, y el texto lo decide el traductor compartido del módulo:
 
-| `reason` | Cuándo | Texto |
-| --- | --- | --- |
-| `missing_code` | la URL llega sin `code` (el rodeo por Google se cortó a medias) | `errors.unauthenticated` |
-| `failed` | el canje falló | `authErrorMessage(error, t)` (`src/modules/auth/utils/auth_error_message`) |
+| `reason`       | Cuándo                                                          | Texto                                                                      |
+| -------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `missing_code` | la URL llega sin `code` (el rodeo por Google se cortó a medias) | `errors.unauthenticated`                                                   |
+| `failed`       | el canje falló                                                  | `authErrorMessage(error, t)` (`src/modules/auth/utils/auth_error_message`) |
 
 `authErrorMessage` cubre los 12 `meta.code` del contrato más el fallo de red (`status === 0`), y
 cuando un `429` llega sin ningún tiempo de espera —ni `meta.retry_after_seconds` ni la cabecera
@@ -113,7 +113,7 @@ acabaría en el catálogo en vez de en su lección.
   lleva su acción al lado: un toast diría la misma frase dos veces, y el `<Toaster>` está en
   `visibleToasts={1}`.
 - **El estado de carga también tiene salida.** El pie lleva `shared.back_to_login`: si el canje se
-  queda colgado, el usuario no se queda encerrado mirando el spinner.
+  queda colgado, el usuario no se queda encerrado mirando el skeleton.
 - **Fuera de `<Guest>`**: se puede llegar aquí con una sesión vieja, y este flujo la sustituye.
   `<Guest>` rebotaría al usuario antes de canjear el código, que se perdería para siempre.
 - **Dentro de `NO_RETURN_ROUTES`**: el interceptor ya incluye `ROUTES.oauth_callback` en esa lista
@@ -122,10 +122,10 @@ acabaría en el catálogo en vez de en su lección.
 
 ## Estados y accesibilidad
 
-| Estado | Qué se pinta | Acción |
-| --- | --- | --- |
-| Carga | `oauth_callback.loading.*` + `role="status" aria-live="polite" aria-busy="true"` con el texto `shared.loading` en `sr-only` | pie "Volver a iniciar sesión" |
-| Error (los dos motivos) | `oauth_callback.error.*` + detalle en `AuthFormError` (`role="alert"`) | botón `size="lg"` ancho completo a `/ingresar` |
+| Estado                  | Qué se pinta                                                                                                                | Acción                                         |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Carga                   | `oauth_callback.loading.*` + `role="status" aria-live="polite" aria-busy="true"` con el texto `shared.loading` en `sr-only` | pie "Volver a iniciar sesión"                  |
+| Error (los dos motivos) | `oauth_callback.error.*` + detalle en `AuthFormError` (`role="alert"`)                                                      | botón `size="lg"` ancho completo a `/ingresar` |
 
 No hay estado vacío distinto del de error: la URL sin `code` **es** el vacío de esta pantalla y se
 pinta como `missing_code`, con la misma acción.
@@ -155,3 +155,6 @@ poder mirar el estado de carga sin prisa:
   anillo de 2 px del token `ring` (`oklch(0.708 0 0)`) y `Enter` sigue el enlace.
 - **360 px** (medido en un iframe de 360 px de ancho): `scrollWidth === clientWidth` (356/356), sin
   scroll horizontal; la tarjeta mide 332 px.
+
+La página declara su título traducido mediante `useTitle` de `@/hooks`; el hook añade
+` - Arxatec Academy` y lo actualiza también al cambiar de idioma.

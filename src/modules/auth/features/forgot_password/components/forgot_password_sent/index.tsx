@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import { NS } from "@/locales/namespaces";
 import { AuthCard } from "@/modules/auth/components/auth_card";
 import { AuthNote } from "@/modules/auth/components/auth_note";
+import { forgotPassword } from "@/modules/auth/features/forgot_password/i18n";
+import { shared } from "@/modules/auth/i18n";
 import { RouteHelpers } from "@/routes/routes";
 
 export interface ForgotPasswordSentProps {
@@ -24,18 +26,24 @@ export const ForgotPasswordSent = ({ onResend }: ForgotPasswordSentProps) => {
     <div
       ref={container}
       tabIndex={-1}
-      className="flex w-full max-w-[420px] justify-center outline-none"
+      className="flex w-full max-w-sm justify-center outline-none"
     >
       <AuthCard
-        title={t("forgot_password.sent.title")}
-        subtitle={t("forgot_password.sent.description")}
+        title={t(forgotPassword.sent.title)}
+        subtitle={t(forgotPassword.sent.description)}
       >
-        <AuthNote text={t("forgot_password.sent.hint")} />
+        <AuthNote text={t(forgotPassword.sent.hint)} />
         <Button asChild size="sm" className="w-full">
-          <Link to={RouteHelpers.login()}>{t("shared.back_to_login")}</Link>
+          <Link to={RouteHelpers.login()}>{t(shared.backToLogin)}</Link>
         </Button>
-        <Button type="button" variant="ghost" size="sm" className="w-full" onClick={onResend}>
-          {t("forgot_password.sent.resend")}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="w-full"
+          onClick={onResend}
+        >
+          {t(forgotPassword.sent.resend)}
         </Button>
       </AuthCard>
     </div>

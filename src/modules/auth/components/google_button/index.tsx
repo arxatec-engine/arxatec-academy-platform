@@ -7,7 +7,12 @@ export interface GoogleButtonProps {
   loading?: boolean;
 }
 
-export const GoogleButton = ({ label, onClick, disabled = false, loading = false }: GoogleButtonProps) => (
+export const GoogleButton = ({
+  label,
+  onClick,
+  disabled = false,
+  loading = false,
+}: GoogleButtonProps) => (
   <Button
     type="button"
     variant="outline"

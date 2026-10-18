@@ -8,5 +8,6 @@ export type ForgotPasswordMutation = UseMutationResult<void, Error, string>;
 
 export const useForgotPassword = (): ForgotPasswordMutation =>
   useMutation({
-    mutationFn: (email: string) => requestPasswordReset({ email, redirectTo: readReturnPath() }),
+    mutationFn: (email: string) =>
+      requestPasswordReset({ email, redirectTo: readReturnPath() }),
   });

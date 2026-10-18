@@ -1,14 +1,11 @@
-import { API_ERROR_CODES } from "@/constants/api_error_codes";
 import { axiosPublicInstance } from "@/interceptors";
-import { ApiError } from "@/interceptors/api_error";
 import { AUTH_ENDPOINTS } from "@/modules/auth/constants";
+import { requireAuthData } from "@/modules/auth/utils/require_auth_data";
 import type { ApiSession } from "@/types/auth";
 import type { Response } from "@/types/services";
 
 import type { LoginFormValues } from "../schemas";
 import type { LoginPayload, LoginRequest } from "../types";
-
-const MALFORMED_STATUS = 500;
 
 const toLoginRequest = (values: LoginFormValues): LoginRequest => ({
   email: values.email,
@@ -21,17 +18,5 @@ export const login = async (values: LoginFormValues): Promise<ApiSession> => {
     AUTH_ENDPOINTS.login,
     toLoginRequest(values),
   );
-  const payload = data.data;
-
-  if (payload === undefined) {
-    throw new ApiError({
-      status: MALFORMED_STATUS,
-      code: API_ERROR_CODES.INTERNAL_ERROR,
-      description: data.description,
-      fields: null,
-      retryAfterSeconds: null,
-    });
-  }
-
-  return payload;
+  return requireAuthData(data);
 };

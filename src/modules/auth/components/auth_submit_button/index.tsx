@@ -17,11 +17,13 @@ export const AuthSubmitButton = ({
   <Button
     type="submit"
     size="sm"
-    className="w-full"
+    className="mt-2 w-full"
     aria-busy={loading}
     disabled={disabled || loading}
   >
-    {loading ? <Loader2 aria-hidden="true" className="size-4 animate-spin" /> : null}
+    {loading ? (
+      <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+    ) : null}
     {loading && loadingLabel !== undefined ? loadingLabel : label}
   </Button>
 );

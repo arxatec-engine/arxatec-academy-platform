@@ -4,7 +4,10 @@ import { API_ERROR_CODES } from "@/constants/api_error_codes";
 import { ApiError } from "@/interceptors/api_error";
 import { i18n } from "@/locales/i18n";
 import { NS } from "@/locales/namespaces";
-import { authErrorMessage, type AuthTranslator } from "@/modules/auth/utils/auth_error_message";
+import {
+  authErrorMessage,
+  type AuthTranslator,
+} from "@/modules/auth/utils/auth_error_message";
 
 const t = i18n.getFixedT(null, NS.auth) as AuthTranslator;
 
@@ -37,12 +40,19 @@ describe("authErrorMessage", () => {
   });
 
   it("interpola los segundos que manda el servidor", () => {
-    expect(authErrorMessage(apiError(429, API_ERROR_CODES.RATE_LIMITED, 45), t)).toContain("45");
-    expect(authErrorMessage(apiError(429, API_ERROR_CODES.RESEND_COOLDOWN, 45), t)).toContain("45");
+    expect(
+      authErrorMessage(apiError(429, API_ERROR_CODES.RATE_LIMITED, 45), t),
+    ).toContain("45");
+    expect(
+      authErrorMessage(apiError(429, API_ERROR_CODES.RESEND_COOLDOWN, 45), t),
+    ).toContain("45");
   });
 
   it("no inventa una cuenta atras cuando el sobre no trae retry_after_seconds", () => {
-    const message = authErrorMessage(apiError(429, API_ERROR_CODES.RATE_LIMITED, null), t);
+    const message = authErrorMessage(
+      apiError(429, API_ERROR_CODES.RATE_LIMITED, null),
+      t,
+    );
 
     expect(message).toBe(t("errors.retry_later"));
     expect(message).not.toMatch(/\d/);
@@ -50,8 +60,14 @@ describe("authErrorMessage", () => {
 
   it("distingue el fallo de red del fallo del servidor y del codigo desconocido", () => {
     expect(authErrorMessage(apiError(0, null), t)).toBe(t("errors.network"));
-    expect(authErrorMessage(apiError(500, "SIN_DOCUMENTAR"), t)).toBe(t("errors.internal_error"));
-    expect(authErrorMessage(apiError(418, "SIN_DOCUMENTAR"), t)).toBe(t("errors.unknown"));
-    expect(authErrorMessage(new Error("cualquier cosa"), t)).toBe(t("errors.unknown"));
+    expect(authErrorMessage(apiError(500, "SIN_DOCUMENTAR"), t)).toBe(
+      t("errors.internal_error"),
+    );
+    expect(authErrorMessage(apiError(418, "SIN_DOCUMENTAR"), t)).toBe(
+      t("errors.unknown"),
+    );
+    expect(authErrorMessage(new Error("cualquier cosa"), t)).toBe(
+      t("errors.unknown"),
+    );
   });
 });

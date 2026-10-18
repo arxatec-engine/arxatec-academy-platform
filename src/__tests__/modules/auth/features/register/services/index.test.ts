@@ -6,7 +6,10 @@ import { registerAccount } from "@/modules/auth/features/register/services";
 import type { RegisterRequest } from "@/modules/auth/features/register/types";
 
 import { buildApiSession } from "../../../../../mocks/fixtures";
-import { axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../../mocks/interceptors";
+import {
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../mocks/interceptors";
 
 vi.mock("@/interceptors", async () => {
   const module = await import("../../../../../mocks/interceptors");
@@ -28,10 +31,6 @@ const request: RegisterRequest = {
   full_name: "María Quispe Rojas",
   email: "maria@estudioqp.pe",
   password: "unaClaveLarga",
-  organization: "Estudio Quispe & Rojas",
-  is_independent: false,
-  city: "LIMA",
-  city_other: null,
 };
 
 describe("registerAccount", () => {
@@ -40,18 +39,24 @@ describe("registerAccount", () => {
   });
 
   it("llama al endpoint del contrato con la instancia publica", async () => {
-    axiosPublicInstanceMock.post.mockResolvedValue(envelope(buildApiSession()));
+    axiosPublicInstanceMock.post.mockResolvedValue(envelope({ ...buildApiSession(), verification_email_sent: true }));
 
     await registerAccount(request);
 
-    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(AUTH_ENDPOINTS.register, request);
+    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+      AUTH_ENDPOINTS.register,
+      request,
+    );
   });
 
   it("devuelve data.data: la sesion iniciada que promete el contrato", async () => {
     const session = buildApiSession();
-    axiosPublicInstanceMock.post.mockResolvedValue(envelope(session));
+    axiosPublicInstanceMock.post.mockResolvedValue(envelope({ ...session, verification_email_sent: true }));
 
-    await expect(registerAccount(request)).resolves.toEqual(session);
+    await expect(registerAccount(request)).resolves.toEqual({
+      ...session,
+      verification_email_sent: true,
+    });
   });
 
   it("lanza un ApiError en vez de propagar undefined si el sobre llega sin data", async () => {

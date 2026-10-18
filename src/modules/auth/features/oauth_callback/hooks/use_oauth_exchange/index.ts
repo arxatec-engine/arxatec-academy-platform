@@ -3,7 +3,10 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { authKeys } from "@/modules/auth/keys";
-import { forgetReturnPath, readReturnPath } from "@/modules/auth/utils/redirect_to";
+import {
+  forgetReturnPath,
+  readReturnPath,
+} from "@/modules/auth/utils/redirect_to";
 import { ROUTE_QUERY_PARAM_NAMES, RouteHelpers } from "@/routes/routes";
 import { selectUser, useUserStore } from "@/store/user";
 
@@ -24,7 +27,9 @@ export const useOauthExchange = (): OauthExchange => {
 
   const code = params.success ? params.data.code : "";
   const target =
-    (params.success ? params.data.redirect_to : null) ?? savedRedirect ?? RouteHelpers.home();
+    (params.success ? params.data.redirect_to : null) ??
+    savedRedirect ??
+    RouteHelpers.home();
 
   const queryClient = useQueryClient();
   const setSession = useUserStore((state) => state.setSession);

@@ -36,7 +36,8 @@ export const useResendVerificationEmail = ({
 
   useEffect(() => {
     if (hasStarted.current) return;
-    if (initialCooldownSeconds === undefined || initialCooldownSeconds <= 0) return;
+    if (initialCooldownSeconds === undefined || initialCooldownSeconds <= 0)
+      return;
     hasStarted.current = true;
     start(initialCooldownSeconds);
   }, [initialCooldownSeconds, start]);

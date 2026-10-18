@@ -8,7 +8,9 @@ export const buildGoogleAuthorizeUrl = (redirectTo: string | null): string => {
   const base = `${ENV.API_URL}${AUTH_ENDPOINTS.google_authorize}`;
   if (redirectTo === null) return base;
 
-  const search = new URLSearchParams({ [ROUTE_QUERY_PARAM_NAMES.redirect_to]: redirectTo });
+  const search = new URLSearchParams({
+    [ROUTE_QUERY_PARAM_NAMES.redirect_to]: redirectTo,
+  });
   return `${base}?${search.toString()}`;
 };
 

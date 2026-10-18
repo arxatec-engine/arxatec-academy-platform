@@ -6,13 +6,13 @@ en `<html>`**, no estado de React: el CSS reacciona solo y no se recalcula nada 
 
 ## Reparto
 
-| Pieza | Responsabilidad |
-| --- | --- |
-| `src/store/theme` | `mode: light \| dark \| system` (default `system`), persistido en `LOCAL_STORAGE_KEYS.THEME_MODE`. |
-| `src/utilities/theme` | `resolveTheme(mode)` y `applyResolvedTheme(theme)`: la única función que toca `classList` y `style.colorScheme`. |
-| `src/hooks/use_darkmode` | Escucha `prefers-color-scheme` **en vivo** con `matchMedia().addEventListener` y reaplica. |
-| `ThemeBootstrap` | Monta el hook una vez, dentro de `<Core>`. No pinta nada propio. |
-| `src/components/shared/theme_selector` | Los tres botones (sol / luna / monitor) con `aria-pressed`. |
+| Pieza                                  | Responsabilidad                                                                                                            |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `src/store/theme`                      | `mode: light \| dark \| system` (default `system`), persistido en `LOCAL_STORAGE_KEYS.THEME_MODE`.                         |
+| `src/utilities/theme`                  | `resolveTheme(mode)` y `applyResolvedTheme(theme)`: aplica `classList`, `style.colorScheme` y el favicon al tema resuelto. |
+| `src/hooks/use_darkmode`               | Escucha `prefers-color-scheme` **en vivo** con `matchMedia().addEventListener` y reaplica.                                 |
+| `ThemeBootstrap`                       | Monta el hook una vez, dentro de `<Core>`. No pinta nada propio.                                                           |
+| `src/components/shared/theme_selector` | Los tres botones (sol / luna / monitor) con `aria-pressed`.                                                                |
 
 `useDarkMode` solo se suscribe a `matchMedia` cuando el modo es `system`
 (`src/hooks/use_darkmode/index.ts:32`): en `light` o `dark` la preferencia del sistema es
@@ -32,3 +32,12 @@ vuelve el destello — sin que falle ningún test, porque el script vive fuera d
 
 El script cae a `system` ante cualquier valor raro y va envuelto en `try/catch` porque
 `localStorage` lanza en modo privado de algunos navegadores.
+
+## Favicon
+
+`public/favicon.svg` usa el isotipo de Arxatec y se adapta al sistema sin JavaScript.
+El enlace `#app-favicon` de `index.html` apunta inicialmente a ese archivo; el script
+inicial selecciona `favicon_light.svg` o `favicon_dark.svg` según el modo guardado
+y la preferencia del sistema, antes de montar React. `applyResolvedTheme` mantiene
+el icono sincronizado al cambiar de modo o al cambiar el sistema en modo `system`.
+Los tres SVG comparten los recursos de marca del panel de administración.

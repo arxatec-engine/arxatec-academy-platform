@@ -1,12 +1,13 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { i18n } from "@/locales/i18n";
 import ResetPasswordPage from "@/modules/auth/features/reset_password/pages";
 import { RouteHelpers } from "@/routes/routes";
-
-import { axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../mocks/interceptors";
+import {
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../mocks/interceptors";
 import { renderWithProviders } from "../../../../utils/render_with_providers";
 
 vi.mock("@/interceptors", async () => {
@@ -36,14 +37,21 @@ describe("formulario de reset_password", () => {
     renderWithProviders(<ResetPasswordPage />, { route: routeWithToken });
 
     const field = screen.getByLabelText("Nueva contraseña");
-    expect(field).toHaveAttribute("type", "password");
+    expect(field).toHaveProperty("type", "password");
 
     await user.tab();
-    expect(screen.getAllByRole("button", { name: "Mostrar la contraseña" })).toHaveLength(2);
-    expect(screen.getAllByRole("button", { name: "Mostrar la contraseña" })[0]).toHaveFocus();
+    expect(
+      screen.getAllByRole("button", { name: "Mostrar la contraseña" }),
+    ).toHaveLength(2);
+    expect(
+      screen.getAllByRole("button", { name: "Mostrar la contraseña" })[0],
+    ).toHaveFocus();
 
     await user.keyboard("{Enter}");
-    expect(screen.getByLabelText("Nueva contraseña")).toHaveAttribute("type", "text");
+    expect(screen.getByLabelText("Nueva contraseña")).toHaveProperty(
+      "type",
+      "text",
+    );
     expect(axiosPublicInstanceMock.post).not.toHaveBeenCalled();
   });
 
@@ -53,13 +61,19 @@ describe("formulario de reset_password", () => {
     renderWithProviders(<ResetPasswordPage />, { route: routeWithToken });
 
     await user.type(screen.getByLabelText("Nueva contraseña"), "unaClaveLarga");
-    await user.type(screen.getByLabelText("Repite la contraseña"), "unaClaveLarga{Enter}");
+    await user.type(
+      screen.getByLabelText("Repite la contraseña"),
+      "unaClaveLarga{Enter}",
+    );
 
     await waitFor(() => {
-      expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith("/auth/password/reset", {
-        token: "tok_123",
-        password: "unaClaveLarga",
-      });
+      expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+        "/auth/password/reset",
+        {
+          token: "tok_123",
+          password: "unaClaveLarga",
+        },
+      );
     });
   });
 
@@ -68,13 +82,17 @@ describe("formulario de reset_password", () => {
     renderWithProviders(<ResetPasswordPage />, { route: routeWithToken });
 
     await user.type(screen.getByLabelText("Nueva contraseña"), "corta");
-    await user.click(screen.getByRole("button", { name: "Guardar la contraseña" }));
+    await user.click(
+      screen.getByRole("button", { name: "Guardar la contraseña" }),
+    );
 
     const field = await screen.findByLabelText("Nueva contraseña");
     await waitFor(() => {
       expect(field).toHaveAttribute("aria-invalid", "true");
     });
-    expect(field.getAttribute("aria-describedby")).toContain("reset-password-new-error");
+    expect(field.getAttribute("aria-describedby")).toContain(
+      "reset-password-new-error",
+    );
     expect(screen.getByLabelText("Nueva contraseña")).toHaveFocus();
   });
 
@@ -85,7 +103,9 @@ describe("formulario de reset_password", () => {
       ["pt", "Escolha uma senha nova"],
     ] as const) {
       await i18n.changeLanguage(language);
-      const view = renderWithProviders(<ResetPasswordPage />, { route: routeWithToken });
+      const view = renderWithProviders(<ResetPasswordPage />, {
+        route: routeWithToken,
+      });
 
       expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
       expect(screen.queryByText(/reset_password\./)).not.toBeInTheDocument();

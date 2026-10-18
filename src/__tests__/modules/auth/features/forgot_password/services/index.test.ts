@@ -6,7 +6,10 @@ import { AUTH_ENDPOINTS } from "@/modules/auth/constants";
 import { requestPasswordReset } from "@/modules/auth/features/forgot_password/services";
 import { readRedirectTo } from "@/services/auth_storage";
 
-import { axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../../mocks/interceptors";
+import {
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../mocks/interceptors";
 
 vi.mock("@/interceptors", async () => {
   const module = await import("../../../../../mocks/interceptors");
@@ -35,21 +38,33 @@ describe("requestPasswordReset", () => {
       requestPasswordReset({ email: "maria@estudioqp.pe", redirectTo: null }),
     ).resolves.toBeUndefined();
 
-    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(AUTH_ENDPOINTS.forgot_password, {
-      email: "maria@estudioqp.pe",
-    });
+    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+      AUTH_ENDPOINTS.forgot_password,
+      {
+        email: "maria@estudioqp.pe",
+      },
+    );
   });
 
   it("manda el destino de retorno en snake_case cuando existe", async () => {
     axiosPublicInstanceMock.post.mockResolvedValue(envelope);
-    window.sessionStorage.setItem(LOCAL_STORAGE_KEYS.REDIRECT_TO, "/curso/fundamentos");
+    window.sessionStorage.setItem(
+      LOCAL_STORAGE_KEYS.REDIRECT_TO,
+      "/curso/fundamentos",
+    );
 
-    await requestPasswordReset({ email: "maria@estudioqp.pe", redirectTo: readRedirectTo() });
-
-    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(AUTH_ENDPOINTS.forgot_password, {
+    await requestPasswordReset({
       email: "maria@estudioqp.pe",
-      redirect_to: "/curso/fundamentos",
+      redirectTo: readRedirectTo(),
     });
+
+    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+      AUTH_ENDPOINTS.forgot_password,
+      {
+        email: "maria@estudioqp.pe",
+        redirect_to: "/curso/fundamentos",
+      },
+    );
   });
 
   it("propaga el ApiError que normaliza el interceptor", async () => {

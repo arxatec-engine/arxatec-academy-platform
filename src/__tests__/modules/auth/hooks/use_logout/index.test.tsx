@@ -10,7 +10,10 @@ import { ROUTES } from "@/routes/routes";
 import { useUserStore } from "@/store/user";
 
 import { buildApiUser } from "../../../../mocks/fixtures";
-import { axiosInstanceMock, resetInterceptorsMock } from "../../../../mocks/interceptors";
+import {
+  axiosInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../mocks/interceptors";
 import {
   createTestQueryClient,
   renderWithProviders,
@@ -51,8 +54,14 @@ const tree = (
 describe("useLogout", () => {
   beforeEach(() => {
     resetInterceptorsMock();
-    window.localStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH, "test.jwt.token");
-    window.sessionStorage.setItem(LOCAL_STORAGE_KEYS.REDIRECT_TO, "/curso/fundamentos");
+    window.localStorage.setItem(
+      LOCAL_STORAGE_KEYS.TOKEN_AUTH,
+      "test.jwt.token",
+    );
+    window.sessionStorage.setItem(
+      LOCAL_STORAGE_KEYS.REDIRECT_TO,
+      "/curso/fundamentos",
+    );
   });
 
   it("revoca la sesion, vacia store, almacenamiento y cache, y va al login", async () => {
@@ -67,8 +76,12 @@ describe("useLogout", () => {
     expect(await screen.findByText("pantalla de login")).toBeInTheDocument();
     expect(axiosInstanceMock.post).toHaveBeenCalledWith("/auth/logout");
     expect(useUserStore.getState().user).toBeNull();
-    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBeNull();
-    expect(window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO)).toBeNull();
+    expect(
+      window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH),
+    ).toBeNull();
+    expect(
+      window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO),
+    ).toBeNull();
     expect(queryClient.getQueryData(["curso", "fundamentos"])).toBeUndefined();
   });
 
@@ -89,6 +102,8 @@ describe("useLogout", () => {
 
     expect(await screen.findByText("pantalla de login")).toBeInTheDocument();
     expect(useUserStore.getState().user).toBeNull();
-    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBeNull();
+    expect(
+      window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH),
+    ).toBeNull();
   });
 });

@@ -5,7 +5,10 @@ import { AUTH_ENDPOINTS } from "@/modules/auth/constants";
 import { exchangeGoogleCode } from "@/modules/auth/features/oauth_callback/services";
 
 import { buildApiSession } from "../../../../../mocks/fixtures";
-import { axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../../mocks/interceptors";
+import {
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../mocks/interceptors";
 
 vi.mock("@/interceptors", async () => {
   const module = await import("../../../../../mocks/interceptors");
@@ -32,16 +35,23 @@ describe("exchangeGoogleCode", () => {
     const session = buildApiSession();
     axiosPublicInstanceMock.post.mockResolvedValue(envelope(session));
 
-    await expect(exchangeGoogleCode({ code: "abc123" })).resolves.toEqual(session);
+    await expect(exchangeGoogleCode({ code: "abc123" })).resolves.toEqual(
+      session,
+    );
 
-    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(AUTH_ENDPOINTS.google_exchange, {
-      code: "abc123",
-    });
+    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+      AUTH_ENDPOINTS.google_exchange,
+      {
+        code: "abc123",
+      },
+    );
   });
 
   it("no propaga un sobre sin data: lanza ApiError", async () => {
     axiosPublicInstanceMock.post.mockResolvedValue(envelope(undefined));
 
-    await expect(exchangeGoogleCode({ code: "abc123" })).rejects.toBeInstanceOf(ApiError);
+    await expect(exchangeGoogleCode({ code: "abc123" })).rejects.toBeInstanceOf(
+      ApiError,
+    );
   });
 });

@@ -9,7 +9,8 @@ import { sanitizeRedirectPath } from "@/utilities/redirect";
 
 const isBrowser = (): boolean => typeof window !== "undefined";
 
-const storages = (): Storage[] => (isBrowser() ? [window.localStorage, window.sessionStorage] : []);
+const storages = (): Storage[] =>
+  isBrowser() ? [window.localStorage, window.sessionStorage] : [];
 
 const readFirst = (key: string): string | null => {
   for (const storage of storages()) {
@@ -29,7 +30,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const isNullableString = (value: unknown): value is string | null =>
   value === null || typeof value === "string";
 
-const isMember = <T extends string>(options: readonly T[], value: unknown): value is T =>
+const isMember = <T extends string>(
+  options: readonly T[],
+  value: unknown,
+): value is T =>
   typeof value === "string" && options.some((option) => option === value);
 
 export const isApiUser = (value: unknown): value is ApiUser => {
@@ -66,14 +70,19 @@ const storageHoldingToken = (): Storage | null => {
   return null;
 };
 
-export const readAuthToken = (): string | null => readFirst(LOCAL_STORAGE_KEYS.TOKEN_AUTH);
+export const readAuthToken = (): string | null =>
+  readFirst(LOCAL_STORAGE_KEYS.TOKEN_AUTH);
 
 export const readAuthUser = (): ApiUser | null => {
   const raw = readFirst(LOCAL_STORAGE_KEYS.USER_AUTH);
   return raw === null ? null : parseUser(raw);
 };
 
-export const writeAuthSession = (token: string, user: ApiUser, rememberMe: boolean): void => {
+export const writeAuthSession = (
+  token: string,
+  user: ApiUser,
+  rememberMe: boolean,
+): void => {
   if (!isBrowser()) return;
   clearAuthSession();
   const target = rememberMe ? window.localStorage : window.sessionStorage;
@@ -94,7 +103,9 @@ export const clearAuthSession = (): void => {
 
 export const readRedirectTo = (): string | null => {
   if (!isBrowser()) return null;
-  return sanitizeRedirectPath(window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO));
+  return sanitizeRedirectPath(
+    window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO),
+  );
 };
 
 export const writeRedirectTo = (path: string): void => {

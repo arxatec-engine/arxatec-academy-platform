@@ -6,4 +6,5 @@ export const LOCAL_STORAGE_KEYS = {
   REDIRECT_TO: "arxatec_academy.redirect_to",
 } as const;
 
-export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS];
+export type LocalStorageKey =
+  (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS];

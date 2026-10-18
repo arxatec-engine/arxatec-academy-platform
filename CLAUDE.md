@@ -25,24 +25,24 @@ no hay BFF: el navegador llama directo a la API.
 
 ## 2. Stack
 
-| Capa | Elección | Nota |
-| --- | --- | --- |
-| Framework | React 19 + TypeScript strict | |
-| Bundler | Vite 7 + `@vitejs/plugin-react-swc` | SWC, no Babel |
-| Routing | `react-router-dom` v6 (`createBrowserRouter`) | rutas como datos, no como JSX |
-| Estado remoto | `@tanstack/react-query` v5 | **toda** llamada a API pasa por aquí |
-| HTTP | `axios` (instancia única con interceptores) | nunca `fetch` suelto |
-| Estado global | `zustand` | mínimo: usuario y workspace |
-| Formularios | `react-hook-form` + `zod` (`@hookform/resolvers/zod`) | |
-| Estilos | Tailwind CSS v4 (`@tailwindcss/vite`) + `clsx` + `tailwind-merge` | |
-| UI | `arxatec-ui` (design system propio, sobre Radix) + `lucide-react` | |
-| Notificaciones | `sonner` | |
-| Tiempo real | `socket.io-client` (singleton) | |
-| i18n | `i18next` + `react-i18next` (es/en/pt) | claves **tipadas** |
-| Editor rico | TipTap 3 | compartido entre chat y tareas |
-| Tests | Vitest + Testing Library; Playwright para E2E | |
-| Escritorio | Electron + `electron-builder` + `electron-updater` | configs Vite separadas |
-| PWA | `vite-plugin-pwa` (Workbox) | |
+| Capa           | Elección                                                          | Nota                                 |
+| -------------- | ----------------------------------------------------------------- | ------------------------------------ |
+| Framework      | React 19 + TypeScript strict                                      |                                      |
+| Bundler        | Vite 7 + `@vitejs/plugin-react-swc`                               | SWC, no Babel                        |
+| Routing        | `react-router-dom` v6 (`createBrowserRouter`)                     | rutas como datos, no como JSX        |
+| Estado remoto  | `@tanstack/react-query` v5                                        | **toda** llamada a API pasa por aquí |
+| HTTP           | `axios` (instancia única con interceptores)                       | nunca `fetch` suelto                 |
+| Estado global  | `zustand`                                                         | mínimo: usuario y workspace          |
+| Formularios    | `react-hook-form` + `zod` (`@hookform/resolvers/zod`)             |                                      |
+| Estilos        | Tailwind CSS v4 (`@tailwindcss/vite`) + `clsx` + `tailwind-merge` |                                      |
+| UI             | `arxatec-ui` (design system propio, sobre Radix) + `lucide-react` |                                      |
+| Notificaciones | `sonner`                                                          |                                      |
+| Tiempo real    | `socket.io-client` (singleton)                                    |                                      |
+| i18n           | `i18next` + `react-i18next` (es/en/pt)                            | claves **tipadas**                   |
+| Editor rico    | TipTap 3                                                          | compartido entre chat y tareas       |
+| Tests          | Vitest + Testing Library; Playwright para E2E                     |                                      |
+| Escritorio     | Electron + `electron-builder` + `electron-updater`                | configs Vite separadas               |
+| PWA            | `vite-plugin-pwa` (Workbox)                                       |                                      |
 
 **Alias único:** `@` → `./src` (declarado en `vite.config.ts` y `tsconfig`).
 
@@ -126,13 +126,13 @@ falta, se sube al nivel del dominio primero.
 
 Los módulos grandes añaden carpetas especializadas (el ejemplo canónico es `chat/`):
 
-| Carpeta | Qué contiene |
-| --- | --- |
-| `keys/` | **factory de query keys** del módulo (ver §6) |
-| `realtime/` | nombres de eventos de socket + tipos de payload |
-| `adapters/` | traducción API → UI (ver §9) |
-| `policy/` | reglas de permisos puras, sin React |
-| `types/` | `Api*` (lo que manda el backend) y `*UI` (lo que consume la UI) |
+| Carpeta     | Qué contiene                                                    |
+| ----------- | --------------------------------------------------------------- |
+| `keys/`     | **factory de query keys** del módulo (ver §6)                   |
+| `realtime/` | nombres de eventos de socket + tipos de payload                 |
+| `adapters/` | traducción API → UI (ver §9)                                    |
+| `policy/`   | reglas de permisos puras, sin React                             |
+| `types/`    | `Api*` (lo que manda el backend) y `*UI` (lo que consume la UI) |
 
 ---
 
@@ -142,8 +142,8 @@ Los módulos grandes añaden carpetas especializadas (el ejemplo canónico es `c
 
 ```ts
 // src/interceptors/index.ts
-export const axiosInstance = axios.create({ baseURL: API_URL });        // autenticada
-export const axiosPublicInstance = axios.create({ baseURL: API_URL });  // sin token
+export const axiosInstance = axios.create({ baseURL: API_URL }); // autenticada
+export const axiosPublicInstance = axios.create({ baseURL: API_URL }); // sin token
 ```
 
 Lo que hacen los interceptores, y por qué importa:
@@ -160,9 +160,13 @@ Lo que hacen los interceptores, y por qué importa:
 
 ```ts
 interface Response<T = void> {
-  status: number; message: string; description: string;
-  timestamp: string; path: string;
-  data?: T; meta?: { code?: string };
+  status: number;
+  message: string;
+  description: string;
+  timestamp: string;
+  path: string;
+  data?: T;
+  meta?: { code?: string };
 }
 ```
 
@@ -174,11 +178,16 @@ import { axiosInstance } from "@/interceptors";
 import type { Response, Case } from "@/types";
 
 export async function getCases(workspaceId: string): Promise<Case[]> {
-  const { data } = await axiosInstance.get<Response<Case[]>>(`/${workspaceId}/cases/manage`);
+  const { data } = await axiosInstance.get<Response<Case[]>>(
+    `/${workspaceId}/cases/manage`,
+  );
   return data.data ?? [];
 }
 
-export async function archiveCase(workspaceId: string, caseId: string): Promise<void> {
+export async function archiveCase(
+  workspaceId: string,
+  caseId: string,
+): Promise<void> {
   await axiosInstance.patch(`/${workspaceId}/cases/manage/archive/${caseId}`);
 }
 ```
@@ -202,11 +211,11 @@ con `useMutation`. Sin excepciones.
 
 Se apartan de los de fábrica en tres puntos, cada uno por un problema real medido:
 
-| Opción | Valor | Por qué |
-| --- | --- | --- |
-| `staleTime` | `30_000` | con `0`, navegar entre pantallas que comparten `queryKey` disparaba una petición por montaje |
-| `refetchOnWindowFocus` | `false` | con ~183 queries, volver a la pestaña recargaba todo lo montado a la vez |
-| `retry` | 2 intentos, **nunca en 4xx** | un 404/403/límite-de-plan no se arregla reintentando, y tras un 401 el interceptor ya borró el token |
+| Opción                 | Valor                        | Por qué                                                                                              |
+| ---------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `staleTime`            | `30_000`                     | con `0`, navegar entre pantallas que comparten `queryKey` disparaba una petición por montaje         |
+| `refetchOnWindowFocus` | `false`                      | con ~183 queries, volver a la pestaña recargaba todo lo montado a la vez                             |
+| `retry`                | 2 intentos, **nunca en 4xx** | un 404/403/límite-de-plan no se arregla reintentando, y tras un 401 el interceptor ya borró el token |
 
 Donde se necesita frescura continua se pone `refetchInterval` **explícito** (notificaciones,
 presencia, resúmenes en generación). Cualquier hook puede sobreescribir los defaults.
@@ -284,10 +293,17 @@ Un objeto `ROUTES` agrupado en `Auth` / `Lawyer` / `Public` / `Error`, más
 `ROUTE_PARAM_NAMES` con los nombres de parámetro, más `RouteHelpers`.
 
 ```ts
-export const ROUTE_PARAM_NAMES = { workspaceId: "workspace_id", caseId: "case_id", /* … */ } as const;
+export const ROUTE_PARAM_NAMES = {
+  workspaceId: "workspace_id",
+  caseId: "case_id" /* … */,
+} as const;
 
 export const ROUTES = {
-  Auth: { Login: "/ingresar", Register: "/registrarse", OAuthCallback: "/oauth/callback" },
+  Auth: {
+    Login: "/ingresar",
+    Register: "/registrarse",
+    OAuthCallback: "/oauth/callback",
+  },
   Lawyer: {
     ViewCases: "/:workspace_id/casos",
     ViewCase: `/:workspace_id/casos/:${ROUTE_PARAM_NAMES.caseId}`,
@@ -382,8 +398,12 @@ Complemento: `policy/` para permisos, funciones puras sin React:
 
 ```ts
 export function canManageChannelMembers(
-  channel: ChatChannelUI, authUserId: string | undefined, role: WorkspaceRole | undefined,
-): boolean { /* … */ }
+  channel: ChatChannelUI,
+  authUserId: string | undefined,
+  role: WorkspaceRole | undefined,
+): boolean {
+  /* … */
+}
 ```
 
 Así el mismo criterio se usa en el menú, en el botón y en el test, y se puede testear sin
@@ -397,7 +417,9 @@ Un solo componente monta todo lo que la app necesita siempre:
 
 ```tsx
 <I18nextProvider i18n={i18n}>
-  <QueryClientProvider client={queryClient}>   {/* creado con useState(() => …) */}
+  <QueryClientProvider client={queryClient}>
+    {" "}
+    {/* creado con useState(() => …) */}
     <CoreThemeBootstrap>{children}</CoreThemeBootstrap>
     <Toaster visibleToasts={1} />
     <OfflineBanner />
@@ -436,7 +458,7 @@ Dos reglas que sí o sí se replican:
 
    ```ts
    import { NS } from "@/locales";
-   const { t } = useTranslation(NS.cases);   // no useTranslation("cases")
+   const { t } = useTranslation(NS.cases); // no useTranslation("cases")
    ```
 
    Un typo deja de compilar, hay autocompletado, y renombrar es un solo cambio.
@@ -462,7 +484,10 @@ Un **singleton** de Socket.IO, y el token se re-evalúa en cada (re)conexión:
 export const socket = io(SOCKET_URL, {
   transports: ["websocket", "polling"],
   withCredentials: true,
-  auth: (cb) => cb({ token: localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH) ?? undefined }),
+  auth: (cb) =>
+    cb({
+      token: localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH) ?? undefined,
+    }),
 });
 ```
 
@@ -470,8 +495,13 @@ Los nombres de evento y sus payloads se declaran por módulo en `realtime/events
 grupos: los que **emite el servidor** y los que **emite el cliente**.
 
 ```ts
-export const CHAT_EVENTS = { NEW_MESSAGE: "CHAT_NEW_MESSAGE", TYPING: "CHAT_TYPING" } as const;
-export const CHAT_CLIENT_EVENTS = { JOIN_CHANNEL: "join_chat_channel" } as const;
+export const CHAT_EVENTS = {
+  NEW_MESSAGE: "CHAT_NEW_MESSAGE",
+  TYPING: "CHAT_TYPING",
+} as const;
+export const CHAT_CLIENT_EVENTS = {
+  JOIN_CHANNEL: "join_chat_channel",
+} as const;
 ```
 
 **El patrón de consumo:** un hook se suscribe al montar, se desuscribe al desmontar, y ante
@@ -544,15 +574,14 @@ propias → `CacheFirst`. **Nunca se cachea la API ni el socket.**
      /javascript|text\/css/.test(response.headers.get("content-type") ?? "") ? response : null,
    ```
 
-2. **Regla de servidor: `/assets/` nunca cae al fallback de la SPA.** Si el archivo no existe,
-   404. Comprobación de diez segundos:
+2. **Regla de servidor: `/assets/` nunca cae al fallback de la SPA.** Si el archivo no existe, 404. Comprobación de diez segundos:
 
    ```bash
    curl -sI https://tu-dominio/assets/no-existe.js | head -3   # debe ser 404
    ```
 
-El síntoma de no tener ninguna de las dos es *"Failed to load module script: expected a
-JavaScript-or-Wasm module script but the server responded with a MIME type of text/html"* —
+El síntoma de no tener ninguna de las dos es _"Failed to load module script: expected a
+JavaScript-or-Wasm module script but the server responded with a MIME type of text/html"_ —
 pantalla en blanco tras cada deploy, solo para quien ya había visitado la web, y **imposible
 de reproducir en local porque en `dev` el SW está desactivado**.
 
@@ -682,16 +711,16 @@ reverifícala, y anota el resultado de la reverificación.
 
 Por eso el repo separa dos cosas que suelen mezclarse:
 
-| Tipo | Dónde | Qué se hace con ello |
-| --- | --- | --- |
-| **Documentación viva** (`docs/ARCHITECTURE.md`, `ENV.md`, `TESTING.md`, `I18N.md`, `PWA.md`…) | `docs/` | **se reescribe** cuando el sistema cambia |
-| **Registro de sesión** (auditorías, hallazgos, decisiones) | `docs/registro/<YYYY-MM-DD>/<TEMA>.md` | **se acumula**, nunca se reescribe |
+| Tipo                                                                                          | Dónde                                  | Qué se hace con ello                      |
+| --------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------------------- |
+| **Documentación viva** (`docs/ARCHITECTURE.md`, `ENV.md`, `TESTING.md`, `I18N.md`, `PWA.md`…) | `docs/`                                | **se reescribe** cuando el sistema cambia |
+| **Registro de sesión** (auditorías, hallazgos, decisiones)                                    | `docs/registro/<YYYY-MM-DD>/<TEMA>.md` | **se acumula**, nunca se reescribe        |
 
 Cuatro reglas del registro:
 
 1. Documento nuevo = **carpeta nueva** con la fecha de creación, leída del sistema con
    `date +%F` — nunca de memoria (dos días de desfase acabaron arrastrados a 47 archivos).
-2. Cambio sobre un registro existente = fila nueva en su *Registro de cambios*, **en su
+2. Cambio sobre un registro existente = fila nueva en su _Registro de cambios_, **en su
    carpeta**. No se abre carpeta nueva para actualizar algo que ya existe.
 3. **Cabecera obligatoria** con fecha, commit verificado y método. Sin commit, un registro es
    una opinión. Si el hallazgo toca el contrato con el backend, se declaran **los dos** commits.

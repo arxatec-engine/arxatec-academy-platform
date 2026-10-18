@@ -18,7 +18,9 @@ export interface DarkMode {
 export const useDarkMode = (): DarkMode => {
   const mode = useThemeStore(selectThemeMode);
   const setMode = useThemeStore((state) => state.setMode);
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => resolveTheme(mode));
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() =>
+    resolveTheme(mode),
+  );
 
   useEffect(() => {
     const sync = (): void => {

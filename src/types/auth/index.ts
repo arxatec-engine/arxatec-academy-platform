@@ -1,7 +1,12 @@
 export const API_USER_ROLES = ["STUDENT", "ADMIN"] as const;
 export type ApiUserRole = (typeof API_USER_ROLES)[number];
 
-export const API_USER_CITIES = ["LIMA", "AREQUIPA", "TRUJILLO", "OTHER"] as const;
+export const API_USER_CITIES = [
+  "LIMA",
+  "AREQUIPA",
+  "TRUJILLO",
+  "OTHER",
+] as const;
 export type ApiUserCity = (typeof API_USER_CITIES)[number];
 
 export const API_AUTH_PROVIDERS = ["PASSWORD", "GOOGLE"] as const;

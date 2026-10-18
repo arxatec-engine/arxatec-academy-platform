@@ -6,13 +6,13 @@ con el mismo tono; **no se "mejora" el español**.
 
 ## Piezas
 
-| Archivo | Qué es |
-| --- | --- |
-| `namespaces.ts` | `NS` (`common`, `auth`), `NAMESPACES` y `DEFAULT_NS`. Se usa `useTranslation(NS.auth)`, nunca `useTranslation("auth")`. |
-| `resources.ts` | `LANGUAGES`, `DEFAULT_LANGUAGE`, `toLanguage()` y el objeto `resources` que carga los seis JSON. |
-| `i18n.ts` | Única inicialización de i18next. Exporta `i18n`, que consume `<Core>` en el `I18nextProvider`. |
-| `<lang>/auth.json` | Las 7 pantallas de auth más `shared`, `errors` y `validation`. |
-| `<lang>/common.json` | Chrome de la app: tema, idioma, estados, catálogo y pantallas de error. |
+| Archivo              | Qué es                                                                                                                  |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `namespaces.ts`      | `NS` (`common`, `auth`), `NAMESPACES` y `DEFAULT_NS`. Se usa `useTranslation(NS.auth)`, nunca `useTranslation("auth")`. |
+| `resources.ts`       | `LANGUAGES`, `DEFAULT_LANGUAGE`, `toLanguage()` y el objeto `resources` que carga los seis JSON.                        |
+| `i18n.ts`            | Única inicialización de i18next. Exporta `i18n`, que consume `<Core>` en el `I18nextProvider`.                          |
+| `<lang>/auth.json`   | Las 7 pantallas de auth más `shared`, `errors` y `validation`.                                                          |
+| `<lang>/common.json` | Chrome de la app: tema, idioma, estados, catálogo y pantallas de error.                                                 |
 
 ## Claves tipadas
 
@@ -20,8 +20,19 @@ con el mismo tono; **no se "mejora" el español**.
 sale de los JSON de `es` (`resources.ts:41`). Consecuencia comprobada: `t("login.titulo_inexistente")`
 **no compila** (TS2345). Corolario: **no existen claves dinámicas**. Cuando hay que elegir clave
 según una variante (ciudad, modo de tema, tipo de error), se escribe un mapa explícito de literales
-—ver `src/components/shared/theme_selector/index.tsx:17` y `src/components/shared/error_screen/index.tsx:15`—
+—ver `src/components/shared/i18n/index.ts` y `src/components/shared/error_screen/i18n/index.ts`—
 y nunca `t(\`prefijo.${variable}\`)`.
+
+Las claves también se centralizan en un `i18n/index.ts` junto al módulo que las usa, siguiendo el
+patrón del frontend de Lawyer. Los componentes llaman `t(login.title)` o
+`t(checkEmail.description, { email })`; el JSON conserva la ruta y el texto, mientras el código
+consume el nombre semántico del mapa. Los datos interpolados, como `email` o `seconds`, se pasan
+como opciones de `t()` y nunca forman parte de la clave.
+
+Al añadir un texto visible, añade su clave al mapa local del componente o feature y úsala desde ahí.
+Las claves compartidas viven en el mapa del módulo propietario (por ejemplo, `shared`, `errors` y
+`validation` en `src/modules/auth/i18n/index.ts`). Esto conserva el autocompletado y el chequeo de
+TypeScript sin repetir rutas literales por las pantallas, schemas o lógica de feedback.
 
 ## Detección de idioma
 

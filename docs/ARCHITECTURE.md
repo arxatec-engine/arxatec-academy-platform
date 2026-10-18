@@ -1,128 +1,91 @@
-# Arquitectura del frontend — mapa del módulo de autenticación
+# Arquitectura del frontend
 
-Estado: las **7 pantallas** del módulo de login están integradas, registradas en el árbol de rutas
-y recorridas en el navegador (claro y oscuro, es/en/pt). Este documento es el mapa; el porqué de
-cada decisión concreta vive en el `docs/README.md` de su carpeta, que es lo que manda
-(`harness/01_reglas_globales.md` §5).
+## Producto y estructura
 
-## 1. Las capas, de fuera a dentro
+Academy es una SPA de React 19 y TypeScript estricto. Presenta cursos gratuitos de legal tech, lecciones en video o artículo, progreso del estudiante, comentarios y gestión de cuenta. Los cursos pueden consultarse sin sesión; las rutas privadas requieren una cuenta y el backend vuelve a comprobar cada operación.
 
 ```text
-main.tsx  →  <Core>  →  <RouterProvider router>          eager: guards, layouts, pantalla de error
-                          │
-                          ├─ app_routes    /  ·  /revisa-tu-correo
-                          ├─ auth_routes   /ingresar · /crear-cuenta · /recuperar-contrasena
-                          │                /restablecer-contrasena · /verificar-correo · /oauth/callback
-                          └─ error_routes  /sesion-vencida · *
+src/
+├── components/{guards,layout,shared}/
+├── config/env/                 # lectura central de VITE_API_URL
+├── constants/                  # errores y claves del navegador
+├── hooks/                      # sesión, idioma, tema y título
+├── interceptors/               # axiosInstance y axiosPublicInstance
+├── locales/{es,en,pt}/         # common y auth
+├── modules/
+│   ├── auth/                   # registro, login, Google, recuperación y correo
+│   ├── catalog/features/       # catálogo, ficha de curso y lección
+│   ├── progress/               # Mis cursos, inscripción y finalización
+│   ├── comments/               # hilos de lecciones
+│   ├── profile/                # datos, avatar, contraseña y baja
+│   ├── notifications/          # avisos y propuestas de temas
+│   └── admin/                  # contenido, moderación, estudiantes y avisos
+├── routes/                     # rutas centralizadas y carga diferida
+├── services/auth_storage/      # persistencia de sesión y retorno
+├── store/{user,theme}/         # estado mínimo del navegador
+├── types/                      # contratos comunes de API
+└── __tests__/                  # pruebas organizadas junto al módulo
 ```
 
-| Capa | Carpeta | Regla que la sostiene |
-| --- | --- | --- |
-| Rutas como datos | `src/routes` | `ROUTES` + `RouteHelpers` son la fuente única; ningún path se escribe a mano (`03_` §8). |
-| Guards | `src/components/guards` | `<Auth>` exige sesión —y distingue "no hay sesión" de "la petición falló"—; `<Guest>` saca de las pantallas de auth a quien **ya llegó** con sesión. |
-| Capa HTTP | `src/interceptors` | Exactamente dos instancias de axios. Es el único sitio que cierra sesión (401). |
-| Estado remoto | `@tanstack/react-query` | Toda llamada al servidor pasa por `useQuery`/`useMutation`. Cero `fetch`, cero API dentro de `useEffect`. |
-| Estado global | `src/store` | `user` y `theme`, nada más. Lo del servidor no entra aquí. |
-| Dominio | `src/modules/auth` | Lo compartido arriba, una carpeta por pantalla en `features/`. |
+Los directorios opcionales aparecen conforme el módulo los necesita. Una feature agrupa sus páginas, componentes, hooks, servicios, tipos, validación y documentación. Las páginas componen la pantalla; las lecturas y escrituras remotas pasan por hooks de React Query y servicios HTTP.
 
-## 2. El módulo de auth
+## Camino de datos
 
 ```text
-src/modules/auth/
-├─ adapters/            Api* (snake_case) → *UI (camelCase). Un solo punto de traducción.
-├─ keys/                authKeys: me() · verifyEmail(token) · googleExchange(code)
-├─ constants/           AUTH_ENDPOINTS (los 11 del contrato) y los límites de contraseña
-├─ types/               UserUI, SessionUI, MePayload
-├─ services/            me/ (GET /auth/me) · logout/ (POST /auth/logout)
-├─ hooks/               use_logout · use_auth_message
-├─ utils/               redirect_to · messages · auth_error_message · google_authorize
-├─ components/          auth_card · auth_field · auth_form_error · auth_submit_button
-│                       auth_divider · auth_footer_link · auth_note · google_button
-│                       password_input · password_field
-└─ features/            login · register · forgot_password · reset_password
-                        verify_email (dos pantallas) · oauth_callback · session_expired
+ruta → guardia → página → componente → hook de React Query → servicio → interceptor de Axios → API
 ```
 
-**Regla de colocación:** una feature → vive en la feature; dos o más del mismo dominio → sube a
-`modules/auth/`; cruza dominios → `src/components/shared`, `src/hooks`, `src/utilities`. Nunca se
-importa desde dentro de otra feature.
+`src/types/services` define el sobre `Response<T>`. Los servicios comprueban que la respuesta incluya los datos requeridos y devuelven el contenido de `data`; los adaptadores de cada módulo convierten campos del API `snake_case` al formato que presenta la interfaz. La infraestructura normaliza fallos a `ApiError`, con estado, código y descripción. No hay peticiones a la API dentro de JSX ni de `useEffect`.
 
-Lo que la integración subió, y por qué:
+`axiosInstance` adjunta el token del usuario para operaciones autenticadas. `axiosPublicInstance` no adjunta credenciales y evita que una respuesta de acceso público cierre la sesión abierta. Ambas comparten el origen `ENV.API_URL`; los servicios eligen la instancia según el endpoint y el nivel de acceso.
 
-| Pieza | Estaba en | Ahora | Motivo |
-| --- | --- | --- | --- |
-| `password_input` + `password_field` | login, registro y reset, tres copias distintas | `modules/auth/components` | Reset seguía usando `<Input type="password">`, que monta un **segundo** ojo sin nombre accesible. Un solo componente, un solo ojo, `aria-pressed`. |
-| `buildGoogleAuthorizeUrl` / `startGoogleAuthorize` | login y registro, duplicado literal | `modules/auth/utils/google_authorize` | Dos copias del mismo endpoint divergen. |
-| `authErrorMessage` | `verify_email/utils` | `modules/auth/utils/auth_error_message` | Lo necesitaban seis pantallas. |
-| Mapa de `meta.fields` | tres mapas parciales | `modules/auth/utils/messages` | El backend manda claves de i18n **ya montadas**; el mapa a clave tipada tiene que ser uno. |
-| Query keys de verify y de exchange | `features/*/keys` | `modules/auth/keys` | Invalidar desde otra feature deja de ser adivinar (`03_` §6). |
-| Pantalla 07 | `features/check_email` (re-export puente) | `features/verify_email/pages/check_email` | El puente ya no hace falta: la ruta apunta a la pantalla real y la carpeta se borró. |
+React Query administra respuestas remotas. Sus valores predeterminados están en `src/utilities/query`: caché de 30 segundos, sin recarga por cambio de foco y hasta dos reintentos, salvo errores de cliente. Las claves se agrupan por módulo. Las mutaciones invalidan o actualizan las consultas relacionadas.
 
-## 3. Un solo camino para cada cosa
+## Sesión, roles y rutas
 
-**El texto de un error.** `authErrorMessage(error, t)` traduce un `ApiError` a una frase y cubre
-**los 12 `meta.code`** del contrato (§5) con un `Record<ApiErrorCode, clave>`: si el contrato añade
-un código, TypeScript exige la fila. Fuera del mapa quedan solo el fallo de red (`status === 0`) y
-el código sin documentar (5xx → `errors.internal_error`, resto → `errors.unknown`). Los segundos de
-un `429` salen de `meta.retry_after_seconds` o, si el sobre no los trae, de la cabecera
-`Retry-After` que el interceptor también lee (contrato §6); sin ninguna de las dos se usa
-`errors.retry_later`, que no inventa segundos.
+`src/routes/routes.ts` es la fuente única de rutas y helpers. `lazyPage` carga páginas bajo demanda. `Auth` protege Mis cursos, Perfil y la revisión de correo; `Admin` añade la comprobación de rol `ADMIN` para las herramientas de personal. Son controles de navegación, no un límite de seguridad: el servicio valida sesión, permisos, propiedad de datos y reglas de negocio.
 
-**Dónde se pinta.** Lo fija `harness/05_diseno_y_ux.md` §5 y aquí no hay excepciones por pantalla:
+El inicio de sesión acepta correo y contraseña, con opción de recordar la sesión. El formulario de registro solicita nombre, correo y contraseña; el registro y Google crean una sesión. El acceso con contraseña y Google comparten la navegación de la cuenta. Los flujos de verificación de correo y recuperación usan enlaces con token; el correo sin verificar permite ver cursos, pero el backend exige verificación para comentar.
 
-| Caso | Dónde aparece |
-| --- | --- |
-| `INVALID_CREDENTIALS`, `ACCOUNT_USES_GOOGLE`, `VALIDATION_ERROR` sin campo | `auth_form_error` bajo el formulario |
-| `VALIDATION_ERROR` con `meta.fields` | en el campo, con `aria-invalid` y foco al primero |
-| `EMAIL_ALREADY_REGISTERED` | en el campo correo + enlace a iniciar sesión |
-| `TOKEN_INVALID` | pantalla propia de enlace caducado, con la acción para pedir otro |
-| red, `RATE_LIMITED`, `RESEND_COOLDOWN`, `INTERNAL_ERROR` | toast de `sonner`, con el formulario intacto |
-| `SESSION_EXPIRED` | pantalla E7 (la manda el interceptor, no la pantalla) |
+El token y la vista pública del usuario se guardan en `localStorage` cuando se recuerda la sesión y en `sessionStorage` cuando dura solo la pestaña. Axios lee el token al enviar cada solicitud. No se guardan contraseñas. `redirect_to` se valida y conserva en almacenamiento de sesión para volver a la página solicitada después de autenticarse. La expiración de sesión limpia los datos y ofrece una ruta de retorno.
 
-**El destino de retorno.** `modules/auth/utils/redirect_to` es la única puerta para las pantallas;
-solo el interceptor llama a `@/services/auth_storage` directamente, y es deliberado: importar
-`@/modules/auth/**` desde la capa HTTP mete el módulo en el grafo *eager* y rompe el code splitting.
+| Ruta                                                         | Acceso                             | Función                                                                      |
+| ------------------------------------------------------------ | ---------------------------------- | ---------------------------------------------------------------------------- |
+| `/`                                                          | Público                            | Catálogo con búsqueda y filtros de tema y nivel.                             |
+| `/cursos/:slug`                                              | Público                            | Descripción y temario de un curso.                                           |
+| `/cursos/:course_slug/lecciones/:lesson_slug`                | Público con contenido condicionado | Muestra una lección accesible o el estado bloqueado con el temario.          |
+| `/ingresar`                                                  | Invitado                           | Opciones de acceso, incluido Google.                                         |
+| `/ingresar/correo`, `/crear-cuenta`                          | Invitado                           | Login por correo y alta de estudiante.                                       |
+| `/recuperar-contrasena`, `/restablecer-contrasena`           | Invitado/enlace                    | Recuperación y cambio de contraseña.                                         |
+| `/verificar-correo`, `/revisa-tu-correo`                     | Enlace/sesión                      | Confirmación y estado del correo.                                            |
+| `/oauth/callback`                                            | Flujo Google                       | Intercambio del código de un solo uso.                                       |
+| `/mis-cursos`, `/perfil`                                     | Sesión                             | Aprendizaje y cuenta personal.                                               |
+| `/cursos/:slug/examen`                                      | Sesión                             | Examen final de 15 preguntas para obtener el certificado.                    |
+| `/admin/cursos`, `/admin/cursos/:id`, `/admin/lecciones/:id` | Rol ADMIN                          | Crear y mantener cursos y lecciones.                                         |
+| `/admin/comentarios`, `/admin/usuarios`, `/admin/avisos`     | Rol ADMIN                          | Moderar comentarios, consultar estudiantes y gestionar solicitudes de aviso. |
+| `/sesion-vencida` y `*`                                      | Público                            | Sesión cerrada y ruta no encontrada.                                         |
 
-**Quién navega tras iniciar sesión.** La pantalla, no el guard. `<Guest>` mira si había sesión **al
-montar**: quien ya llegó autenticado sale de ahí; quien se autentica estando en la pantalla se
-queda hasta que la propia pantalla navegue. Sin esto, registrarse con un `redirect_to` guardado
-mandaba al usuario a la lección en vez de a `/revisa-tu-correo` — reproducido con el árbol real y
-cubierto por `src/__tests__/routes/router/index.test.tsx`.
+`ROUTES` y `RouteHelpers` son la referencia final si una ruta cambia. Los títulos de las páginas se traducen y se actualizan con `useTitle`, que añade ` - Arxatec Academy`.
 
-## 4. Rutas y carga diferida
+## Experiencia de aprendizaje
 
-Todas las páginas entran con `lazyPage(() => import("ruta/literal"))`. El string literal es lo que
-Vite necesita para crear el chunk. Medido en `pnpm build` de esta integración:
+El catálogo obtiene cursos publicados de `GET /courses`; búsqueda, tema y nivel se conservan en la URL y forman parte de la clave de consulta. La ficha pública presenta temario. El inicio de curso inscribe a un usuario autenticado; una persona visitante puede abrir una muestra y se le ofrece crear cuenta o entrar para continuar. `GET /courses/:course_slug/lessons/:lesson_slug` puede responder con `403 LESSON_LOCKED`; el servicio lo convierte a un estado de contenido bloqueado que conserva el contexto del curso.
 
-| Chunk | Pantalla |
-| --- | --- |
-| `pages-Cr6sZurx.js` (2.2 kB) | catálogo `/` |
-| `pages-DWyC1-mX.js` (6.6 kB) | `/ingresar` |
-| `pages-Bm9JGlrz.js` (90.6 kB) | `/crear-cuenta` — se lleva el `Select` de `arxatec-ui`, que no usa nadie más |
-| `pages-BoQulEG1.js` (5.5 kB) | `/recuperar-contrasena` |
-| `pages-CsLkThXx.js` (7.4 kB) | `/restablecer-contrasena` |
-| `pages-CnD-1MrQ.js` (4.2 kB) | `/verificar-correo` |
-| `check_email-CQOtEXe1.js` (4.4 kB) | `/revisa-tu-correo` |
-| `pages-B0hgQcPO.js` (4.6 kB) | `/oauth/callback` |
-| `pages-AET-cenq.js` (4.4 kB) | `/sesion-vencida` |
+Las lecciones componen video de YouTube/Vimeo, artículo HTML saneado por el backend, transcripción y recursos. Los hilos de comentarios se pueden leer públicamente; el backend limita publicación y respuesta a cuentas con correo verificado. La página Mis cursos muestra cursos en progreso y completados. Una marca de lección invalida su consulta para reflejar el cambio al volver al listado.
 
-El chunk inicial (`index-*.js`, 315 kB) **no** contiene ninguna de las nueve: comprobado buscando
-en él las claves de i18n de cada pantalla (`login.title`, `register.title`, `catalog.title`,
-`session_expired.title`) — cero coincidencias. Ningún barril entra en el grafo eager:
-`src/routes/index.ts` reexporta solo `routes.ts`.
+Completar las lecciones habilita el examen final. El certificado requiere aprobar 15 preguntas,
+con 12 aciertos como mínimo inicial; administración configura las preguntas, opciones, respuesta
+correcta y activación dentro del editor de cada curso. El navegador solo envía versión y
+respuestas elegidas: el servicio corrige, guarda el intento y emite el certificado al aprobar.
 
-## 5. Qué falta y quién lo tiene que dar
+Perfil permite editar datos personales, foto y contraseña en cuentas de contraseña, revisar un resumen y pedir la baja de cuenta. Las respuestas del servidor actualizan el usuario de sesión; la baja vacía la sesión y la caché. El backend decide las validaciones definitivas.
 
-1. **La lista completa de `meta.fields`.** El contrato §5 solo documenta `auth.errors.email_invalid`.
-   `toAuthMessageKey` mapea esa y las `auth.validation.*` que corresponden a campos existentes; el
-   resto cae en `errors.validation_error`. Lo tiene que publicar el equipo de service.
-2. **`Retry-After` expuesta por CORS en el `429 RATE_LIMITED`.** El contrato §6 garantiza la
-   cabecera, y el frontend ya la lee, pero no es CORS-safelisted: hasta que el backend la añada a
-   `Access-Control-Expose-Headers`, el navegador no se la entrega y el texto sigue siendo
-   `errors.retry_later` (`harness/registro/2026-08-20/CORRECCION_REVISION_LOGIN.md`).
-3. **`POST /auth/register` no devuelve `retry_after_seconds`**, así que la pantalla 07 no puede
-   pintar "Reenviar en 45 s" antes del primer clic sin inventarse el número.
-4. **`useLogout` no lo monta ninguna pantalla todavía**: no hay chrome de app con menú de usuario.
-   El catálogo de la fase siguiente debe consumirlo en vez de escribir su propio cierre de sesión.
-5. **Los botones `size="lg"` de `arxatec-ui` miden 36 px**, por debajo de los 44 px recomendados
-   como objetivo táctil. Es la escala de la librería y afecta a todas las pantallas por igual.
+## Internacionalización y presentación
+
+`i18next` ofrece español, inglés y portugués. Español es el idioma predeterminado y la preferencia se conserva en el navegador. Los recursos están divididos en los namespaces `common` y `auth`; TypeScript toma sus claves de los recursos en español y la prueba de recursos comprueba paridad entre idiomas.
+
+La interfaz utiliza Tailwind CSS 4 y `arxatec-ui`. Tema claro, oscuro o del sistema e idioma se controlan desde Mi cuenta → Mi perfil (`/perfil`), con sesión iniciada. La cabecera no incluye estos controles. Las preferencias se conservan en este navegador. `src/index.css` importa el tema del paquete y define estilos de lectura para artículos. `vite.config.ts` adapta las familias tipográficas del CSS del paquete a la tipografía sans de Academy.
+
+## Configuración y límites
+
+`src/config/env` es el único punto que lee variables `import.meta.env`; `VITE_API_URL` es pública y apunta al prefijo `/api/v1`. Vite y los scripts disponibles están descritos en `package.json`. Para el arranque, las pruebas y el build consulta [Entorno](ENV.md) y [Verificación](TESTING.md).

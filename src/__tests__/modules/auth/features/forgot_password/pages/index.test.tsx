@@ -7,7 +7,10 @@ import { ApiError } from "@/interceptors/api_error";
 import { AUTH_ENDPOINTS } from "@/modules/auth/constants";
 import ForgotPasswordPage from "@/modules/auth/features/forgot_password/pages";
 
-import { axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../../mocks/interceptors";
+import {
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../mocks/interceptors";
 import { renderWithProviders } from "../../../../../utils/render_with_providers";
 
 vi.mock("@/interceptors", async () => {
@@ -31,9 +34,10 @@ const successEnvelope = {
   },
 };
 
-const emailField = (): HTMLElement => screen.getByLabelText("Correo");
+const emailField = (): HTMLElement => screen.getByLabelText("Correo electrónico");
 
-const submitButton = (): HTMLElement => screen.getByRole("button", { name: "Enviar el enlace" });
+const submitButton = (): HTMLElement =>
+  screen.getByRole("button", { name: "Enviar el enlace" });
 
 describe("ForgotPasswordPage", () => {
   beforeEach(() => {
@@ -41,16 +45,17 @@ describe("ForgotPasswordPage", () => {
     vi.mocked(toast.error).mockReset();
   });
 
-  it("pinta el formulario de un solo campo y el pie a iniciar sesion", () => {
+  it("pinta el formulario de un solo campo y el regreso a iniciar sesion", () => {
     renderWithProviders(<ForgotPasswordPage />);
 
-    expect(screen.getByRole("heading", { name: "Recupera tu contraseña" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Recupera tu contraseña" }),
+    ).toBeInTheDocument();
     expect(emailField()).toHaveAttribute("type", "email");
     expect(submitButton()).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Volver a iniciar sesión" })).toHaveAttribute(
-      "href",
-      "/ingresar",
-    );
+    expect(
+      screen.getByRole("link", { name: "Volver atrás" }),
+    ).toHaveAttribute("href", "/ingresar");
   });
 
   it("no llama a la API y pide el correo cuando el campo va vacio", async () => {
@@ -73,14 +78,21 @@ describe("ForgotPasswordPage", () => {
     await user.click(submitButton());
 
     expect(
-      await screen.findByText("Si esa cuenta existe, el enlace ya va en camino."),
+      await screen.findByText(
+        "Si esa cuenta existe, el enlace ya va en camino.",
+      ),
     ).toBeInTheDocument();
-    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(AUTH_ENDPOINTS.forgot_password, {
-      email: EMAIL,
-    });
-    expect(screen.queryByLabelText("Correo")).not.toBeInTheDocument();
+    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+      AUTH_ENDPOINTS.forgot_password,
+      {
+        email: EMAIL,
+      },
+    );
+    expect(screen.queryByLabelText("Correo electrónico")).not.toBeInTheDocument();
     expect(screen.queryByText(EMAIL)).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Volver a iniciar sesión" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Volver a iniciar sesión" }),
+    ).toBeInTheDocument();
   });
 
   it("permite volver al formulario con el correo ya escrito", async () => {
@@ -90,9 +102,11 @@ describe("ForgotPasswordPage", () => {
 
     await user.type(emailField(), EMAIL);
     await user.click(submitButton());
-    await user.click(await screen.findByRole("button", { name: "Enviar otro enlace" }));
+    await user.click(
+      await screen.findByRole("button", { name: "Enviar otro enlace" }),
+    );
 
-    expect(await screen.findByLabelText("Correo")).toHaveValue(EMAIL);
+    expect(await screen.findByLabelText("Correo electrónico")).toHaveValue(EMAIL);
   });
 
   it("pinta el 422 en el campo correo y conserva lo escrito", async () => {
@@ -111,7 +125,9 @@ describe("ForgotPasswordPage", () => {
     await user.type(emailField(), EMAIL);
     await user.click(submitButton());
 
-    expect(await screen.findByText("Ese correo no parece válido.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Ese correo no parece válido."),
+    ).toBeInTheDocument();
     expect(emailField()).toHaveValue(EMAIL);
     expect(vi.mocked(toast.error)).not.toHaveBeenCalled();
   });
@@ -138,7 +154,9 @@ describe("ForgotPasswordPage", () => {
       );
     });
     expect(emailField()).toHaveValue(EMAIL);
-    expect(screen.queryByText("Si esa cuenta existe, el enlace ya va en camino.")).toBeNull();
+    expect(
+      screen.queryByText("Si esa cuenta existe, el enlace ya va en camino."),
+    ).toBeNull();
   });
 
   it("cuenta el tiempo de espera cuando el servidor limita los intentos", async () => {
@@ -172,13 +190,17 @@ describe("ForgotPasswordPage", () => {
     await i18n.changeLanguage("pt");
     renderWithProviders(<ForgotPasswordPage />);
 
-    expect(screen.getByRole("heading", { name: "Recupere a sua senha" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Recupere a sua senha" }),
+    ).toBeInTheDocument();
 
     await user.type(screen.getByLabelText("E-mail"), EMAIL);
     await user.click(screen.getByRole("button", { name: "Enviar o link" }));
 
     expect(
-      await screen.findByText("Se essa conta existir, o link já está a caminho."),
+      await screen.findByText(
+        "Se essa conta existir, o link já está a caminho.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -190,7 +212,9 @@ describe("ForgotPasswordPage", () => {
     await user.type(emailField(), `${EMAIL}{Enter}`);
 
     expect(
-      await screen.findByText("Si esa cuenta existe, el enlace ya va en camino."),
+      await screen.findByText(
+        "Si esa cuenta existe, el enlace ya va en camino.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -209,7 +233,9 @@ describe("ForgotPasswordPage", () => {
       expect(confirmation.closest("[tabindex='-1']")).toHaveFocus();
     });
 
-    await user.click(screen.getByRole("button", { name: "Enviar otro enlace" }));
+    await user.click(
+      screen.getByRole("button", { name: "Enviar otro enlace" }),
+    );
 
     await waitFor(() => {
       expect(emailField()).toHaveFocus();
@@ -256,7 +282,9 @@ describe("ForgotPasswordPage", () => {
     await user.type(emailField(), EMAIL);
     await user.click(submitButton());
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Revisa los campos marcados.");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Revisa los campos marcados.",
+    );
     expect(emailField()).toHaveValue(EMAIL);
   });
 
@@ -275,13 +303,17 @@ describe("ForgotPasswordPage", () => {
     await user.type(emailField(), EMAIL);
     await user.click(submitButton());
 
-    const sending = await screen.findByRole("button", { name: "Enviando el enlace" });
+    const sending = await screen.findByRole("button", {
+      name: "Enviando el enlace",
+    });
     expect(sending).toBeDisabled();
     expect(sending).toHaveAttribute("aria-busy", "true");
 
     release();
     expect(
-      await screen.findByText("Si esa cuenta existe, el enlace ya va en camino."),
+      await screen.findByText(
+        "Si esa cuenta existe, el enlace ya va en camino.",
+      ),
     ).toBeInTheDocument();
   });
 });

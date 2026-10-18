@@ -32,12 +32,18 @@ describe("resetPassword", () => {
   it("manda token y contrasena al endpoint del contrato con la instancia publica", async () => {
     axiosPublicInstanceMock.post.mockResolvedValue(envelope);
 
-    const result = await resetPassword({ token: "tok_123", password: "unaClaveLarga" });
-
-    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(AUTH_ENDPOINTS.reset_password, {
+    const result = await resetPassword({
       token: "tok_123",
       password: "unaClaveLarga",
     });
+
+    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+      AUTH_ENDPOINTS.reset_password,
+      {
+        token: "tok_123",
+        password: "unaClaveLarga",
+      },
+    );
     expect(axiosInstanceMock.post).not.toHaveBeenCalled();
     expect(result).toBeUndefined();
   });
@@ -46,8 +52,8 @@ describe("resetPassword", () => {
     const failure = new Error("boom");
     axiosPublicInstanceMock.post.mockRejectedValue(failure);
 
-    await expect(resetPassword({ token: "tok_123", password: "unaClaveLarga" })).rejects.toBe(
-      failure,
-    );
+    await expect(
+      resetPassword({ token: "tok_123", password: "unaClaveLarga" }),
+    ).rejects.toBe(failure);
   });
 });

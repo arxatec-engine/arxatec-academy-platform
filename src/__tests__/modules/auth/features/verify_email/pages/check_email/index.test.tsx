@@ -8,7 +8,10 @@ import { CHECK_EMAIL_STATE_KEY } from "@/modules/auth/constants";
 import CheckEmailPage from "@/modules/auth/features/verify_email/pages/check_email";
 
 import { buildApiUser } from "../../../../../../mocks/fixtures";
-import { axiosInstanceMock, resetInterceptorsMock } from "../../../../../../mocks/interceptors";
+import {
+  axiosInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../../mocks/interceptors";
 import { renderWithProviders } from "../../../../../../utils/render_with_providers";
 
 vi.mock("@/interceptors", async () => {
@@ -55,10 +58,19 @@ describe("pagina /revisa-tu-correo", () => {
   it("pinta el correo del usuario en negrita y las dos acciones", async () => {
     renderWithProviders(<CheckEmailPage />, { user });
 
-    expect(screen.getByRole("heading", { name: "Revisa tu correo" })).toBeInTheDocument();
-    expect(await screen.findByText("maria@estudioqp.pe")).toHaveProperty("tagName", "STRONG");
-    expect(screen.getByRole("link", { name: "Ir al catálogo" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("button", { name: "Reenviar el enlace" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Revisa tu correo" }),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("maria@estudioqp.pe")).toHaveProperty(
+      "tagName",
+      "STRONG",
+    );
+    expect(
+      screen.getByRole("link", { name: "Ir al catálogo" }),
+    ).toHaveAttribute("href", "/");
+    expect(
+      screen.getByRole("button", { name: "Reenviar el enlace" }),
+    ).toBeInTheDocument();
   });
 
   it("reenvia el enlace y arranca la cuenta atras con los segundos del servidor", async () => {
@@ -66,9 +78,13 @@ describe("pagina /revisa-tu-correo", () => {
 
     renderWithProviders(<CheckEmailPage />, { user });
 
-    await userEvent.click(screen.getByRole("button", { name: "Reenviar el enlace" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Reenviar el enlace" }),
+    );
 
-    const button = await screen.findByRole("button", { name: "Reenviar en 45 s" });
+    const button = await screen.findByRole("button", {
+      name: "Reenviar en 45 s",
+    });
     expect(axiosInstanceMock.post).toHaveBeenCalledWith("/auth/email/resend");
     expect(button).toHaveAttribute("aria-disabled", "true");
     expect(toastMock.success).toHaveBeenCalledWith("Te mandamos otro enlace.");
@@ -79,8 +95,12 @@ describe("pagina /revisa-tu-correo", () => {
 
     renderWithProviders(<CheckEmailPage />, { user });
 
-    await userEvent.click(screen.getByRole("button", { name: "Reenviar el enlace" }));
-    const button = await screen.findByRole("button", { name: "Reenviar en 45 s" });
+    await userEvent.click(
+      screen.getByRole("button", { name: "Reenviar el enlace" }),
+    );
+    const button = await screen.findByRole("button", {
+      name: "Reenviar en 45 s",
+    });
     await userEvent.click(button);
 
     expect(axiosInstanceMock.post).toHaveBeenCalledTimes(1);
@@ -99,10 +119,16 @@ describe("pagina /revisa-tu-correo", () => {
 
     renderWithProviders(<CheckEmailPage />, { user });
 
-    await userEvent.click(screen.getByRole("button", { name: "Reenviar el enlace" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Reenviar el enlace" }),
+    );
 
-    expect(await screen.findByRole("button", { name: "Reenviar en 30 s" })).toBeInTheDocument();
-    expect(toastMock.error).toHaveBeenCalledWith("Espera 30 s antes de pedir otro enlace.");
+    expect(
+      await screen.findByRole("button", { name: "Reenviar en 30 s" }),
+    ).toBeInTheDocument();
+    expect(toastMock.error).toHaveBeenCalledWith(
+      "Espera 30 s antes de pedir otro enlace.",
+    );
   });
 
   it("sin correo en la sesion no inventa el parrafo, pero deja pedir el enlace", () => {
@@ -114,7 +140,9 @@ describe("pagina /revisa-tu-correo", () => {
         "Mientras tanto ya puedes ver todos los cursos: la verificación solo hace falta para escribir comentarios.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Reenviar el enlace" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Reenviar el enlace" }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -130,15 +158,18 @@ describe("pantalla 07 en los tres idiomas", () => {
     ["pt", "Veja o seu e-mail"],
   ] as const;
 
-  it.each(titles)("carga %s sin dejar claves crudas a la vista", async (language, title) => {
-    await i18n.changeLanguage(language);
+  it.each(titles)(
+    "carga %s sin dejar claves crudas a la vista",
+    async (language, title) => {
+      await i18n.changeLanguage(language);
 
-    renderWithProviders(<CheckEmailPage />, { user });
+      renderWithProviders(<CheckEmailPage />, { user });
 
-    expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
-    expect(await screen.findByText("maria@estudioqp.pe")).toBeInTheDocument();
-    expect(screen.queryByText(/check_email\./)).not.toBeInTheDocument();
-  });
+      expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
+      expect(await screen.findByText("maria@estudioqp.pe")).toBeInTheDocument();
+      expect(screen.queryByText(/check_email\./)).not.toBeInTheDocument();
+    },
+  );
 });
 
 describe("cuenta atras al llegar desde el registro", () => {
@@ -156,13 +187,33 @@ describe("cuenta atras al llegar desde el registro", () => {
       routeState: { [CHECK_EMAIL_STATE_KEY]: true },
     });
 
-    expect(await screen.findByRole("button", { name: "Reenviar en 45 s" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: "Reenviar en 45 s" }),
+    ).toBeInTheDocument();
     expect(axiosInstanceMock.post).not.toHaveBeenCalled();
   });
 
   it("no bloquea el boton cuando se entra directo a la pantalla", async () => {
-    renderWithProviders(<CheckEmailPage />, { user, route: "/revisa-tu-correo" });
+    renderWithProviders(<CheckEmailPage />, {
+      user,
+      route: "/revisa-tu-correo",
+    });
 
-    expect(await screen.findByRole("button", { name: "Reenviar el enlace" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: "Reenviar el enlace" }),
+    ).toBeInTheDocument();
+  });
+
+  it("explica el fallo de envío inicial y permite reenviar inmediatamente", async () => {
+    renderWithProviders(<CheckEmailPage />, {
+      user,
+      route: "/revisa-tu-correo",
+      routeState: { [CHECK_EMAIL_STATE_KEY]: false },
+    });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "No pudimos enviar el enlace a maria@estudioqp.pe",
+    );
+    expect(screen.getByRole("button", { name: "Reenviar el enlace" })).toBeInTheDocument();
   });
 });

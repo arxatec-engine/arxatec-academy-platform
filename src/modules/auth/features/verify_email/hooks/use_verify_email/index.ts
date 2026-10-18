@@ -1,5 +1,5 @@
 import { skipToken, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { API_ERROR_CODES } from "@/constants/api_error_codes";
@@ -14,7 +14,6 @@ import type { VerifyEmailStatus } from "../../types";
 export interface VerifyEmailState {
   status: VerifyEmailStatus;
   error: unknown;
-  retry: () => void;
 }
 
 export const useVerifyEmail = (): VerifyEmailState => {
@@ -33,7 +32,7 @@ export const useVerifyEmail = (): VerifyEmailState => {
     staleTime: Infinity,
   });
 
-  const { data, error, isFetching, isPending, refetch } = query;
+  const { data, error, isFetching, isPending } = query;
   const isVerified = data !== undefined;
 
   useEffect(() => {
@@ -41,17 +40,14 @@ export const useVerifyEmail = (): VerifyEmailState => {
     void queryClient.invalidateQueries({ queryKey: authKeys.me() });
   }, [isVerified, queryClient]);
 
-  const retry = useCallback(() => {
-    void refetch();
-  }, [refetch]);
-
   const resolveStatus = (): VerifyEmailStatus => {
     if (token === null) return "missing_token";
     if (isPending || isFetching) return "loading";
     if (data !== undefined) return data.alreadyVerified ? "already" : "success";
-    if (isApiError(error) && error.code === API_ERROR_CODES.TOKEN_INVALID) return "expired";
+    if (isApiError(error) && error.code === API_ERROR_CODES.TOKEN_INVALID)
+      return "expired";
     return "failed";
   };
 
-  return { status: resolveStatus(), error, retry };
+  return { status: resolveStatus(), error };
 };

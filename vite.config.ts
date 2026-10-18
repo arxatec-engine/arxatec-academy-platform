@@ -6,7 +6,34 @@ import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [react(), babel({ presets: [reactCompilerPreset()] }), tailwindcss()],
+  plugins: [
+    react(),
+    babel({ presets: [reactCompilerPreset()] }),
+    tailwindcss(),
+  ],
+  css: {
+    postcss: {
+      plugins: [
+        {
+          postcssPlugin: "academy-sans-only",
+          AtRule: {
+            import(rule) {
+              if (rule.params.includes("https://fonts.googleapis.com/"))
+                rule.remove();
+            },
+          },
+          Declaration: {
+            "font-family"(declaration) {
+              const parent = declaration.parent;
+              if (parent?.type !== "atrule" || parent.name !== "font-face") {
+                declaration.value = "var(--font-sans)";
+              }
+            },
+          },
+        },
+      ],
+    },
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
@@ -33,7 +60,12 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reportsDirectory: "./coverage",
-      include: ["src/interceptors/**", "src/utilities/**", "src/services/**", "src/store/**"],
+      include: [
+        "src/interceptors/**",
+        "src/utilities/**",
+        "src/services/**",
+        "src/store/**",
+      ],
       exclude: ["src/**/docs/**"],
     },
   },

@@ -1,14 +1,24 @@
-import { createElement, lazy, Suspense, type ComponentType, type ReactElement } from "react";
+import {
+  createElement,
+  lazy,
+  Suspense,
+  type ComponentType,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 
-import { LoadingScreen } from "@/components/shared/loading_screen";
+import { RouteFallback } from "@/components/shared/route_fallback";
 
 export interface PageModule {
   default: ComponentType;
 }
 
-export const lazyPage = (loader: () => Promise<PageModule>): ReactElement =>
+export const lazyPage = (
+  loader: () => Promise<PageModule>,
+  fallback: ReactNode = createElement(RouteFallback),
+): ReactElement =>
   createElement(
     Suspense,
-    { fallback: createElement(LoadingScreen) },
+    { fallback },
     createElement(lazy(loader)),
   );

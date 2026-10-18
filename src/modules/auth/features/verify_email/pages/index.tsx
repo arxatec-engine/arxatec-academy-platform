@@ -3,21 +3,22 @@ import {
   CircleAlert,
   CircleCheck,
   Link2Off,
-  LoaderCircle,
   MailCheck,
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-
+import { useTitle } from "@/hooks";
+import { errorScreen } from "@/components/shared/error_screen/i18n";
 import { NS } from "@/locales/namespaces";
 import { AuthFooterLink } from "@/modules/auth/components/auth_footer_link";
+import { verifyEmail } from "@/modules/auth/features/verify_email/i18n";
+import { shared } from "@/modules/auth/i18n";
 import { authErrorMessage } from "@/modules/auth/utils/auth_error_message";
 import { rememberReturnPath } from "@/modules/auth/utils/redirect_to";
 import { RouteHelpers } from "@/routes/routes";
 import { selectIsAuthenticated, useUserStore } from "@/store/user";
-
 import { VerificationStateCard } from "../components/verification_state_card";
 import { useVerifyEmail } from "../hooks/use_verify_email";
 
@@ -34,11 +35,14 @@ interface VerifyEmailView {
 const VerifyEmailPage = () => {
   const { t } = useTranslation(NS.auth);
   const { t: tCommon } = useTranslation(NS.common);
-  const { status, error, retry } = useVerifyEmail();
+  const { status, error } = useVerifyEmail();
   const hasSession = useUserStore(selectIsAuthenticated);
 
   const catalogFooter = (
-    <AuthFooterLink label={t("shared.go_to_catalog")} to={RouteHelpers.home()} />
+    <AuthFooterLink
+      label={t(shared.goToCatalog)}
+      to={RouteHelpers.home()}
+    />
   );
 
   const linkAction = (to: string, label: string): ReactNode => (
@@ -62,42 +66,50 @@ const VerifyEmailPage = () => {
   const resolveView = (): VerifyEmailView => {
     if (status === "loading") {
       return {
-        icon: LoaderCircle,
-        iconClassName: "animate-spin",
+        icon: MailCheck,
         busy: true,
-        title: t("verify_email.loading.title"),
-        description: t("verify_email.loading.description"),
+        title: t(verifyEmail.loading.title),
+        description: t(verifyEmail.loading.description),
       };
     }
 
     if (status === "success") {
       return {
         icon: CircleCheck,
-        title: t("verify_email.success.title"),
-        description: t("verify_email.success.description"),
-        action: linkAction(RouteHelpers.home(), t("verify_email.success.action")),
+        title: t(verifyEmail.success.title),
+        description: t(verifyEmail.success.description),
+        action: linkAction(
+          RouteHelpers.home(),
+          t(verifyEmail.success.action),
+        ),
       };
     }
 
     if (status === "already") {
       return {
         icon: MailCheck,
-        title: t("verify_email.already.title"),
-        description: t("verify_email.already.description"),
-        action: linkAction(RouteHelpers.home(), t("verify_email.already.action")),
+        title: t(verifyEmail.already.title),
+        description: t(verifyEmail.already.description),
+        action: linkAction(
+          RouteHelpers.home(),
+          t(verifyEmail.already.action),
+        ),
       };
     }
 
     if (status === "expired") {
       return {
         icon: Link2Off,
-        title: t("verify_email.expired.title"),
+        title: t(verifyEmail.expired.title),
         description: hasSession
-          ? t("verify_email.expired.description")
-          : t("verify_email.expired.signed_out.description"),
+          ? t(verifyEmail.expired.description)
+          : t(verifyEmail.expired.signedOut.description),
         action: hasSession
-          ? linkAction(RouteHelpers.checkEmail(), t("verify_email.expired.action"))
-          : signInAction(t("verify_email.expired.signed_out.action")),
+          ? linkAction(
+              RouteHelpers.checkEmail(),
+              t(verifyEmail.expired.action),
+            )
+          : signInAction(t(verifyEmail.expired.signedOut.action)),
         footer: catalogFooter,
       };
     }
@@ -105,31 +117,30 @@ const VerifyEmailPage = () => {
     if (status === "missing_token") {
       return {
         icon: Link2Off,
-        title: t("verify_email.missing_token.title"),
+        title: t(verifyEmail.missingToken.title),
         description: hasSession
-          ? t("verify_email.missing_token.description")
-          : t("verify_email.missing_token.signed_out.description"),
+          ? t(verifyEmail.missingToken.description)
+          : t(verifyEmail.missingToken.signedOut.description),
         action: hasSession
-          ? linkAction(RouteHelpers.checkEmail(), t("verify_email.missing_token.action"))
-          : signInAction(t("verify_email.missing_token.signed_out.action")),
+          ? linkAction(
+              RouteHelpers.checkEmail(),
+              t(verifyEmail.missingToken.action),
+            )
+          : signInAction(t(verifyEmail.missingToken.signedOut.action)),
         footer: catalogFooter,
       };
     }
 
     return {
       icon: CircleAlert,
-      title: tCommon("errors.unexpected.title"),
+      title: tCommon(errorScreen.copy.unexpected.title),
       description: authErrorMessage(error, t),
-      action: (
-        <Button type="button" size="sm" className="w-full" onClick={retry}>
-          {tCommon("actions.retry")}
-        </Button>
-      ),
       footer: catalogFooter,
     };
   };
 
   const view = resolveView();
+  useTitle(view.title);
 
   return (
     <VerificationStateCard

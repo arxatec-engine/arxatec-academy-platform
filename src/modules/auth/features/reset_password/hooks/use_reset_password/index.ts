@@ -1,4 +1,8 @@
-import { useMutation, useQueryClient, type UseMutateFunction } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  type UseMutateFunction,
+} from "@tanstack/react-query";
 
 import { authKeys } from "@/modules/auth/keys";
 import { useUserStore } from "@/store/user";

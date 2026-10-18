@@ -1,4 +1,9 @@
-import type { ApiAuthProvider, ApiUser, ApiUserCity, ApiUserRole } from "@/types/auth";
+import type {
+  ApiAuthProvider,
+  ApiUser,
+  ApiUserCity,
+  ApiUserRole,
+} from "@/types/auth";
 
 export interface UserUI {
   id: string;

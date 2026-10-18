@@ -1,9 +1,8 @@
-import { Card, CardContent, CardFooter, CardHeader, Isotype } from "arxatec-ui";
 import type { ReactNode } from "react";
-
+import { Header } from "@/modules/auth/components/header";
 import { cn } from "@/utilities/cn";
 
-export interface AuthCardProps {
+interface Props {
   title: string;
   subtitle?: string;
   children?: ReactNode;
@@ -11,22 +10,24 @@ export interface AuthCardProps {
   className?: string;
 }
 
-export const AuthCard = ({ title, subtitle, children, footer, className }: AuthCardProps) => (
-  <Card className={cn("w-full max-w-[420px] gap-5 py-6", className)}>
-    <CardHeader className="flex flex-col items-center gap-2 px-6 text-center">
-      <Isotype className="size-7 text-foreground" />
-      <h1 className="text-xl leading-tight font-medium text-foreground">{title}</h1>
-      {subtitle === undefined ? null : (
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
+export const AuthCard = ({
+  title,
+  subtitle,
+  children,
+  footer,
+  className,
+}: Props) => (
+  <div className={cn("flex w-full flex-col gap-6", className)}>
+    <Header title={title} description={subtitle} />
+    <div>
+      {children === undefined ? null : (
+        <div className="flex flex-col gap-4">{children}</div>
       )}
-    </CardHeader>
-    {children === undefined ? null : (
-      <CardContent className="flex flex-col gap-4 px-6">{children}</CardContent>
-    )}
-    {footer === undefined ? null : (
-      <CardFooter className="justify-center px-6 pt-0 text-sm text-muted-foreground">
-        {footer}
-      </CardFooter>
-    )}
-  </Card>
+      {footer === undefined ? null : (
+        <div className="mt-4 text-center text-sm text-secondary-foreground">
+          {footer}
+        </div>
+      )}
+    </div>
+  </div>
 );

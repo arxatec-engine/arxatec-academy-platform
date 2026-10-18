@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-
+import { useTitle } from "@/hooks";
 import { NS } from "@/locales/namespaces";
 import { AuthCard } from "@/modules/auth/components/auth_card";
 import { AuthFooterLink } from "@/modules/auth/components/auth_footer_link";
+import { resetPassword } from "@/modules/auth/features/reset_password/i18n";
+import { shared } from "@/modules/auth/i18n";
 import { ROUTE_QUERY_PARAM_NAMES, RouteHelpers } from "@/routes/routes";
-
 import { ResetLinkInvalid } from "../components/reset_link_invalid";
 import { ResetPasswordForm } from "../components/reset_password_form";
 import { ResetPasswordSuccess } from "../components/reset_password_success";
@@ -16,6 +17,7 @@ import type { ResetPasswordFormValues } from "../schemas";
 
 const ResetPasswordPage = () => {
   const { t } = useTranslation(NS.auth);
+  useTitle(t(resetPassword.title));
   const [searchParams] = useSearchParams();
   const { submit, isPending, isSuccess, error } = useResetPassword();
   const { describe } = useResetPasswordFeedback();
@@ -41,9 +43,14 @@ const ResetPasswordPage = () => {
 
   return (
     <AuthCard
-      title={t("reset_password.title")}
-      subtitle={t("reset_password.subtitle")}
-      footer={<AuthFooterLink label={t("shared.back_to_login")} to={RouteHelpers.login()} />}
+      title={t(resetPassword.title)}
+      subtitle={t(resetPassword.subtitle)}
+      footer={
+        <AuthFooterLink
+          label={t(shared.backToLogin)}
+          to={RouteHelpers.login()}
+        />
+      }
     >
       <ResetPasswordForm
         isPending={isPending}

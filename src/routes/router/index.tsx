@@ -1,14 +1,14 @@
 import { createBrowserRouter, type RouteObject } from "react-router-dom";
-
-import { ErrorScreen } from "@/components/shared/error_screen";
-
+import { RouteLayout } from "@/components/layout/route_layout";
 import { appRoutes } from "../app_routes";
 import { authRoutes } from "../auth_routes";
+import { RouteErrorBoundary } from "../error_boundary";
 import { errorRoutes } from "../error_routes";
 
 export const routeTree: RouteObject[] = [
   {
-    errorElement: <ErrorScreen kind="unexpected" />,
+    element: <RouteLayout />,
+    errorElement: <RouteErrorBoundary />,
     children: [...appRoutes, ...authRoutes, ...errorRoutes],
   },
 ];

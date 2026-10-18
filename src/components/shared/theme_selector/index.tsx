@@ -1,23 +1,25 @@
-import { Button } from "arxatec-ui";
-import { Monitor, Moon, Sun } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Button, Label, RadioGroup, RadioGroupItem } from "arxatec-ui";
+import { useId } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useDarkMode } from "@/hooks/use_darkmode";
+import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
 import type { ThemeMode } from "@/store/theme";
 import { cn } from "@/utilities/cn";
 
 interface ThemeOption {
   mode: ThemeMode;
-  labelKey: "theme.light" | "theme.dark" | "theme.system";
-  icon: LucideIcon;
+  labelKey:
+    | (typeof UI_TEXT.themes)["light"]
+    | (typeof UI_TEXT.themes)["dark"]
+    | (typeof UI_TEXT.themes)["system"];
 }
 
 const THEME_OPTIONS: readonly ThemeOption[] = [
-  { mode: "light", labelKey: "theme.light", icon: Sun },
-  { mode: "dark", labelKey: "theme.dark", icon: Moon },
-  { mode: "system", labelKey: "theme.system", icon: Monitor },
+  { mode: "light", labelKey: UI_TEXT.themes.light },
+  { mode: "dark", labelKey: UI_TEXT.themes.dark },
+  { mode: "system", labelKey: UI_TEXT.themes.system },
 ];
 
 export interface ThemeSelectorProps {
@@ -25,35 +27,46 @@ export interface ThemeSelectorProps {
 }
 
 export const ThemeSelector = ({ className }: ThemeSelectorProps) => {
+  const id = useId();
   const { t } = useTranslation(NS.common);
   const { mode, setMode } = useDarkMode();
 
   return (
-    <div
-      role="group"
-      aria-label={t("theme.label")}
-      className={cn("flex items-center gap-0.5 rounded-md border border-border p-0.5", className)}
+    <RadioGroup
+      value={mode}
+      orientation="horizontal"
+      onValueChange={(value) => {
+        const option = THEME_OPTIONS.find((entry) => entry.mode === value);
+        if (option) setMode(option.mode);
+      }}
+      aria-label={t(UI_TEXT.theme)}
+      className={cn(
+        "flex min-w-0 max-w-full flex-wrap items-center gap-1",
+        className,
+      )}
     >
       {THEME_OPTIONS.map((option) => {
-        const Icon = option.icon;
-        const isActive = option.mode === mode;
         const label = t(option.labelKey);
 
         return (
           <Button
             key={option.mode}
-            type="button"
-            size="icon"
-            variant={isActive ? "secondary" : "ghost"}
-            aria-pressed={isActive}
-            title={label}
-            onClick={() => setMode(option.mode)}
+            asChild
+            size="sm"
+            variant="outline"
+            className={cn(
+              "text-sm",
+              mode === option.mode &&
+                "border-foreground/40 bg-muted dark:border-foreground/40 dark:bg-muted",
+            )}
           >
-            <Icon aria-hidden="true" className="size-4" />
-            <span className="sr-only">{label}</span>
+            <Label htmlFor={`${id}-${option.mode}`}>
+              <RadioGroupItem id={`${id}-${option.mode}`} value={option.mode} />
+              <span>{label}</span>
+            </Label>
           </Button>
         );
       })}
-    </div>
+    </RadioGroup>
   );
 };

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { AUTH_PASSWORD_MAX_LENGTH } from "@/modules/auth/constants";
+import { validation } from "@/modules/auth/i18n";
 
 const EMAIL_MAX_LENGTH = 254;
 
@@ -10,13 +11,13 @@ export const loginSchema = z.object({
   email: z
     .string()
     .trim()
-    .min(1, { message: "validation.email_required" })
-    .max(EMAIL_MAX_LENGTH, { message: "validation.email_too_long" })
-    .refine(isEmail, { message: "validation.email_invalid" }),
+    .min(1, { message: validation.emailRequired })
+    .max(EMAIL_MAX_LENGTH, { message: validation.emailTooLong })
+    .refine(isEmail, { message: validation.emailInvalid }),
   password: z
     .string()
-    .min(1, { message: "validation.password_required" })
-    .max(AUTH_PASSWORD_MAX_LENGTH, { message: "validation.password_too_long" }),
+    .min(1, { message: validation.passwordRequired })
+    .max(AUTH_PASSWORD_MAX_LENGTH, { message: validation.passwordTooLong }),
   rememberMe: z.boolean(),
 });
 

@@ -1,0 +1,73 @@
+.content {
+  overflow: hidden;
+}
+
+/* The mounted comments panel has no measured Radix height on its first opening. */
+.persistentContent {
+  overflow: hidden;
+}
+
+.persistentGrid {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 220ms ease-out, opacity 220ms ease-out;
+}
+
+.persistentContent[data-state="open"] .persistentGrid {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.persistentClip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.content[data-state="open"] {
+  animation: reveal 220ms ease-out both;
+}
+
+.content[data-state="closed"]:not([hidden]) {
+  animation: conceal 180ms ease-in both;
+}
+
+@keyframes reveal {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes conceal {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .persistentGrid {
+    transition: none;
+  }
+
+  .content[data-state="open"],
+  .content[data-state="closed"]:not([hidden]) {
+    animation: none;
+  }
+
+  .content[data-state="closed"]:not([hidden]) {
+    height: 0;
+    opacity: 0;
+  }
+}

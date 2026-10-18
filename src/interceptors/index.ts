@@ -1,9 +1,16 @@
-import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from "axios";
+import axios, {
+  type AxiosInstance,
+  type InternalAxiosRequestConfig,
+} from "axios";
 
 import { ENV } from "@/config/env";
 import { API_ERROR_CODES, closesSession } from "@/constants/api_error_codes";
 import { RouteHelpers, ROUTES } from "@/routes/routes";
-import { clearAuthSession, readAuthToken, writeRedirectTo } from "@/services/auth_storage";
+import {
+  clearAuthSession,
+  readAuthToken,
+  writeRedirectTo,
+} from "@/services/auth_storage";
 
 import { ApiError, type ApiErrorDetails } from "./api_error";
 
@@ -17,6 +24,7 @@ const MILLISECONDS_PER_SECOND = 1000;
 
 const NO_RETURN_ROUTES: readonly string[] = [
   ROUTES.login,
+  ROUTES.login_email,
   ROUTES.register,
   ROUTES.session_expired,
   ROUTES.oauth_callback,
@@ -45,14 +53,17 @@ const readStringRecord = (value: unknown): Record<string, string> | null => {
 };
 
 const readPositiveNumber = (value: unknown): number | null =>
-  typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
+  typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? value
+    : null;
 
 const readHeader = (headers: unknown, name: string): string | null => {
   if (!isRecord(headers)) return null;
   for (const [key, value] of Object.entries(headers)) {
     if (key.toLowerCase() !== name) continue;
     if (typeof value === "string") return readNonEmptyString(value);
-    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+    if (typeof value === "number" && Number.isFinite(value))
+      return String(value);
   }
   return null;
 };
@@ -61,10 +72,14 @@ const parseRetryAfter = (raw: string | null): number | null => {
   if (raw === null) return null;
   const value = raw.trim();
   const seconds = Number(value);
-  if (value.length > 0 && Number.isFinite(seconds)) return seconds >= 0 ? Math.ceil(seconds) : null;
+  if (value.length > 0 && Number.isFinite(seconds))
+    return seconds >= 0 ? Math.ceil(seconds) : null;
   const deadline = Date.parse(value);
   if (Number.isNaN(deadline)) return null;
-  return Math.max(0, Math.ceil((deadline - Date.now()) / MILLISECONDS_PER_SECOND));
+  return Math.max(
+    0,
+    Math.ceil((deadline - Date.now()) / MILLISECONDS_PER_SECOND),
+  );
 };
 
 const isBlob = (value: unknown): value is Blob =>
@@ -100,6 +115,7 @@ const toDetails = (
     retryAfterSeconds:
       readPositiveNumber(meta.retry_after_seconds) ??
       parseRetryAfter(readHeader(headers, RETRY_AFTER_HEADER)),
+    data: envelope.data,
   };
 };
 
@@ -118,7 +134,9 @@ const closeSessionOnce = (code: string | null): void => {
   hasClosedSession = true;
 
   const location = currentLocation();
-  const isReturnable = !NO_RETURN_ROUTES.some((route) => location.startsWith(route));
+  const isReturnable = !NO_RETURN_ROUTES.some((route) =>
+    location.startsWith(route),
+  );
 
   if (code === API_ERROR_CODES.SESSION_EXPIRED) {
     if (isReturnable) writeRedirectTo(location);
@@ -129,20 +147,32 @@ const closeSessionOnce = (code: string | null): void => {
   window.location.assign(RouteHelpers.login());
 };
 
-const attachAuthorization = (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+const attachAuthorization = (
+  config: InternalAxiosRequestConfig,
+): InternalAxiosRequestConfig => {
   const token = readAuthToken();
   if (token !== null) config.headers.set("Authorization", `Bearer ${token}`);
   else config.headers.delete("Authorization");
   return config;
 };
 
-const normalizeError = async (error: unknown, closeSession: boolean): Promise<never> => {
+const normalizeError = async (
+  error: unknown,
+  closeSession: boolean,
+): Promise<never> => {
   const axiosError = axios.isAxiosError(error) ? error : null;
   const status = axiosError?.response?.status ?? UNKNOWN_STATUS;
   const payload = await resolvePayload(axiosError?.response?.data);
   const fallback =
-    error instanceof Error && error.message.length > 0 ? error.message : FALLBACK_DESCRIPTION;
-  const details = toDetails(status, payload, fallback, axiosError?.response?.headers);
+    error instanceof Error && error.message.length > 0
+      ? error.message
+      : FALLBACK_DESCRIPTION;
+  const details = toDetails(
+    status,
+    payload,
+    fallback,
+    axiosError?.response?.headers,
+  );
 
   if (closeSession && closesSession(details.status, details.code)) {
     closeSessionOnce(details.code);

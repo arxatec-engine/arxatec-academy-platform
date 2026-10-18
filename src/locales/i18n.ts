@@ -5,7 +5,12 @@ import { initReactI18next } from "react-i18next";
 import { LOCAL_STORAGE_KEYS } from "@/constants/local_storage";
 
 import { DEFAULT_NS, NAMESPACES } from "./namespaces";
-import { DEFAULT_LANGUAGE, LANGUAGES, resources, toLanguage } from "./resources";
+import {
+  DEFAULT_LANGUAGE,
+  LANGUAGES,
+  resources,
+  toLanguage,
+} from "./resources";
 
 const syncDocumentLanguage = (language: string): void => {
   if (typeof document === "undefined") return;

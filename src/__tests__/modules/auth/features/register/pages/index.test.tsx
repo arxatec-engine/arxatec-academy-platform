@@ -1,18 +1,20 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { LOCAL_STORAGE_KEYS } from "@/constants/local_storage";
+import { CHECK_EMAIL_STATE_KEY } from "@/modules/auth/constants";
 import { ApiError } from "@/interceptors/api_error";
 import { i18n } from "@/locales/i18n";
 import RegisterPage from "@/modules/auth/features/register/pages";
 import { ROUTES, RouteHelpers } from "@/routes/routes";
 import { useUserStore } from "@/store/user";
-
 import { buildApiSession } from "../../../../../mocks/fixtures";
-import { axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../../mocks/interceptors";
+import {
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../mocks/interceptors";
 import { renderWithProviders } from "../../../../../utils/render_with_providers";
 
 vi.mock("@/interceptors", async () => {
@@ -47,9 +49,10 @@ Element.prototype.hasPointerCapture = function hasPointerCapture(): boolean {
 Element.prototype.setPointerCapture = function setPointerCapture(): void {
   return;
 };
-Element.prototype.releasePointerCapture = function releasePointerCapture(): void {
-  return;
-};
+Element.prototype.releasePointerCapture =
+  function releasePointerCapture(): void {
+    return;
+  };
 
 const envelope = (data: unknown) => ({
   data: {
@@ -72,7 +75,12 @@ const createPendingResponse = (): PendingResponse => {
   const promise = new Promise<unknown>((resolve) => {
     settle = resolve;
   });
-  return { promise, resolve: (value) => { settle(value); } };
+  return {
+    promise,
+    resolve: (value) => {
+      settle(value);
+    },
+  };
 };
 
 const apiError = (
@@ -88,10 +96,16 @@ const apiError = (
     retryAfterSeconds: null,
   });
 
+const CheckEmailDestination = () => {
+  const { state } = useLocation();
+  const sent = state?.[CHECK_EMAIL_STATE_KEY] as boolean | undefined;
+  return <span>revisa tu correo: {String(sent)}</span>;
+};
+
 const tree = (
   <Routes>
     <Route path={ROUTES.register} element={<RegisterPage />} />
-    <Route path={ROUTES.check_email} element={<span>revisa tu correo</span>} />
+    <Route path={ROUTES.check_email} element={<CheckEmailDestination />} />
     <Route path={ROUTES.login} element={<span>inicia sesion</span>} />
   </Routes>
 );
@@ -100,26 +114,14 @@ const renderRegister = () =>
   renderWithProviders(tree, { route: RouteHelpers.register(), user: null });
 
 const fullNameField = () => screen.getByLabelText("Nombre completo");
-const emailField = () => screen.getByLabelText("Correo");
+const emailField = () => screen.getByLabelText("Correo electrónico");
 const passwordField = () => screen.getByLabelText("Contraseña");
-const organizationField = () => screen.getByLabelText("Estudio u organización");
-const independentBox = () =>
-  screen.getByRole("checkbox", { name: "Trabajo de forma independiente" });
-const cityTrigger = () => screen.getByLabelText("Ciudad");
-const submitButton = () => screen.getByRole("button", { name: "Crear cuenta" });
-
-const pickCity = async (user: ReturnType<typeof userEvent.setup>, option: string) => {
-  await user.click(cityTrigger());
-  const listbox = await screen.findByRole("listbox");
-  await user.click(within(listbox).getByRole("option", { name: option }));
-};
+const submitButton = () => screen.getByRole("button", { name: "Registrarse" });
 
 const fillRequiredFields = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.type(fullNameField(), "María Quispe Rojas");
   await user.type(emailField(), "maria@estudioqp.pe");
   await user.type(passwordField(), "unaClaveLarga");
-  await user.type(organizationField(), "Estudio Quispe & Rojas");
-  await pickCity(user, "Lima");
 };
 
 describe("RegisterPage", () => {
@@ -128,116 +130,71 @@ describe("RegisterPage", () => {
     vi.mocked(toast.error).mockReset();
   });
 
-  it("pinta la pantalla 04 con sus textos y sus cinco campos", () => {
+  it("pide solo nombre, correo y contrasena para crear la cuenta", () => {
     renderRegister();
 
-    expect(screen.getByRole("heading", { name: "Crea tu cuenta" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Crear cuenta" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Gratis, sin tarjeta. Al terminar vuelves a la lección que estabas viendo.",
+        "Ingresa tus datos para crear una cuenta en la plataforma, si ya tienes una cuenta, puedes ingresar.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Continuar con Google" })).toBeInTheDocument();
-    expect(screen.getByText("o con tu correo")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Continuar con Google" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("Estudio u organización"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Ciudad")).not.toBeInTheDocument();
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
     expect(fullNameField()).toBeInTheDocument();
     expect(emailField()).toBeInTheDocument();
-    expect(screen.getByText("8 caracteres o más")).toBeInTheDocument();
-    expect(organizationField()).toBeInTheDocument();
-    expect(independentBox()).not.toBeChecked();
-    expect(cityTrigger()).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "Usamos tus datos solo para darte acceso a los cursos y avisarte cuando publicamos uno nuevo.",
-      ),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Inicia sesión" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Ingresar" })).toHaveAttribute(
       "href",
-      RouteHelpers.login(),
+      RouteHelpers.loginEmail(),
     );
-  });
-
-  it("deshabilita y limpia la organizacion al marcar que trabaja de forma independiente", async () => {
-    const user = userEvent.setup();
-    renderRegister();
-
-    await user.type(organizationField(), "Estudio Quispe & Rojas");
-    expect(organizationField()).toHaveValue("Estudio Quispe & Rojas");
-
-    await user.click(independentBox());
-
-    expect(organizationField()).toHaveValue("");
-    expect(organizationField()).toBeDisabled();
-
-    await user.click(independentBox());
-
-    expect(organizationField()).toBeEnabled();
-  });
-
-  it("pide la ciudad escrita a mano solo cuando se elige Otra ciudad", async () => {
-    const user = userEvent.setup();
-    renderRegister();
-
-    expect(screen.queryByLabelText("¿En qué ciudad?")).not.toBeInTheDocument();
-
-    await pickCity(user, "Otra ciudad");
-
-    expect(await screen.findByLabelText("¿En qué ciudad?")).toBeInTheDocument();
-
-    await pickCity(user, "Lima");
-
-    expect(screen.queryByLabelText("¿En qué ciudad?")).not.toBeInTheDocument();
   });
 
   it("manda el contrato en snake_case, guarda la sesion y va a revisar el correo", async () => {
     const user = userEvent.setup();
     const session = buildApiSession();
-    axiosPublicInstanceMock.post.mockResolvedValue(envelope(session));
+    axiosPublicInstanceMock.post.mockResolvedValue(envelope({ ...session, verification_email_sent: true }));
 
     renderRegister();
     await fillRequiredFields(user);
     await user.click(submitButton());
 
     await waitFor(() => {
-      expect(screen.getByText("revisa tu correo")).toBeInTheDocument();
+      expect(screen.getByText("revisa tu correo: true")).toBeInTheDocument();
     });
 
-    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith("/auth/register", {
-      full_name: "María Quispe Rojas",
-      email: "maria@estudioqp.pe",
-      password: "unaClaveLarga",
-      organization: "Estudio Quispe & Rojas",
-      is_independent: false,
-      city: "LIMA",
-      city_other: null,
-    });
-    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBe(session.token);
-    expect(useUserStore.getState().user?.email).toBe(session.user.email);
-  });
-
-  it("manda organization null e incluye city_other cuando toca", async () => {
-    const user = userEvent.setup();
-    axiosPublicInstanceMock.post.mockResolvedValue(envelope(buildApiSession()));
-
-    renderRegister();
-    await user.type(fullNameField(), "María Quispe Rojas");
-    await user.type(emailField(), "maria@estudioqp.pe");
-    await user.type(passwordField(), "unaClaveLarga");
-    await user.click(independentBox());
-    await pickCity(user, "Otra ciudad");
-    await user.type(await screen.findByLabelText("¿En qué ciudad?"), "Cusco");
-    await user.click(submitButton());
-
-    await waitFor(() => {
-      expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith("/auth/register", {
+    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+      "/auth/register",
+      {
         full_name: "María Quispe Rojas",
         email: "maria@estudioqp.pe",
         password: "unaClaveLarga",
-        organization: null,
-        is_independent: true,
-        city: "OTHER",
-        city_other: "Cusco",
-      });
-    });
+      },
+    );
+    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBe(
+      session.token,
+    );
+    expect(useUserStore.getState().user?.email).toBe(session.user.email);
+  });
+
+  it("conserva la sesión y permite reenvío si el correo inicial falla", async () => {
+    const user = userEvent.setup();
+    const session = buildApiSession();
+    axiosPublicInstanceMock.post.mockResolvedValue(envelope({ ...session, verification_email_sent: false }));
+
+    renderRegister();
+    await fillRequiredFields(user);
+    await user.click(submitButton());
+
+    expect(await screen.findByText("revisa tu correo: false")).toBeInTheDocument();
+    expect(useUserStore.getState().user?.email).toBe(session.user.email);
   });
 
   it("valida en el navegador antes de llamar al contrato", async () => {
@@ -246,10 +203,11 @@ describe("RegisterPage", () => {
 
     await user.click(submitButton());
 
-    expect(await screen.findByText("Escribe tu nombre completo.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Escribe tu nombre completo."),
+    ).toBeInTheDocument();
     expect(screen.getByText("Escribe tu correo.")).toBeInTheDocument();
     expect(screen.getByText("Escribe una contraseña.")).toBeInTheDocument();
-    expect(screen.getByText("Elige tu ciudad.")).toBeInTheDocument();
     expect(axiosPublicInstanceMock.post).not.toHaveBeenCalled();
     expect(fullNameField()).toHaveFocus();
   });
@@ -261,32 +219,36 @@ describe("RegisterPage", () => {
     await user.type(fullNameField(), "María Quispe Rojas");
     await user.type(emailField(), "maria@estudioqp.pe");
     await user.type(passwordField(), "corta12");
-    await pickCity(user, "Lima");
     await user.click(submitButton());
 
     expect(await screen.findByText("8 caracteres o más.")).toBeInTheDocument();
 
     const field = passwordField();
     expect(field).toHaveAttribute("aria-invalid", "true");
-    expect(field.getAttribute("aria-describedby")).toContain("register-password-error");
+    expect(field.getAttribute("aria-describedby")).toContain(
+      "register-password-error",
+    );
     expect(axiosPublicInstanceMock.post).not.toHaveBeenCalled();
   });
 
   it("pinta EMAIL_ALREADY_REGISTERED en el campo correo, con enlace a iniciar sesion y sin vaciar el formulario", async () => {
     const user = userEvent.setup();
-    axiosPublicInstanceMock.post.mockRejectedValue(apiError(409, "EMAIL_ALREADY_REGISTERED"));
+    axiosPublicInstanceMock.post.mockRejectedValue(
+      apiError(409, "EMAIL_ALREADY_REGISTERED"),
+    );
 
     renderRegister();
     await fillRequiredFields(user);
     await user.click(submitButton());
 
-    expect(await screen.findByText("Ese correo ya tiene una cuenta.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Ese correo ya tiene una cuenta."),
+    ).toBeInTheDocument();
     expect(emailField()).toHaveAttribute("aria-invalid", "true");
     expect(emailField()).toHaveFocus();
-    expect(screen.getAllByRole("link", { name: "Inicia sesión" })[0]).toHaveAttribute(
-      "href",
-      RouteHelpers.login(),
-    );
+    expect(
+      screen.getAllByRole("link", { name: "Ingresar" })[0],
+    ).toHaveAttribute("href", RouteHelpers.loginEmail());
     expect(toast.error).not.toHaveBeenCalled();
     expect(fullNameField()).toHaveValue("María Quispe Rojas");
     expect(emailField()).toHaveValue("maria@estudioqp.pe");
@@ -303,7 +265,9 @@ describe("RegisterPage", () => {
     await fillRequiredFields(user);
     await user.click(submitButton());
 
-    expect(await screen.findByText("Ese correo no parece válido.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Ese correo no parece válido."),
+    ).toBeInTheDocument();
     expect(toast.error).not.toHaveBeenCalled();
   });
 
@@ -319,11 +283,10 @@ describe("RegisterPage", () => {
       expect(toast.error).toHaveBeenCalled();
     });
 
-    expect(vi.mocked(toast.error).mock.calls[0]?.[0]).toBe(
+    expect(toast.error).toHaveBeenCalledWith(
       "No hay conexión. Revisa tu internet y vuelve a intentarlo.",
     );
     expect(emailField()).toHaveValue("maria@estudioqp.pe");
-    expect(organizationField()).toHaveValue("Estudio Quispe & Rojas");
   });
 
   it("envia con Enter desde el teclado y anuncia la espera", async () => {
@@ -335,54 +298,35 @@ describe("RegisterPage", () => {
     await fillRequiredFields(user);
     await user.type(emailField(), "{Enter}");
 
-    const button = await screen.findByRole("button", { name: "Creando tu cuenta" });
+    const button = await screen.findByRole("button", {
+      name: "Registrando…",
+    });
     expect(button).toHaveAttribute("aria-busy", "true");
     expect(button).toBeDisabled();
 
-    pending.resolve(envelope(buildApiSession()));
+    pending.resolve(envelope({ ...buildApiSession(), verification_email_sent: true }));
 
     await waitFor(() => {
-      expect(screen.getByText("revisa tu correo")).toBeInTheDocument();
+      expect(screen.getByText("revisa tu correo: true")).toBeInTheDocument();
     });
   });
 
-  it("se recorre entero con el teclado, incluida la ciudad", async () => {
+  it("recorre los tres campos y el envio con el teclado", async () => {
     const user = userEvent.setup();
     renderRegister();
 
     await user.tab();
-    expect(screen.getByRole("button", { name: "Continuar con Google" })).toHaveFocus();
-
+    expect(screen.getByRole("link", { name: "Volver atrás" })).toHaveFocus();
     await user.tab();
     expect(fullNameField()).toHaveFocus();
-
     await user.tab();
     expect(emailField()).toHaveFocus();
-
     await user.tab();
     expect(passwordField()).toHaveFocus();
-
     await user.tab();
-    expect(screen.getByRole("button", { name: "Mostrar la contraseña" })).toHaveFocus();
-
-    await user.tab();
-    expect(organizationField()).toHaveFocus();
-
-    await user.tab();
-    expect(independentBox()).toHaveFocus();
-
-    await user.tab();
-    expect(cityTrigger()).toHaveFocus();
-
-    await user.keyboard("{Enter}");
-    await screen.findByRole("listbox");
-    await user.keyboard("{ArrowDown}{Enter}");
-
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
-    });
-    expect(cityTrigger()).toHaveTextContent("Arequipa");
-
+    expect(
+      screen.getByRole("button", { name: "Mostrar la contraseña" }),
+    ).toHaveFocus();
     await user.tab();
     expect(submitButton()).toHaveFocus();
   });
@@ -392,19 +336,24 @@ describe("RegisterPage", () => {
     renderRegister();
 
     await user.type(passwordField(), "unaClaveLarga");
-    expect(passwordField()).toHaveAttribute("type", "password");
+    expect(passwordField()).toHaveProperty("type", "password");
 
-    await user.click(screen.getByRole("button", { name: "Mostrar la contraseña" }));
+    await user.click(
+      screen.getByRole("button", { name: "Mostrar la contraseña" }),
+    );
 
-    expect(passwordField()).toHaveAttribute("type", "text");
-    expect(screen.getByRole("button", { name: "Ocultar la contraseña" })).toBeInTheDocument();
+    expect(passwordField()).toHaveProperty("type", "text");
+    expect(passwordField()).toHaveValue("unaClaveLarga");
+    expect(
+      screen.getByRole("button", { name: "Ocultar la contraseña" }),
+    ).toBeInTheDocument();
   });
 
   it("pinta los tres idiomas sin claves crudas a la vista", async () => {
     for (const [language, title, submit] of [
-      ["es", "Crea tu cuenta", "Crear cuenta"],
-      ["en", "Create your account", "Create account"],
-      ["pt", "Crie a sua conta", "Criar conta"],
+      ["es", "Crear cuenta", "Registrarse"],
+      ["en", "Create account", "Sign up"],
+      ["pt", "Criar conta", "Cadastrar-se"],
     ] as const) {
       await i18n.changeLanguage(language);
       const view = renderRegister();

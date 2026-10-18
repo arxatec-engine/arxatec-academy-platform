@@ -5,29 +5,15 @@ import { Link } from "react-router-dom";
 import { NS } from "@/locales/namespaces";
 import { AuthCard } from "@/modules/auth/components/auth_card";
 import { AuthFooterLink } from "@/modules/auth/components/auth_footer_link";
+import { resetPassword } from "@/modules/auth/features/reset_password/i18n";
+import { shared } from "@/modules/auth/i18n";
 import { RouteHelpers } from "@/routes/routes";
 
 export type ResetLinkInvalidReason = "expired" | "missing_token";
 
-interface ResetLinkInvalidCopy {
-  title: "reset_password.expired.title" | "reset_password.missing_token.title";
-  description:
-    | "reset_password.expired.description"
-    | "reset_password.missing_token.description";
-  action: "reset_password.expired.action" | "reset_password.missing_token.action";
-}
-
-const COPY: Record<ResetLinkInvalidReason, ResetLinkInvalidCopy> = {
-  expired: {
-    title: "reset_password.expired.title",
-    description: "reset_password.expired.description",
-    action: "reset_password.expired.action",
-  },
-  missing_token: {
-    title: "reset_password.missing_token.title",
-    description: "reset_password.missing_token.description",
-    action: "reset_password.missing_token.action",
-  },
+const COPY = {
+  expired: resetPassword.expired,
+  missing_token: resetPassword.missingToken,
 };
 
 export interface ResetLinkInvalidProps {
@@ -42,9 +28,14 @@ export const ResetLinkInvalid = ({ reason }: ResetLinkInvalidProps) => {
     <AuthCard
       title={t(copy.title)}
       subtitle={t(copy.description)}
-      footer={<AuthFooterLink label={t("shared.back_to_login")} to={RouteHelpers.login()} />}
+      footer={
+        <AuthFooterLink
+          label={t(shared.backToLogin)}
+          to={RouteHelpers.login()}
+        />
+      }
     >
-      <div role="status" className="flex flex-col gap-3">
+      <div role="status" className="flex flex-col gap-2">
         <Button asChild size="sm" className="w-full">
           <Link to={RouteHelpers.forgotPassword()}>{t(copy.action)}</Link>
         </Button>

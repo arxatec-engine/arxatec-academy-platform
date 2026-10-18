@@ -6,9 +6,14 @@ import { NS } from "@/locales/namespaces";
 import { AuthFormError } from "@/modules/auth/components/auth_form_error";
 import { AuthSubmitButton } from "@/modules/auth/components/auth_submit_button";
 import { PasswordField } from "@/modules/auth/components/password_field";
+import { resetPassword } from "@/modules/auth/features/reset_password/i18n";
 import { useAuthMessage } from "@/modules/auth/hooks/use_auth_message";
+import { shared } from "@/modules/auth/i18n";
 
-import { resetPasswordSchema, type ResetPasswordFormValues } from "../../schemas";
+import {
+  resetPasswordSchema,
+  type ResetPasswordFormValues,
+} from "../../schemas";
 
 export interface ResetPasswordFormProps {
   isPending: boolean;
@@ -33,11 +38,15 @@ export const ResetPasswordForm = ({
   });
 
   return (
-    <form noValidate className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+    <form
+      noValidate
+      className="flex flex-col gap-2"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <PasswordField
         id="reset-password-new"
-        label={t("shared.fields.new_password.label")}
-        hint={t("shared.fields.new_password.hint")}
+        label={t(shared.fields.newPassword.label)}
+        hint={t(shared.fields.newPassword.hint)}
         autoComplete="new-password"
         autoFocus
         registration={register("password")}
@@ -45,15 +54,15 @@ export const ResetPasswordForm = ({
       />
       <PasswordField
         id="reset-password-confirm"
-        label={t("shared.fields.confirm_password.label")}
+        label={t(shared.fields.confirmPassword.label)}
         autoComplete="new-password"
         registration={register("confirmPassword")}
         error={readMessage(errors.confirmPassword?.message)}
       />
       {errorMessage === null ? null : <AuthFormError message={errorMessage} />}
       <AuthSubmitButton
-        label={t("reset_password.submit")}
-        loadingLabel={t("reset_password.submitting")}
+        label={t(resetPassword.submit)}
+        loadingLabel={t(resetPassword.submitting)}
         loading={isPending}
       />
     </form>

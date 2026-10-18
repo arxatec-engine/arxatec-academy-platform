@@ -15,29 +15,47 @@ export const authRoutes: RouteObject[] = [
         children: [
           {
             path: ROUTES.login,
-            element: lazyPage(() => import("@/modules/auth/features/login/pages")),
+            element: lazyPage(
+              () => import("@/modules/auth/features/login_options/pages"),
+            ),
+          },
+          {
+            path: ROUTES.login_email,
+            element: lazyPage(
+              () => import("@/modules/auth/features/login/pages"),
+            ),
           },
           {
             path: ROUTES.register,
-            element: lazyPage(() => import("@/modules/auth/features/register/pages")),
+            element: lazyPage(
+              () => import("@/modules/auth/features/register/pages"),
+            ),
           },
           {
             path: ROUTES.forgot_password,
-            element: lazyPage(() => import("@/modules/auth/features/forgot_password/pages")),
+            element: lazyPage(
+              () => import("@/modules/auth/features/forgot_password/pages"),
+            ),
           },
         ],
       },
       {
         path: ROUTES.reset_password,
-        element: lazyPage(() => import("@/modules/auth/features/reset_password/pages")),
+        element: lazyPage(
+          () => import("@/modules/auth/features/reset_password/pages"),
+        ),
       },
       {
         path: ROUTES.verify_email,
-        element: lazyPage(() => import("@/modules/auth/features/verify_email/pages")),
+        element: lazyPage(
+          () => import("@/modules/auth/features/verify_email/pages"),
+        ),
       },
       {
         path: ROUTES.oauth_callback,
-        element: lazyPage(() => import("@/modules/auth/features/oauth_callback/pages")),
+        element: lazyPage(
+          () => import("@/modules/auth/features/oauth_callback/pages"),
+        ),
       },
     ],
   },

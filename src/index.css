@@ -4,6 +4,28 @@
 @source "./**/*.{ts,tsx}";
 @source "../node_modules/arxatec-ui/dist/**/*.js";
 
+/* Keep library controls on the same radius as the application's rounded-md. */
+@theme inline {
+  --radius-xs: var(--radius-md);
+  --radius-sm: var(--radius-md);
+  --radius-lg: var(--radius-md);
+  --radius-xl: var(--radius-md);
+  --radius-2xl: var(--radius-md);
+  --radius-3xl: var(--radius-md);
+  --radius-4xl: var(--radius-md);
+}
+
+:root {
+  --font-scale: 1.1;
+}
+
+@layer utilities {
+  .rounded,
+  .rounded-full {
+    border-radius: var(--radius-md);
+  }
+}
+
 @layer base {
   html {
     font-family: var(--font-sans);
@@ -12,8 +34,84 @@
   }
 
   body {
+    @apply text-sm;
     min-height: 100svh;
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+
+  button,
+  input,
+  select,
+  textarea,
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--font-sans);
+  }
+
+  :root {
+    --editor-font-sans: var(--font-sans);
+    --editor-font-mono: var(--font-sans);
+  }
+
+  html {
+    scroll-padding-top: 6rem;
+  }
+}
+
+.academy-article,
+.academy-article :where(*) {
+  @apply font-normal;
+}
+
+.academy-article {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.academy-article :where(h1, h2, h3, h4, h5, h6) {
+  margin-block: 1.5em 0.6em;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-2xl);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.academy-article :where(p, ul, ol, blockquote, pre) {
+  margin-block: 1em;
+}
+
+.academy-article :where(ul, ol) {
+  padding-inline-start: 1.5em;
+}
+
+.academy-article ul {
+  list-style-type: disc;
+}
+
+.academy-article ol {
+  list-style-type: decimal;
+}
+
+.academy-article a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.academy-article :where(pre, blockquote) {
+  border-inline-start: 2px solid var(--color-border);
+  padding-inline-start: 1.25em;
+  color: var(--color-muted-foreground);
+}
+
+.academy-article :where(img, video, iframe) {
+  max-width: 100%;
+}
+
+.academy-article pre {
+  white-space: pre-wrap;
 }

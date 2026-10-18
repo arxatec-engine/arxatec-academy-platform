@@ -3,11 +3,11 @@
 Destino del enlace del correo de recuperación (`04_contrato_api_auth.md` §8). No está en el
 tablero de diseño; sigue el tono y la estructura de las pantallas 04–07 (`05_diseno_y_ux.md` §3).
 
-| Cosa | Dónde |
-| --- | --- |
-| Ruta | `ROUTES.reset_password` · `RouteHelpers.resetPassword(token?)` · árbol `auth_routes`, **sin** `<Guest>` |
-| Página | `pages/index.tsx` (`export default`, la carga `lazyPage`) |
-| Endpoint | `POST /auth/password/reset` (contrato §4, endpoint 6) |
+| Cosa        | Dónde                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------- |
+| Ruta        | `ROUTES.reset_password` · `RouteHelpers.resetPassword(token?)` · árbol `auth_routes`, **sin** `<Guest>`             |
+| Página      | `pages/index.tsx` (`export default`, la carga `lazyPage`)                                                           |
+| Endpoint    | `POST /auth/password/reset` (contrato §4, endpoint 6)                                                               |
 | Claves i18n | `auth.reset_password.*`, `auth.shared.fields.{new_password,confirm_password}`, `auth.validation.*`, `auth.errors.*` |
 
 ## El flujo, de arriba abajo
@@ -89,8 +89,8 @@ clave tipada, para las pantallas que sí lo necesitan, vive en `src/modules/auth
   (`src/modules/auth/components/auth_field/index.tsx:34`).
 - `react-hook-form` mueve el foco al primer campo con error al enviar (`shouldFocusError`, su
   valor por defecto), que es lo que pide `05_diseno_y_ux.md` §3.
-- El ojo de ver/ocultar es un `button type="button"` con `aria-pressed` y su texto en `sr-only`
-  (`src/modules/auth/components/password_input/index.tsx:29`), así que `Tab` lo alcanza y no envía
+- El ojo de ver/ocultar es un `Button type="button"` de `arxatec-ui`, con `aria-pressed` y nombre
+  traducido (`src/components/shared/password_input/index.tsx`), así que `Tab` lo alcanza y no envía
   el formulario.
 - Los dos campos van con `autocomplete="new-password"` (el campo compartido
   `src/modules/auth/components/password_field` lo recibe por prop):
@@ -109,18 +109,18 @@ Ejecutado en esta sesión (2026-08-20, árbol de trabajo sin commit):
 
 Qué cubre cada test, contra la lista de `07_gates.md`:
 
-| Gate | Dónde se comprueba |
-| --- | --- |
-| Los tres idiomas sin claves crudas | `form.test.tsx` recorre `es`/`en`/`pt` y busca `reset_password.` y `shared.fields` en pantalla |
-| Teclado: `Tab` llega al ojo, `Enter` no envía desde él | `form.test.tsx` |
-| Teclado: `Enter` envía desde el campo de confirmación | `form.test.tsx` |
-| Foco al primer campo con error | `form.test.tsx` (`aria-invalid` + `aria-describedby` + `toHaveFocus`) |
-| Estado de carga con su acción bloqueada | `page.test.tsx` (`aria-busy="true"` y `disabled` mientras la promesa está pendiente) |
-| Estado de éxito con su acción | `page.test.tsx` (aviso de sesiones cerradas + enlace a `/ingresar`) |
-| Enlace caducado con su acción | `page.test.tsx` (`TOKEN_INVALID` → enlace a `/recuperar-contrasena`) |
-| Sin token, tratado como enlace inválido | `page.test.tsx` |
-| El formulario no se vacía tras un error | `page.test.tsx` (500 y `status 0` conservan las dos contraseñas) |
-| Un error se cuenta una vez: toast **o** bajo el formulario | `page.test.tsx` (sin conexión → un solo `toast.error`, ningún `role="alert"`) |
+| Gate                                                       | Dónde se comprueba                                                                             |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Los tres idiomas sin claves crudas                         | `form.test.tsx` recorre `es`/`en`/`pt` y busca `reset_password.` y `shared.fields` en pantalla |
+| Teclado: `Tab` llega al ojo, `Enter` no envía desde él     | `form.test.tsx`                                                                                |
+| Teclado: `Enter` envía desde el campo de confirmación      | `form.test.tsx`                                                                                |
+| Foco al primer campo con error                             | `form.test.tsx` (`aria-invalid` + `aria-describedby` + `toHaveFocus`)                          |
+| Estado de carga con su acción bloqueada                    | `page.test.tsx` (`aria-busy="true"` y `disabled` mientras la promesa está pendiente)           |
+| Estado de éxito con su acción                              | `page.test.tsx` (aviso de sesiones cerradas + enlace a `/ingresar`)                            |
+| Enlace caducado con su acción                              | `page.test.tsx` (`TOKEN_INVALID` → enlace a `/recuperar-contrasena`)                           |
+| Sin token, tratado como enlace inválido                    | `page.test.tsx`                                                                                |
+| El formulario no se vacía tras un error                    | `page.test.tsx` (500 y `status 0` conservan las dos contraseñas)                               |
+| Un error se cuenta una vez: toast **o** bajo el formulario | `page.test.tsx` (sin conexión → un solo `toast.error`, ningún `role="alert"`)                  |
 
 Tema claro/oscuro y 360 px **no se comprueban en jsdom**; se sostienen por construcción y por
 revisión del código, no por medición de esta sesión:
@@ -130,10 +130,12 @@ revisión del código, no por medición de esta sesión:
   `text-foreground`, `text-muted-foreground`, `text-destructive` y de los componentes de
   `arxatec-ui`, que ya reaccionan a `.dark`.
 - Tampoco hay `font-serif` ni `Cormorant` (D-008): mismo `grep`, cero coincidencias.
-- Ancho: la tarjeta es `w-full max-w-[420px]` (`src/modules/auth/components/auth_card/index.tsx:15`)
-  dentro de un `main` con `px-4` (`src/components/layout/auth_layout/index.tsx:12`), así que a
-  360 px ocupa 328 px y ningún hijo fija un ancho mínimo mayor.
+- Ancho: la tarjeta es `w-full` dentro del contenedor `max-w-sm` de `AuthLayout`, con
+  `px-4` exterior y `p-4` interior. A 360 px dispone de 328 px sin fijar anchos mínimos mayores.
 
 Una sesión anterior en este mismo árbol de trabajo anotó una revisión manual en el navegador
 (dev en `:5211`) de los dos temas, los tres idiomas y el toast sin conexión. **No se ha
 reproducido aquí**; queda como evidencia de esa sesión, no de esta.
+
+La página declara su título traducido mediante `useTitle` de `@/hooks`; el hook añade
+` - Arxatec Academy` y lo actualiza también al cambiar de idioma.

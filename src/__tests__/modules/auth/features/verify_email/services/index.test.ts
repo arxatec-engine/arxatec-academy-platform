@@ -5,7 +5,11 @@ import {
   verifyEmail,
 } from "@/modules/auth/features/verify_email/services";
 
-import { axiosInstanceMock, axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../../mocks/interceptors";
+import {
+  axiosInstanceMock,
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../mocks/interceptors";
 
 vi.mock("@/interceptors", async () => {
   const module = await import("../../../../../mocks/interceptors");
@@ -34,21 +38,30 @@ describe("servicios de verify_email", () => {
 
     const result = await verifyEmail({ token: "tok_123" });
 
-    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith("/auth/email/verify", {
-      token: "tok_123",
-    });
+    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+      "/auth/email/verify",
+      {
+        token: "tok_123",
+      },
+    );
     expect(axiosInstanceMock.post).not.toHaveBeenCalled();
     expect(result).toEqual({ alreadyVerified: false });
   });
 
   it("trata EMAIL_ALREADY_VERIFIED como exito, no como error", async () => {
-    axiosPublicInstanceMock.post.mockResolvedValue(envelope(undefined, "EMAIL_ALREADY_VERIFIED"));
+    axiosPublicInstanceMock.post.mockResolvedValue(
+      envelope(undefined, "EMAIL_ALREADY_VERIFIED"),
+    );
 
-    await expect(verifyEmail({ token: "tok_123" })).resolves.toEqual({ alreadyVerified: true });
+    await expect(verifyEmail({ token: "tok_123" })).resolves.toEqual({
+      alreadyVerified: true,
+    });
   });
 
   it("reenvia con la instancia autenticada y devuelve los segundos del servidor", async () => {
-    axiosInstanceMock.post.mockResolvedValue(envelope({ retry_after_seconds: 45 }));
+    axiosInstanceMock.post.mockResolvedValue(
+      envelope({ retry_after_seconds: 45 }),
+    );
 
     const result = await resendVerificationEmail();
 
@@ -57,8 +70,12 @@ describe("servicios de verify_email", () => {
   });
 
   it("no se inventa los segundos cuando el sobre no los trae", async () => {
-    axiosInstanceMock.post.mockResolvedValue(envelope({ retry_after_seconds: "45" }));
+    axiosInstanceMock.post.mockResolvedValue(
+      envelope({ retry_after_seconds: "45" }),
+    );
 
-    await expect(resendVerificationEmail()).resolves.toEqual({ retryAfterSeconds: null });
+    await expect(resendVerificationEmail()).resolves.toEqual({
+      retryAfterSeconds: null,
+    });
   });
 });

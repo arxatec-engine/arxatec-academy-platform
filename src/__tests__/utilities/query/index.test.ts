@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { ApiError } from "@/interceptors/api_error";
-import { createQueryClient, QUERY_STALE_TIME, shouldRetryRequest } from "@/utilities/query";
+import {
+  createQueryClient,
+  QUERY_STALE_TIME,
+  shouldRetryRequest,
+} from "@/utilities/query";
 
 const makeApiError = (status: number): ApiError =>
   new ApiError({

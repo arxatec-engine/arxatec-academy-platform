@@ -15,10 +15,13 @@
     "test:unit:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
+    "@dnd-kit/abstract": "^0.5.1",
+    "@dnd-kit/dom": "^0.5.1",
+    "@dnd-kit/react": "^0.5.1",
     "@hookform/resolvers": "^5.9.1",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-query": "^5.101.4",
-    "arxatec-ui": "^0.1.60",
+    "arxatec-ui": "^0.1.72",
     "axios": "^1.19.0",
     "clsx": "^2.1.1",
     "i18next": "^26.3.6",

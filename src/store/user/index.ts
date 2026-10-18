@@ -33,4 +33,5 @@ export const useUserStore = create<UserStore>((set) => ({
 
 export const selectUser = (state: UserStore): ApiUser | null => state.user;
 
-export const selectIsAuthenticated = (state: UserStore): boolean => state.user !== null;
+export const selectIsAuthenticated = (state: UserStore): boolean =>
+  state.user !== null;

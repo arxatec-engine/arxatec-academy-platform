@@ -19,7 +19,6 @@ const DESTINATIONS: Record<SessionCloseTarget, () => string> = {
 
 export interface SessionCloseState {
   close: (target: SessionCloseTarget) => void;
-  retry: () => void;
   pendingTarget: SessionCloseTarget | null;
   error: unknown;
 }
@@ -30,7 +29,9 @@ export const useSessionClose = (): SessionCloseState => {
   const clearUser = useUserStore((state) => state.clearUser);
 
   const mutation = useMutation({
-    mutationFn: async (target: SessionCloseTarget): Promise<SessionCloseOutcome> => {
+    mutationFn: async (
+      target: SessionCloseTarget,
+    ): Promise<SessionCloseOutcome> => {
       const result = await closeExpiredSession();
       return { ...result, target };
     },
@@ -50,9 +51,6 @@ export const useSessionClose = (): SessionCloseState => {
 
   return {
     close,
-    retry: () => {
-      close(mutation.variables ?? SESSION_CLOSE_TARGETS.login);
-    },
     pendingTarget: mutation.isPending ? mutation.variables : null,
     error: mutation.error,
   };

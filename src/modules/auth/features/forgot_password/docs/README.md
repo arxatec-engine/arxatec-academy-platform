@@ -4,12 +4,12 @@ Pantalla 06 del tablero (`harness/05_diseno_y_ux.md` §4). Un solo campo (correo
 ("Enviar el enlace"); al enviar, la pantalla cambia a un estado de confirmación que **no dice si
 el correo existe**.
 
-| Cosa | Dónde |
-| --- | --- |
-| Ruta | `ROUTES.forgot_password` · `RouteHelpers.forgotPassword()` · registrada en `src/routes/auth_routes/index.tsx:25` bajo `<Guest>` |
-| Endpoint | `POST /auth/password/forgot` (`src/modules/auth/constants/index.ts:6`) con `axiosPublicInstance` |
-| Claves i18n | `auth:forgot_password.*` (incluida la sección `sent`), `auth:shared.fields.email.*`, `auth:validation.*`, `auth:errors.*` |
-| Página | `pages/index.tsx`, `export default` (lo exige `lazyPage`) |
+| Cosa        | Dónde                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Ruta        | `ROUTES.forgot_password` · `RouteHelpers.forgotPassword()` · registrada en `src/routes/auth_routes/index.tsx:25` bajo `<Guest>` |
+| Endpoint    | `POST /auth/password/forgot` (`src/modules/auth/constants/index.ts:6`) con `axiosPublicInstance`                                |
+| Claves i18n | `auth:forgot_password.*` (incluida la sección `sent`), `auth:shared.fields.email.*`, `auth:validation.*`, `auth:errors.*`       |
+| Página      | `pages/index.tsx`, `export default` (lo exige `lazyPage`)                                                                       |
 
 ## 1. El flujo
 
@@ -60,14 +60,14 @@ El hook no pinta nada (no hay invalidación que hacer: esto no cachea nada); el 
 feedback (`03_reglas_frontend.md` §6). El reparto está en `components/forgot_password_form/index.tsx:63-93`
 y sigue la tabla de `05_diseno_y_ux.md` §5:
 
-| Caso | `meta.code` | Qué se pinta |
-| --- | --- | --- |
-| Campo vacío o correo mal escrito | — (Zod, antes de salir) | error bajo el campo, `aria-invalid`, foco al campo |
-| `422` con `fields.email` | `VALIDATION_ERROR` | error **en el campo correo** (`:81-83`) |
-| `422` sin campo reconocible | `VALIDATION_ERROR` | error bajo el formulario con `role="alert"` (`:82`) |
-| `429` | `RATE_LIMITED` | toast con los segundos de `retry_after_seconds` (`:74-78`) |
-| `500` / `INTERNAL_ERROR` | `INTERNAL_ERROR` | toast genérico (`:87-90`) |
-| Sin respuesta (status 0) | — | toast de "sin conexión" (`:69-72`) |
+| Caso                             | `meta.code`             | Qué se pinta                                               |
+| -------------------------------- | ----------------------- | ---------------------------------------------------------- |
+| Campo vacío o correo mal escrito | — (Zod, antes de salir) | error bajo el campo, `aria-invalid`, foco al campo         |
+| `422` con `fields.email`         | `VALIDATION_ERROR`      | error **en el campo correo** (`:81-83`)                    |
+| `422` sin campo reconocible      | `VALIDATION_ERROR`      | error bajo el formulario con `role="alert"` (`:82`)        |
+| `429`                            | `RATE_LIMITED`          | toast con los segundos de `retry_after_seconds` (`:74-78`) |
+| `500` / `INTERNAL_ERROR`         | `INTERNAL_ERROR`        | toast genérico (`:87-90`)                                  |
+| Sin respuesta (status 0)         | —                       | toast de "sin conexión" (`:69-72`)                         |
 
 Dos detalles medidos, no de estilo:
 
@@ -111,3 +111,6 @@ Con `pnpm dev --port 5241` y un servidor de respuestas del contrato en `:3099`
 - Estados: carga (botón con spinner, `disabled`, `aria-busy`), error de campo, error global, fallo
   de red (toast + formulario intacto) y confirmación con sus dos acciones.
 - 360 px: sin desbordamiento horizontal (`scrollWidth === clientWidth === 360`).
+
+La página declara su título traducido mediante `useTitle` de `@/hooks`; el hook añade
+` - Arxatec Academy` y lo actualiza también al cambiar de idioma.

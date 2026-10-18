@@ -24,14 +24,20 @@ describe("forgotPasswordSchema", () => {
 
   it("rechaza un correo demasiado largo", () => {
     const local = "a".repeat(FORGOT_PASSWORD_EMAIL_MAX_LENGTH);
-    expect(firstMessage(`${local}@estudioqp.pe`)).toBe("validation.email_too_long");
+    expect(firstMessage(`${local}@estudioqp.pe`)).toBe(
+      "validation.email_too_long",
+    );
   });
 
   it("acepta un correo valido y lo entrega sin espacios", () => {
-    const result = forgotPasswordSchema.safeParse({ email: "  maria@estudioqp.pe  " });
+    const result = forgotPasswordSchema.safeParse({
+      email: "  maria@estudioqp.pe  ",
+    });
 
     expect(result.success).toBe(true);
-    expect(result.success ? result.data.email : null).toBe("maria@estudioqp.pe");
+    expect(result.success ? result.data.email : null).toBe(
+      "maria@estudioqp.pe",
+    );
   });
 
   it("devuelve claves que el traductor compartido del modulo reconoce", () => {

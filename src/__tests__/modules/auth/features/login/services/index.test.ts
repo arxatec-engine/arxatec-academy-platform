@@ -5,7 +5,10 @@ import { AUTH_ENDPOINTS } from "@/modules/auth/constants";
 import { login } from "@/modules/auth/features/login/services";
 
 import { buildApiSession } from "../../../../../mocks/fixtures";
-import { axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../../mocks/interceptors";
+import {
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../mocks/interceptors";
 
 vi.mock("@/interceptors", async () => {
   const module = await import("../../../../../mocks/interceptors");
@@ -40,11 +43,14 @@ describe("login (servicio)", () => {
 
     await login(values);
 
-    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(AUTH_ENDPOINTS.login, {
-      email: "maria@estudioqp.pe",
-      password: "unaClaveLarga",
-      remember_me: true,
-    });
+    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+      AUTH_ENDPOINTS.login,
+      {
+        email: "maria@estudioqp.pe",
+        password: "unaClaveLarga",
+        remember_me: true,
+      },
+    );
   });
 
   it("devuelve data.data, no la respuesta de axios", async () => {

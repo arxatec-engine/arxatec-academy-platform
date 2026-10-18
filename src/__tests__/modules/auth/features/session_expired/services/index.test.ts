@@ -4,7 +4,10 @@ import { LOCAL_STORAGE_KEYS } from "@/constants/local_storage";
 import { ApiError } from "@/interceptors/api_error";
 import { closeExpiredSession } from "@/modules/auth/features/session_expired/services";
 
-import { axiosInstanceMock, resetInterceptorsMock } from "../../../../../mocks/interceptors";
+import {
+  axiosInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../mocks/interceptors";
 
 vi.mock("@/interceptors", async () => {
   const module = await import("../../../../../mocks/interceptors");
@@ -22,7 +25,13 @@ const okEnvelope = {
 };
 
 const apiError = (status: number, code: string): ApiError =>
-  new ApiError({ status, code, description: "fallo", fields: null, retryAfterSeconds: null });
+  new ApiError({
+    status,
+    code,
+    description: "fallo",
+    fields: null,
+    retryAfterSeconds: null,
+  });
 
 describe("closeExpiredSession", () => {
   beforeEach(() => {
@@ -37,7 +46,10 @@ describe("closeExpiredSession", () => {
   });
 
   it("revoca la sesion cuando todavia hay token guardado", async () => {
-    window.localStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH, "test.jwt.token");
+    window.localStorage.setItem(
+      LOCAL_STORAGE_KEYS.TOKEN_AUTH,
+      "test.jwt.token",
+    );
     axiosInstanceMock.post.mockResolvedValue(okEnvelope);
 
     await expect(closeExpiredSession()).resolves.toEqual({ revoked: true });
@@ -45,14 +57,20 @@ describe("closeExpiredSession", () => {
   });
 
   it("trata el 401 como sesion ya cerrada, no como error", async () => {
-    window.sessionStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH, "test.jwt.token");
+    window.sessionStorage.setItem(
+      LOCAL_STORAGE_KEYS.TOKEN_AUTH,
+      "test.jwt.token",
+    );
     axiosInstanceMock.post.mockRejectedValue(apiError(401, "SESSION_EXPIRED"));
 
     await expect(closeExpiredSession()).resolves.toEqual({ revoked: false });
   });
 
-  it("propaga cualquier otro fallo para que la pantalla ofrezca reintentar", async () => {
-    window.localStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH, "test.jwt.token");
+  it("propaga cualquier otro fallo para que la pantalla muestre el error", async () => {
+    window.localStorage.setItem(
+      LOCAL_STORAGE_KEYS.TOKEN_AUTH,
+      "test.jwt.token",
+    );
     axiosInstanceMock.post.mockRejectedValue(apiError(500, "INTERNAL_ERROR"));
 
     await expect(closeExpiredSession()).rejects.toBeInstanceOf(ApiError);

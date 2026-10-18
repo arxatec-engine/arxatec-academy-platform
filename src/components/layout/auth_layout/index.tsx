@@ -1,16 +1,18 @@
+import { Logo } from "arxatec-ui";
 import { Outlet } from "react-router-dom";
+import { useAuthReturnPath } from "@/modules/auth/hooks/use_auth_return_path";
 
-import { LanguageSelector } from "@/components/shared/language_selector";
-import { ThemeSelector } from "@/components/shared/theme_selector";
+export const AuthLayout = () => {
+  useAuthReturnPath();
 
-export const AuthLayout = () => (
-  <div className="flex min-h-svh w-full flex-col bg-background text-foreground">
-    <header className="flex items-center justify-end gap-2 px-4 py-4">
-      <LanguageSelector />
-      <ThemeSelector />
-    </header>
-    <main className="flex flex-1 items-center justify-center px-4 pb-16">
-      <Outlet />
-    </main>
-  </div>
-);
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
+      <div className="w-full max-w-sm">
+        <Logo variant="academy" className="text-foreground h-auto w-52" />
+        <div className="mt-4 flex flex-col gap-4 bg-card border-border border rounded-md p-4">
+          <Outlet />
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -1,4 +1,8 @@
-import { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
+import {
+  AxiosError,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from "axios";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { API_ERROR_CODES } from "@/constants/api_error_codes";
@@ -27,14 +31,28 @@ const failWith = (
   headers: Record<string, string> = {},
 ): void => {
   instance.defaults.adapter = (config: InternalAxiosRequestConfig) => {
-    const response: AxiosResponse = { data, status, statusText: "", headers, config };
+    const response: AxiosResponse = {
+      data,
+      status,
+      statusText: "",
+      headers,
+      config,
+    };
     return Promise.reject(
-      new AxiosError("Request failed", AxiosError.ERR_BAD_REQUEST, config, null, response),
+      new AxiosError(
+        "Request failed",
+        AxiosError.ERR_BAD_REQUEST,
+        config,
+        null,
+        response,
+      ),
     );
   };
 };
 
-const captureApiError = async (request: Promise<unknown>): Promise<ApiError> => {
+const captureApiError = async (
+  request: Promise<unknown>,
+): Promise<ApiError> => {
   try {
     await request;
   } catch (error) {
@@ -60,7 +78,9 @@ describe("axiosPublicInstance", () => {
       }),
     );
 
-    const error = await captureApiError(axiosPublicInstance.post("/auth/login"));
+    const error = await captureApiError(
+      axiosPublicInstance.post("/auth/login"),
+    );
 
     expect(error.status).toBe(422);
     expect(error.code).toBe(API_ERROR_CODES.VALIDATION_ERROR);
@@ -70,11 +90,20 @@ describe("axiosPublicInstance", () => {
 
   it("lee el sobre cuando el error llega como Blob", async () => {
     const body = JSON.stringify(
-      envelope(429, { code: API_ERROR_CODES.RESEND_COOLDOWN, retry_after_seconds: 45 }),
+      envelope(429, {
+        code: API_ERROR_CODES.RESEND_COOLDOWN,
+        retry_after_seconds: 45,
+      }),
     );
-    failWith(axiosPublicInstance, 429, new Blob([body], { type: "application/json" }));
+    failWith(
+      axiosPublicInstance,
+      429,
+      new Blob([body], { type: "application/json" }),
+    );
 
-    const error = await captureApiError(axiosPublicInstance.post("/auth/email/resend"));
+    const error = await captureApiError(
+      axiosPublicInstance.post("/auth/email/resend"),
+    );
 
     expect(error.code).toBe(API_ERROR_CODES.RESEND_COOLDOWN);
     expect(error.retryAfterSeconds).toBe(45);
@@ -88,7 +117,9 @@ describe("axiosPublicInstance", () => {
       { "retry-after": "120" },
     );
 
-    const error = await captureApiError(axiosPublicInstance.post("/auth/login"));
+    const error = await captureApiError(
+      axiosPublicInstance.post("/auth/login"),
+    );
 
     expect(error.code).toBe(API_ERROR_CODES.RATE_LIMITED);
     expect(error.retryAfterSeconds).toBe(120);
@@ -96,20 +127,33 @@ describe("axiosPublicInstance", () => {
 
   it("acepta la fecha HTTP de Retry-After y la traduce a segundos", async () => {
     const deadline = new Date(Date.now() + 90_000).toUTCString();
-    failWith(axiosPublicInstance, 429, envelope(429, { code: API_ERROR_CODES.RATE_LIMITED }), {
-      "Retry-After": deadline,
-    });
+    failWith(
+      axiosPublicInstance,
+      429,
+      envelope(429, { code: API_ERROR_CODES.RATE_LIMITED }),
+      {
+        "Retry-After": deadline,
+      },
+    );
 
-    const error = await captureApiError(axiosPublicInstance.post("/auth/login"));
+    const error = await captureApiError(
+      axiosPublicInstance.post("/auth/login"),
+    );
 
     expect(error.retryAfterSeconds).toBeGreaterThan(0);
     expect(error.retryAfterSeconds).toBeLessThanOrEqual(90);
   });
 
   it("deja la espera en null cuando el 429 llega sin cabecera ni meta", async () => {
-    failWith(axiosPublicInstance, 429, envelope(429, { code: API_ERROR_CODES.RATE_LIMITED }));
+    failWith(
+      axiosPublicInstance,
+      429,
+      envelope(429, { code: API_ERROR_CODES.RATE_LIMITED }),
+    );
 
-    const error = await captureApiError(axiosPublicInstance.post("/auth/login"));
+    const error = await captureApiError(
+      axiosPublicInstance.post("/auth/login"),
+    );
 
     expect(error.retryAfterSeconds).toBeNull();
   });
@@ -118,11 +162,16 @@ describe("axiosPublicInstance", () => {
     failWith(
       axiosPublicInstance,
       429,
-      envelope(429, { code: API_ERROR_CODES.RESEND_COOLDOWN, retry_after_seconds: 45 }),
+      envelope(429, {
+        code: API_ERROR_CODES.RESEND_COOLDOWN,
+        retry_after_seconds: 45,
+      }),
       { "retry-after": "120" },
     );
 
-    const error = await captureApiError(axiosPublicInstance.post("/auth/email/resend"));
+    const error = await captureApiError(
+      axiosPublicInstance.post("/auth/email/resend"),
+    );
 
     expect(error.retryAfterSeconds).toBe(45);
   });
@@ -137,7 +186,9 @@ describe("axiosPublicInstance", () => {
 
     await captureApiError(axiosPublicInstance.post("/auth/login"));
 
-    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBe("un-token");
+    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBe(
+      "un-token",
+    );
   });
 });
 
@@ -155,7 +206,10 @@ describe("axiosInstance", () => {
     const sinToken = await axiosInstance.get("/auth/me");
     expect(sinToken.data).toEqual({ authorization: null });
 
-    window.sessionStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH, "token-de-sesion");
+    window.sessionStorage.setItem(
+      LOCAL_STORAGE_KEYS.TOKEN_AUTH,
+      "token-de-sesion",
+    );
     const conToken = await axiosInstance.get("/auth/me");
     expect(conToken.data).toEqual({ authorization: "Bearer token-de-sesion" });
   });

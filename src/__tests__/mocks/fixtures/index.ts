@@ -16,7 +16,9 @@ export const buildApiUser = (overrides: Partial<ApiUser> = {}): ApiUser => ({
   ...overrides,
 });
 
-export const buildApiSession = (overrides: Partial<ApiSession> = {}): ApiSession => ({
+export const buildApiSession = (
+  overrides: Partial<ApiSession> = {},
+): ApiSession => ({
   token: "test.jwt.token",
   expires_at: "2026-09-19T12:00:00.000Z",
   user: buildApiUser(),

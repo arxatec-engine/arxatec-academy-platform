@@ -1,29 +1,24 @@
 import { useTranslation } from "react-i18next";
-
+import { useTitle } from "@/hooks";
 import { NS } from "@/locales/namespaces";
-import { AuthCard } from "@/modules/auth/components/auth_card";
-import { AuthFooterLink } from "@/modules/auth/components/auth_footer_link";
-import { RouteHelpers } from "@/routes/routes";
-
+import { AuthBackButton } from "@/modules/auth/components/auth_back_button";
+import { Header } from "@/modules/auth/components/header";
+import { register } from "@/modules/auth/features/register/i18n";
 import { RegisterForm } from "../components/register_form";
 
 const RegisterPage = () => {
   const { t } = useTranslation(NS.auth);
+  useTitle(t(register.pageTitle));
 
   return (
-    <AuthCard
-      title={t("register.title")}
-      subtitle={t("register.subtitle")}
-      footer={
-        <AuthFooterLink
-          question={t("register.footer.question")}
-          label={t("register.footer.link")}
-          to={RouteHelpers.login()}
-        />
-      }
-    >
+    <>
+      <AuthBackButton />
+      <Header
+        title={t(register.title)}
+        description={t(register.subtitle)}
+      />
       <RegisterForm />
-    </AuthCard>
+    </>
   );
 };
 

@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
-
+import { PasswordInput } from "@/components/shared/password_input";
 import { AuthField } from "../auth_field";
-import { PasswordInput } from "../password_input";
 
 export type PasswordAutoComplete = "current-password" | "new-password";
 
 export interface PasswordFieldProps {
   id: string;
   label: string;
+  placeholder?: string;
   hint?: string;
   error?: string;
   action?: ReactNode;
@@ -21,6 +21,7 @@ export interface PasswordFieldProps {
 export const PasswordField = ({
   id,
   label,
+  placeholder,
   hint,
   error,
   action,
@@ -32,11 +33,13 @@ export const PasswordField = ({
   <AuthField id={id} label={label} hint={hint} error={error} action={action}>
     {(control) => (
       <PasswordInput
+        size="sm"
         {...registration}
         {...control}
         autoComplete={autoComplete}
         autoFocus={autoFocus}
         disabled={disabled}
+        placeholder={placeholder}
       />
     )}
   </AuthField>

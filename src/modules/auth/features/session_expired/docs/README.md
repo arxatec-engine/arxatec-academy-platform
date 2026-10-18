@@ -4,12 +4,12 @@ Pantalla **E7** del tablero (`harness/05_diseno_y_ux.md` §4). Es la única pant
 que **no pide nada al usuario**: le cuenta por qué se cerró la sesión y le da los dos caminos
 que el brief nombra, "Iniciar sesión" y "Seguir sin cuenta".
 
-| Cosa | Dónde |
-| --- | --- |
-| Ruta | `ROUTES.session_expired` · `RouteHelpers.sessionExpired()` · árbol `error_routes`, **sin guard** |
-| Endpoint | `POST /auth/logout` (contrato §4, endpoint 3), y solo cuando queda algo que revocar |
-| Claves i18n | `auth.session_expired.*`, `auth.errors.*`, `common.actions.retry` |
-| Página | `pages/index.tsx` → `export default SessionExpiredPage` |
+| Cosa        | Dónde                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------ |
+| Ruta        | `ROUTES.session_expired` · `RouteHelpers.sessionExpired()` · árbol `error_routes`, **sin guard** |
+| Endpoint    | `POST /auth/logout` (contrato §4, endpoint 3), y solo cuando queda algo que revocar              |
+| Claves i18n | `auth.session_expired.*`, `auth.errors.*`                                                       |
+| Página      | `pages/index.tsx` → `export default SessionExpiredPage`                                          |
 
 ## Cómo se llega aquí
 
@@ -28,10 +28,10 @@ No lleva guard a propósito: quien llega ya no tiene sesión, y ponerle `<Auth>`
 
 ## Qué hace cada botón
 
-| Botón | Qué pasa | Destino de retorno |
-| --- | --- | --- |
-| **Iniciar sesión** | cierra la sesión (ver abajo) y navega a `/ingresar` | **se conserva**: es la promesa del párrafo ("vuelves a esta misma lección") |
-| **Seguir sin cuenta** | cierra la sesión y navega al catálogo | **se olvida** |
+| Botón                 | Qué pasa                                            | Destino de retorno                                                          |
+| --------------------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
+| **Iniciar sesión**    | cierra la sesión (ver abajo) y navega a `/ingresar` | **se conserva**: es la promesa del párrafo ("vuelves a esta misma lección") |
+| **Seguir sin cuenta** | cierra la sesión y navega al catálogo               | **se olvida**                                                               |
 
 El segundo caso es una decisión, no un olvido: si el usuario elige seguir sin cuenta, dejar
 `redirect_to` en `sessionStorage` haría que un login posterior —quizá media hora después, desde
@@ -65,18 +65,15 @@ que de otro modo parecería un bug de esta feature.
 
 ## Los estados, cada uno con su acción
 
-| Estado | Qué se pinta |
-| --- | --- |
-| Normal | título, párrafo y los dos botones |
-| Cerrando | el botón pulsado con spinner y `aria-busy`, el otro deshabilitado (`components/session_expired_actions`) |
-| Error | `role="alert"` bajo los botones con el mensaje traducido **y el botón "Volver a intentarlo"**; los dos botones vuelven a estar activos |
-| "Vacío" | no hay destino de retorno guardado: la pantalla es la misma y las dos acciones siguen siendo válidas |
+| Estado   | Qué se pinta                                                                                                                           |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Normal   | título, párrafo y los dos botones                                                                                                      |
+| Cerrando | el botón pulsado con spinner y `aria-busy`, el otro deshabilitado (`components/session_expired_actions`)                               |
+| Error    | `role="alert"` bajo los botones con el mensaje traducido; los dos botones vuelven a estar activos                                      |
+| "Vacío"  | no hay destino de retorno guardado: la pantalla es la misma y las dos acciones siguen siendo válidas                                   |
 
-El error **no** se pinta con un toast, y esto se aparta de la fila "Sin conexión / 500" de
-`harness/05_diseno_y_ux.md` §5 a propósito: aquí no hay formulario que conserve lo escrito, la
-pantalla entera son dos botones, y un toast se lleva consigo la acción de reintentar cuando se
-desvanece. La regla que manda es la otra, la del brief: *cada vacío trae la acción siguiente al
-lado*. El mensaje se elige por `meta.code` con `authErrorMessage`
+El error se muestra bajo los dos botones para mantener el mensaje visible mientras se elige
+"Iniciar sesión" o "Seguir sin cuenta". El mensaje se elige por `meta.code` con `authErrorMessage`
 (`src/modules/auth/utils/auth_error_message`), el mismo traductor que usan las otras seis
 pantallas: un `Record<ApiErrorCode, clave>` explícito, porque las claves de i18n están tipadas y
 `t(variable)` no compila.
@@ -98,7 +95,7 @@ el helper del módulo; si no pasa, se descarta en silencio y se usa el que ya hu
 ```text
 session_expired/
 ├─ components/session_expired_actions/   los dos botones, spinner y aria-busy
-├─ components/session_expired_error/     alerta + "Volver a intentarlo"
+├─ components/session_expired_error/     alerta con el mensaje traducido
 ├─ hooks/use_return_path/                ?redirect_to= → sessionStorage (validado)
 ├─ hooks/use_session_close/              useMutation: revoca, limpia, navega
 ├─ schemas/                              zod del destino de retorno
@@ -108,3 +105,6 @@ session_expired/
 ```
 
 Tests en `src/__tests__/modules/auth/features/session_expired/`.
+
+La página declara su título traducido mediante `useTitle` de `@/hooks`; el hook añade
+` - Arxatec Academy` y lo actualiza también al cambiar de idioma.

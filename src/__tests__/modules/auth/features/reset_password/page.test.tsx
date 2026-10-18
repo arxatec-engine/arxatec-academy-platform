@@ -10,7 +10,10 @@ import { RouteHelpers } from "@/routes/routes";
 import { useUserStore } from "@/store/user";
 
 import { buildApiUser } from "../../../../mocks/fixtures";
-import { axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../mocks/interceptors";
+import {
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../mocks/interceptors";
 import { renderWithProviders } from "../../../../utils/render_with_providers";
 
 vi.mock("@/interceptors", async () => {
@@ -47,7 +50,9 @@ const fillForm = async (password: string, confirmation: string) => {
   const user = userEvent.setup();
   await user.type(screen.getByLabelText("Nueva contraseña"), password);
   await user.type(screen.getByLabelText("Repite la contraseña"), confirmation);
-  await user.click(screen.getByRole("button", { name: "Guardar la contraseña" }));
+  await user.click(
+    screen.getByRole("button", { name: "Guardar la contraseña" }),
+  );
   return user;
 };
 
@@ -58,14 +63,19 @@ describe("ResetPasswordPage", () => {
   });
 
   it("trata la falta de token como enlace invalido y ofrece pedir otro", () => {
-    renderWithProviders(<ResetPasswordPage />, { route: RouteHelpers.resetPassword() });
+    renderWithProviders(<ResetPasswordPage />, {
+      route: RouteHelpers.resetPassword(),
+    });
 
-    expect(screen.getByRole("heading", { name: "Falta el enlace" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Pedir otro enlace" })).toHaveAttribute(
-      "href",
-      RouteHelpers.forgotPassword(),
-    );
-    expect(screen.queryByRole("button", { name: "Guardar la contraseña" })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Falta el enlace" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Pedir otro enlace" }),
+    ).toHaveAttribute("href", RouteHelpers.forgotPassword());
+    expect(
+      screen.queryByRole("button", { name: "Guardar la contraseña" }),
+    ).not.toBeInTheDocument();
   });
 
   it("no llama a la API si la contrasena es corta o no coincide", async () => {
@@ -74,7 +84,9 @@ describe("ResetPasswordPage", () => {
     await fillForm("corta", "distinta");
 
     expect(await screen.findByText("8 caracteres o más.")).toBeInTheDocument();
-    expect(screen.getByText("Las dos contraseñas no coinciden.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Las dos contraseñas no coinciden."),
+    ).toBeInTheDocument();
     expect(axiosPublicInstanceMock.post).not.toHaveBeenCalled();
   });
 
@@ -87,16 +99,20 @@ describe("ResetPasswordPage", () => {
 
     await fillForm("unaClaveLarga", "unaClaveLarga");
 
-    expect(await screen.findByRole("heading", { name: "Contraseña cambiada" })).toBeInTheDocument();
-    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith("/auth/password/reset", {
-      token: "tok_123",
-      password: "unaClaveLarga",
-    });
-    expect(screen.getByText(/Cerramos las demás sesiones/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Iniciar sesión" })).toHaveAttribute(
-      "href",
-      RouteHelpers.login(),
+    expect(
+      await screen.findByRole("heading", { name: "Contraseña cambiada" }),
+    ).toBeInTheDocument();
+    expect(axiosPublicInstanceMock.post).toHaveBeenCalledWith(
+      "/auth/password/reset",
+      {
+        token: "tok_123",
+        password: "unaClaveLarga",
+      },
     );
+    expect(screen.getByText(/Cerramos las demás sesiones/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Iniciar sesión" }),
+    ).toHaveAttribute("href", RouteHelpers.login());
     expect(useUserStore.getState().user).toBeNull();
   });
 
@@ -111,10 +127,9 @@ describe("ResetPasswordPage", () => {
     expect(
       await screen.findByRole("heading", { name: "Ese enlace ya no sirve" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Pedir otro enlace" })).toHaveAttribute(
-      "href",
-      RouteHelpers.forgotPassword(),
-    );
+    expect(
+      screen.getByRole("link", { name: "Pedir otro enlace" }),
+    ).toHaveAttribute("href", RouteHelpers.forgotPassword());
   });
 
   it("conserva lo escrito cuando el servidor falla", async () => {
@@ -128,8 +143,12 @@ describe("ResetPasswordPage", () => {
     await waitFor(() => {
       expect(axiosPublicInstanceMock.post).toHaveBeenCalledTimes(1);
     });
-    expect(screen.getByLabelText("Nueva contraseña")).toHaveValue("unaClaveLarga");
-    expect(screen.getByLabelText("Repite la contraseña")).toHaveValue("unaClaveLarga");
+    expect(screen.getByLabelText("Nueva contraseña")).toHaveValue(
+      "unaClaveLarga",
+    );
+    expect(screen.getByLabelText("Repite la contraseña")).toHaveValue(
+      "unaClaveLarga",
+    );
   });
 
   it("deshabilita el boton y anuncia aria-busy mientras envia", async () => {
@@ -148,7 +167,9 @@ describe("ResetPasswordPage", () => {
     expect(button).toBeDisabled();
 
     release();
-    expect(await screen.findByRole("heading", { name: "Contraseña cambiada" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Contraseña cambiada" }),
+    ).toBeInTheDocument();
   });
 
   it("avisa con un toast cuando no hay conexion y no lo repite bajo el formulario", async () => {
@@ -164,7 +185,9 @@ describe("ResetPasswordPage", () => {
     });
     expect(toast.error).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(screen.getByLabelText("Nueva contraseña")).toHaveValue("unaClaveLarga");
+    expect(screen.getByLabelText("Nueva contraseña")).toHaveValue(
+      "unaClaveLarga",
+    );
   });
 
   it("pinta el error bajo el formulario cuando el backend rechaza la entrada", async () => {
@@ -175,7 +198,11 @@ describe("ResetPasswordPage", () => {
 
     await fillForm("unaClaveLarga", "unaClaveLarga");
 
-    expect(await screen.findByText("Revisa los campos marcados.")).toBeInTheDocument();
-    expect(screen.getByLabelText("Nueva contraseña")).toHaveValue("unaClaveLarga");
+    expect(
+      await screen.findByText("Revisa los campos marcados."),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Nueva contraseña")).toHaveValue(
+      "unaClaveLarga",
+    );
   });
 });

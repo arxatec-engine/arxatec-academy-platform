@@ -3,7 +3,8 @@ export const SESSION_CLOSE_TARGETS = {
   catalog: "catalog",
 } as const;
 
-export type SessionCloseTarget = (typeof SESSION_CLOSE_TARGETS)[keyof typeof SESSION_CLOSE_TARGETS];
+export type SessionCloseTarget =
+  (typeof SESSION_CLOSE_TARGETS)[keyof typeof SESSION_CLOSE_TARGETS];
 
 export interface SessionCloseResult {
   revoked: boolean;

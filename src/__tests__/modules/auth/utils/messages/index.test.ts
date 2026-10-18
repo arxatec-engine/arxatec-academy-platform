@@ -27,14 +27,18 @@ describe("claves de mensaje del modulo de auth", () => {
   });
 
   it("traduce las claves que el backend manda en meta.fields", () => {
-    expect(toAuthMessageKey("auth.errors.email_invalid")).toBe("errors.email_invalid");
+    expect(toAuthMessageKey("auth.errors.email_invalid")).toBe(
+      "errors.email_invalid",
+    );
     expect(toAuthMessageKey("auth.validation.password_required")).toBe(
       "validation.password_required",
     );
   });
 
   it("cae en el aviso generico cuando el backend manda una clave sin documentar", () => {
-    expect(toAuthMessageKey("auth.errors.todavia_no_documentado")).toBe("errors.validation_error");
+    expect(toAuthMessageKey("auth.errors.todavia_no_documentado")).toBe(
+      "errors.validation_error",
+    );
     expect(isAuthMessageKey(toAuthMessageKey("lo que sea"))).toBe(true);
   });
 });

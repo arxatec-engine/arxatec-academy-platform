@@ -3,10 +3,10 @@
 Una sola feature cubre las **dos** rutas de la verificación de correo, porque comparten el
 endpoint de reenvío, los estados y la tarjeta:
 
-| Ruta | Página | Guard | Endpoint |
-| --- | --- | --- | --- |
-| `/revisa-tu-correo` (pantalla 07 del tablero) | `pages/check_email/index.tsx` | `<Auth>` | `POST /auth/email/resend` (Bearer) |
-| `/verificar-correo?token=…` (destino del enlace) | `pages/index.tsx` | sin guard | `POST /auth/email/verify` (pública) |
+| Ruta                                             | Página                        | Guard     | Endpoint                            |
+| ------------------------------------------------ | ----------------------------- | --------- | ----------------------------------- |
+| `/revisa-tu-correo` (pantalla 07 del tablero)    | `pages/check_email/index.tsx` | `<Auth>`  | `POST /auth/email/resend` (Bearer)  |
+| `/verificar-correo?token=…` (destino del enlace) | `pages/index.tsx`             | sin guard | `POST /auth/email/verify` (pública) |
 
 Registro en el árbol (lo hace el integrador):
 
@@ -43,14 +43,14 @@ puede ver un fallo**: no hizo nada mal.
 `hooks/use_verify_email/index.ts:48` resuelve seis estados y `pages/index.tsx:62` les pone
 icono, texto y **acción** — ningún estado se entrega sin la suya (`harness/05_diseno_y_ux.md` §5):
 
-| Estado | Cuándo | Acción al lado (con sesión) | Acción al lado (sin sesión) |
-| --- | --- | --- | --- |
-| `loading` | la petición está en vuelo | — (spinner + `aria-busy`) | ídem |
-| `success` | 200 sin `meta.code` | Ir al catálogo | ídem |
-| `already` | 200 con `EMAIL_ALREADY_VERIFIED` | Ir al catálogo | ídem |
-| `expired` | `400 TOKEN_INVALID` (`hooks/use_verify_email/index.ts:52`) | Reenviar el enlace → `/revisa-tu-correo` | Iniciar sesión → `/ingresar` |
-| `missing_token` | la URL llegó sin `?token=` o recortada | Reenviar el enlace → `/revisa-tu-correo` | Iniciar sesión → `/ingresar` |
-| `failed` | red caída, 500, cualquier otro código | Volver a intentarlo (`refetch`) | ídem |
+| Estado          | Cuándo                                                     | Acción al lado (con sesión)              | Acción al lado (sin sesión)  |
+| --------------- | ---------------------------------------------------------- | ---------------------------------------- | ---------------------------- |
+| `loading`       | la petición está en vuelo                                  | — (`Skeleton` + `aria-busy`)             | ídem                         |
+| `success`       | 200 sin `meta.code`                                        | Ir al catálogo                           | ídem                         |
+| `already`       | 200 con `EMAIL_ALREADY_VERIFIED`                           | Ir al catálogo                           | ídem                         |
+| `expired`       | `400 TOKEN_INVALID` (`hooks/use_verify_email/index.ts:52`) | Reenviar el enlace → `/revisa-tu-correo` | Iniciar sesión → `/ingresar` |
+| `missing_token` | la URL llegó sin `?token=` o recortada                     | Reenviar el enlace → `/revisa-tu-correo` | Iniciar sesión → `/ingresar` |
+| `failed`        | red caída, 500, cualquier otro código                      | Ir al catálogo                           | ídem                         |
 
 ### Por qué la acción cambia cuando no hay sesión
 
@@ -90,11 +90,11 @@ respuesta:
   recoge la cabecera `Retry-After` del `429 RATE_LIMITED` (contrato §6), que es el otro tope de este
   endpoint: 5 reenvíos por hora.
 
-Corolario que se ve al llegar de `/crear-cuenta`: el botón arranca en "Reenviar el enlace", no en
-"Reenviar en 45 s", porque en ese momento el cliente no tiene ningún número del servidor. El
-primer clic puede responder `429`, y ahí sí aparece la cuenta atrás con los segundos reales que
-faltan. Pintar 45 de entrada sería adivinar, y adivinaría mal en cuanto el usuario recargue la
-pantalla a los 40 segundos.
+Al llegar de `/crear-cuenta`, el registro entrega `verification_email_sent`. Si salió el correo,
+el botón arranca con los 45 s de `AUTH_RESEND_COOLDOWN_SECONDS`, en línea con la política del
+backend. Si falló, la pantalla lo dice y permite reintentar inmediatamente; el token fallido ya
+fue invalidado en el servidor. Al entrar directamente a la ruta, el botón también queda listo.
+Si el servidor responde `429`, el hook usa los segundos reales de `meta.retry_after_seconds`.
 
 `useCountdown` cuenta contra una **marca de tiempo**, no restando uno por segundo
 (`hooks/use_countdown/index.ts:6`). Con un `setTimeout` encadenado, una pestaña dormida o un
@@ -129,13 +129,13 @@ se traducen en `utils/auth_error_message/index.ts`, que ramifica por `meta.code`
 Hecha en Chrome contra `pnpm dev` con un stub local de la API (el backend real todavía responde
 `404 NOT_FOUND` en `/auth/*`), sesión sembrada en `localStorage` para pasar el guard `<Auth>`:
 
-| Gate | Resultado |
-| --- | --- |
-| Tema claro y oscuro | las dos pantallas correctas en ambos; ningún color fuera de los tokens |
-| Teclado | `Tab` llega a los dos botones, `Enter` dispara el reenvío y el foco (anillo de 3 px) **se queda** en el botón al bloquearse |
-| es · en · pt | las dos pantallas traducidas enteras, sin claves crudas; el correo sigue en negrita en los tres |
-| Estados | `success`, `already`, `expired` y `missing_token` pintados con su acción; el `429` reinicia la cuenta atrás |
-| 360 px | sin scroll horizontal (`scrollWidth === clientWidth`), la tarjeta baja a ancho completo |
+| Gate                | Resultado                                                                                                                   |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Tema claro y oscuro | las dos pantallas correctas en ambos; ningún color fuera de los tokens                                                      |
+| Teclado             | `Tab` llega a los dos botones, `Enter` dispara el reenvío y el foco (anillo de 3 px) **se queda** en el botón al bloquearse |
+| es · en · pt        | las dos pantallas traducidas enteras, sin claves crudas; el correo sigue en negrita en los tres                             |
+| Estados             | `success`, `already`, `expired` y `missing_token` pintados con su acción; el `429` reinicia la cuenta atrás                 |
+| 360 px              | sin scroll horizontal (`scrollWidth === clientWidth`), la tarjeta baja a ancho completo                                     |
 
 Medido en el registro de red: tres clics seguidos en "Reenviar" durante la cuenta atrás producen
 **un solo** `POST /auth/email/resend`.
@@ -148,12 +148,12 @@ solo consigue que lo pulse y reciba un `429`.
 
 Cómo se resuelve, en cuatro piezas:
 
-| Pieza | Qué hace |
-| --- | --- |
-| `register_form/index.tsx` | navega con `state: { [CHECK_EMAIL_STATE_KEY]: true }` |
-| `pages/check_email/index.tsx` | lee ese estado y pasa `initialCooldownSeconds` |
+| Pieza                                 | Qué hace                                                            |
+| ------------------------------------- | ------------------------------------------------------------------- |
+| `register_form/index.tsx`             | navega con `state: { [CHECK_EMAIL_STATE_KEY]: true }`               |
+| `pages/check_email/index.tsx`         | lee ese estado y pasa `initialCooldownSeconds`                      |
 | `hooks/use_resend_verification_email` | arranca la cuenta atrás **una sola vez**, con un `useRef` de guarda |
-| `constants/index.ts` | `AUTH_RESEND_COOLDOWN_SECONDS = 45` |
+| `constants/index.ts`                  | `AUTH_RESEND_COOLDOWN_SECONDS = 45`                                 |
 
 **Por qué el estado de navegación y no arrancar siempre al montar.** Si la cuenta atrás
 arrancara en cada montaje, un usuario que vuelve a `/revisa-tu-correo` media hora después se
@@ -171,3 +171,6 @@ Guardado por dos tests en
 `src/__tests__/modules/auth/features/verify_email/pages/check_email/index.test.tsx`: uno
 comprueba que con el estado de navegación el botón nace en «Reenviar en 45 s» **sin llamar a la
 API**, y el otro que entrando directo a la ruta el botón está disponible.
+
+La página declara su título traducido mediante `useTitle` de `@/hooks`; el hook añade
+` - Arxatec Academy` y lo actualiza también al cambiar de idioma.

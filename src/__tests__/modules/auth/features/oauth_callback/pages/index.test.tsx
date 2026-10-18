@@ -12,7 +12,10 @@ import { ROUTE_QUERY_PARAM_NAMES, ROUTES, RouteHelpers } from "@/routes/routes";
 import { useUserStore } from "@/store/user";
 
 import { buildApiSession, buildApiUser } from "../../../../../mocks/fixtures";
-import { axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../../mocks/interceptors";
+import {
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../mocks/interceptors";
 import {
   createTestQueryClient,
   renderWithProviders,
@@ -51,7 +54,11 @@ const envelope = (data: unknown) => ({
   },
 });
 
-const apiError = (status: number, code: string, retryAfterSeconds: number | null = null) =>
+const apiError = (
+  status: number,
+  code: string,
+  retryAfterSeconds: number | null = null,
+) =>
   new ApiError({
     status,
     code,
@@ -70,12 +77,13 @@ describe("OauthCallbackPage", () => {
 
     renderWithProviders(tree, { route: callbackRoute("abc123") });
 
-    expect(screen.getByRole("heading", { name: "Entrando con Google" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Entrando con Google" }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveAttribute("aria-busy", "true");
-    expect(screen.getByRole("link", { name: "Volver a iniciar sesión" })).toHaveAttribute(
-      "href",
-      RouteHelpers.login(),
-    );
+    expect(
+      screen.getByRole("link", { name: "Volver a iniciar sesión" }),
+    ).toHaveAttribute("href", RouteHelpers.login());
   });
 
   it("guarda la sesion y devuelve al destino de retorno de la query", async () => {
@@ -90,13 +98,17 @@ describe("OauthCallbackPage", () => {
 
     expect(axiosPublicInstanceMock.post).toHaveBeenCalledTimes(1);
     expect(useUserStore.getState().user?.id).toBe(session.user.id);
-    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBe(session.token);
+    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBe(
+      session.token,
+    );
   });
 
   it("manda al catalogo cuando el destino de retorno no es un path relativo seguro", async () => {
     axiosPublicInstanceMock.post.mockResolvedValue(envelope(buildApiSession()));
 
-    renderWithProviders(tree, { route: callbackRoute("abc123", "https://malo.pe/phishing") });
+    renderWithProviders(tree, {
+      route: callbackRoute("abc123", "https://malo.pe/phishing"),
+    });
 
     await waitFor(() => {
       expect(screen.getByText("catalogo")).toBeInTheDocument();
@@ -113,13 +125,18 @@ describe("OauthCallbackPage", () => {
       expect(screen.getByText("leccion")).toBeInTheDocument();
     });
 
-    expect(window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO)).toBeNull();
+    expect(
+      window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO),
+    ).toBeNull();
   });
 
   it("reemplaza el perfil cacheado del usuario anterior con el de la sesion canjeada", async () => {
     const session = buildApiSession();
     const queryClient = createTestQueryClient();
-    queryClient.setQueryData(authKeys.me(), buildApiUser({ id: "usr_anterior" }));
+    queryClient.setQueryData(
+      authKeys.me(),
+      buildApiUser({ id: "usr_anterior" }),
+    );
     axiosPublicInstanceMock.post.mockResolvedValue(envelope(session));
 
     renderWithProviders(tree, { route: callbackRoute("abc123"), queryClient });
@@ -133,7 +150,9 @@ describe("OauthCallbackPage", () => {
 
   it("conserva el destino de retorno guardado cuando el canje falla", async () => {
     window.sessionStorage.setItem(LOCAL_STORAGE_KEYS.REDIRECT_TO, LESSON_PATH);
-    axiosPublicInstanceMock.post.mockRejectedValue(apiError(400, API_ERROR_CODES.TOKEN_INVALID));
+    axiosPublicInstanceMock.post.mockRejectedValue(
+      apiError(400, API_ERROR_CODES.TOKEN_INVALID),
+    );
 
     renderWithProviders(tree, { route: callbackRoute("abc123") });
 
@@ -141,12 +160,16 @@ describe("OauthCallbackPage", () => {
       expect(screen.getByRole("alert")).toBeInTheDocument();
     });
 
-    expect(window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO)).toBe(LESSON_PATH);
+    expect(window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO)).toBe(
+      LESSON_PATH,
+    );
   });
 
   it("llega a la accion del error con el teclado y la sigue con Enter", async () => {
     const user = userEvent.setup();
-    axiosPublicInstanceMock.post.mockRejectedValue(apiError(400, API_ERROR_CODES.TOKEN_INVALID));
+    axiosPublicInstanceMock.post.mockRejectedValue(
+      apiError(400, API_ERROR_CODES.TOKEN_INVALID),
+    );
 
     renderWithProviders(tree, { route: callbackRoute("abc123") });
 
@@ -156,7 +179,9 @@ describe("OauthCallbackPage", () => {
 
     await user.tab();
 
-    expect(screen.getByRole("link", { name: "Volver a iniciar sesión" })).toHaveFocus();
+    expect(
+      screen.getByRole("link", { name: "Volver a iniciar sesión" }),
+    ).toHaveFocus();
 
     await user.keyboard("{Enter}");
 
@@ -166,26 +191,31 @@ describe("OauthCallbackPage", () => {
   });
 
   it("pinta el error con su accion cuando el codigo ya se uso o vencio (recarga de la pantalla)", async () => {
-    axiosPublicInstanceMock.post.mockRejectedValue(apiError(400, API_ERROR_CODES.TOKEN_INVALID));
+    axiosPublicInstanceMock.post.mockRejectedValue(
+      apiError(400, API_ERROR_CODES.TOKEN_INVALID),
+    );
 
     renderWithProviders(tree, { route: callbackRoute("abc123") });
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "No pudimos entrar con Google" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "No pudimos entrar con Google" }),
+      ).toBeInTheDocument();
     });
 
     expect(screen.getByRole("alert")).toHaveTextContent(
       "Ese enlace ya no sirve: venció o alguien ya lo usó.",
     );
-    expect(screen.getByRole("link", { name: "Volver a iniciar sesión" })).toHaveAttribute(
-      "href",
-      RouteHelpers.login(),
-    );
+    expect(
+      screen.getByRole("link", { name: "Volver a iniciar sesión" }),
+    ).toHaveAttribute("href", RouteHelpers.login());
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
   it("no reintenta el canje: un codigo de un solo uso se pide una vez", async () => {
-    axiosPublicInstanceMock.post.mockRejectedValue(apiError(400, API_ERROR_CODES.TOKEN_INVALID));
+    axiosPublicInstanceMock.post.mockRejectedValue(
+      apiError(400, API_ERROR_CODES.TOKEN_INVALID),
+    );
 
     renderWithProviders(tree, { route: callbackRoute("abc123") });
 
@@ -225,24 +255,34 @@ describe("OauthCallbackPage", () => {
   it("no llama al backend cuando la url llega sin codigo", () => {
     renderWithProviders(tree, { route: ROUTES.oauth_callback });
 
-    expect(screen.getByRole("heading", { name: "No pudimos entrar con Google" })).toBeInTheDocument();
-    expect(screen.getByRole("alert")).toHaveTextContent("Necesitas iniciar sesión para seguir.");
+    expect(
+      screen.getByRole("heading", { name: "No pudimos entrar con Google" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Necesitas iniciar sesión para seguir.",
+    );
     expect(axiosPublicInstanceMock.post).not.toHaveBeenCalled();
   });
 
   it("pinta los tres idiomas sin claves crudas", async () => {
     const { i18n } = await import("@/locales/i18n");
-    axiosPublicInstanceMock.post.mockRejectedValue(apiError(400, API_ERROR_CODES.TOKEN_INVALID));
+    axiosPublicInstanceMock.post.mockRejectedValue(
+      apiError(400, API_ERROR_CODES.TOKEN_INVALID),
+    );
 
     for (const [language, title] of [
       ["en", "We could not sign you in with Google"],
       ["pt", "Não conseguimos entrar com o Google"],
     ] as const) {
       await i18n.changeLanguage(language);
-      const { unmount } = renderWithProviders(tree, { route: callbackRoute("abc123") });
+      const { unmount } = renderWithProviders(tree, {
+        route: callbackRoute("abc123"),
+      });
 
       await waitFor(() => {
-        expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
+        expect(
+          screen.getByRole("heading", { name: title }),
+        ).toBeInTheDocument();
       });
 
       unmount();

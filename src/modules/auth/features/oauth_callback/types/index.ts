@@ -8,5 +8,10 @@ export type OauthExchangeReason = (typeof OAUTH_EXCHANGE_REASONS)[number];
 
 export type OauthExchange =
   | { status: "loading"; target: string }
-  | { status: "error"; reason: OauthExchangeReason; error: unknown; target: string }
+  | {
+      status: "error";
+      reason: OauthExchangeReason;
+      error: unknown;
+      target: string;
+    }
   | { status: "done"; target: string };

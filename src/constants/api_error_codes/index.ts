@@ -13,13 +13,15 @@ export const API_ERROR_CODES = {
   INTERNAL_ERROR: "INTERNAL_ERROR",
 } as const;
 
-export type ApiErrorCode = (typeof API_ERROR_CODES)[keyof typeof API_ERROR_CODES];
+export type ApiErrorCode =
+  (typeof API_ERROR_CODES)[keyof typeof API_ERROR_CODES];
 
 export const API_SUCCESS_CODES = {
   EMAIL_ALREADY_VERIFIED: "EMAIL_ALREADY_VERIFIED",
 } as const;
 
-export type ApiSuccessCode = (typeof API_SUCCESS_CODES)[keyof typeof API_SUCCESS_CODES];
+export type ApiSuccessCode =
+  (typeof API_SUCCESS_CODES)[keyof typeof API_SUCCESS_CODES];
 
 export const SESSION_CLOSING_ERROR_CODES: readonly ApiErrorCode[] = [
   API_ERROR_CODES.UNAUTHENTICATED,
@@ -33,4 +35,5 @@ export const isApiErrorCode = (value: string | null): value is ApiErrorCode =>
 
 export const closesSession = (status: number, code: string | null): boolean =>
   status === UNAUTHORIZED_STATUS &&
-  (code === null || SESSION_CLOSING_ERROR_CODES.some((candidate) => candidate === code));
+  (code === null ||
+    SESSION_CLOSING_ERROR_CODES.some((candidate) => candidate === code));

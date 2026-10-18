@@ -19,7 +19,7 @@ export const SessionExpiredActions = ({
   const isBusy = pendingTarget !== null;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <Button
         type="button"
         size="sm"

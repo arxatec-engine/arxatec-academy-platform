@@ -1,21 +1,34 @@
-import { Button } from "arxatec-ui";
+import { Button, Label, RadioGroup, RadioGroupItem } from "arxatec-ui";
+import { useId } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useLanguage } from "@/hooks/use_language";
+import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
 import type { Language } from "@/locales/resources";
 import { cn } from "@/utilities/cn";
 
 interface LanguageOption {
   language: Language;
-  labelKey: "language.es" | "language.en" | "language.pt";
-  shortKey: "language.short.es" | "language.short.en" | "language.short.pt";
+  labelKey:
+    | (typeof UI_TEXT.languages)["spanish"]
+    | (typeof UI_TEXT.languages)["english"]
+    | (typeof UI_TEXT.languages)["portuguese"];
 }
 
 const LANGUAGE_OPTIONS: readonly LanguageOption[] = [
-  { language: "es", labelKey: "language.es", shortKey: "language.short.es" },
-  { language: "en", labelKey: "language.en", shortKey: "language.short.en" },
-  { language: "pt", labelKey: "language.pt", shortKey: "language.short.pt" },
+  {
+    language: "es",
+    labelKey: UI_TEXT.languages.spanish,
+  },
+  {
+    language: "en",
+    labelKey: UI_TEXT.languages.english,
+  },
+  {
+    language: "pt",
+    labelKey: UI_TEXT.languages.portuguese,
+  },
 ];
 
 export interface LanguageSelectorProps {
@@ -23,33 +36,45 @@ export interface LanguageSelectorProps {
 }
 
 export const LanguageSelector = ({ className }: LanguageSelectorProps) => {
+  const id = useId();
   const { t } = useTranslation(NS.common);
   const { language, changeLanguage } = useLanguage();
 
   return (
-    <div
-      role="group"
-      aria-label={t("language.label")}
-      className={cn("flex items-center gap-0.5 rounded-md border border-border p-0.5", className)}
+    <RadioGroup
+      value={language}
+      orientation="horizontal"
+      onValueChange={(value) => {
+        const option = LANGUAGE_OPTIONS.find((entry) => entry.language === value);
+        if (option) changeLanguage(option.language);
+      }}
+      aria-label={t(UI_TEXT.language)}
+      className={cn(
+        "flex min-w-0 max-w-full flex-wrap items-center gap-1",
+        className,
+      )}
     >
-      {LANGUAGE_OPTIONS.map((option) => {
-        const isActive = option.language === language;
-
-        return (
-          <Button
-            key={option.language}
-            type="button"
-            size="sm"
-            variant={isActive ? "secondary" : "ghost"}
-            aria-pressed={isActive}
-            title={t(option.labelKey)}
-            onClick={() => changeLanguage(option.language)}
-          >
-            <span aria-hidden="true">{t(option.shortKey)}</span>
-            <span className="sr-only">{t(option.labelKey)}</span>
-          </Button>
-        );
-      })}
-    </div>
+      {LANGUAGE_OPTIONS.map((option) => (
+        <Button
+          key={option.language}
+          asChild
+          size="sm"
+          variant="outline"
+          className={cn(
+            "text-sm",
+            language === option.language &&
+              "border-foreground/40 bg-muted dark:border-foreground/40 dark:bg-muted",
+          )}
+        >
+          <Label htmlFor={`${id}-${option.language}`}>
+            <RadioGroupItem
+              id={`${id}-${option.language}`}
+              value={option.language}
+            />
+            {t(option.labelKey)}
+          </Label>
+        </Button>
+      ))}
+    </RadioGroup>
   );
 };

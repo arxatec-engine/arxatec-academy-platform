@@ -1,6 +1,6 @@
 # Guards: `<Auth>` y `<Guest>`
 
-Los dos son **route elements** que pintan `<Outlet/>` o redirigen; van *eager* (regla
+Los dos son **route elements** que pintan `<Outlet/>` o redirigen; van _eager_ (regla
 `harness/03_reglas_frontend.md` §8) y por eso no importan barriles pesados.
 
 ## `<Guest>`
@@ -17,11 +17,11 @@ funcionar aunque el usuario tenga sesión abierta.
 ## `<Auth>`
 
 1. Sin usuario en el store → guarda el destino de retorno, limpia y a `/ingresar`.
-2. Con usuario → `useAuth()` (`GET /auth/me`) y mientras tanto splash.
+2. Con usuario → `useAuth()` (`GET /auth/me`) y mientras tanto `LoadingScreen` con `Skeleton`.
 3. `401 SESSION_EXPIRED` → pantalla E7 conservando el destino de retorno.
 4. `401 UNAUTHENTICATED` (o un 401 sin código) → limpia y a `/ingresar`.
-5. **Cualquier otro fallo** (500, 502, red caída, `status === 0`) → `ErrorScreen` con "Volver a
-   intentarlo", que dispara el `retry` de `useAuth`. **La sesión se queda donde está.**
+5. **Cualquier otro fallo** (500, 502, red caída, `status === 0`) → `ErrorScreen` con el mensaje
+   de error y un enlace al catálogo. **La sesión se queda donde está.**
 
 Es una **segunda línea**, no la única: el interceptor sigue siendo el único sitio que cierra sesión
 ante un 401 (`src/interceptors/index.ts:113`). El guard cubre el caso de un token que ya no vale
@@ -36,7 +36,7 @@ fallo de `GET /auth/me`: `shouldRetryRequest` reintenta dos veces un `500` (no e
 que ejecuta `clearAuthSession()` y vacía `TOKEN_AUTH` y `USER_AUTH` de los dos almacenamientos. Un
 backend caído medio minuto expulsaba a un usuario con una sesión de 30 días perfectamente viva, y
 tenía que volver a escribir la contraseña. Contradice además `harness/03_reglas_frontend.md` §5.2:
-el interceptor es *el único sitio del código que cierra sesión*, y solo ante un 401 con
+el interceptor es _el único sitio del código que cierra sesión_, y solo ante un 401 con
 `UNAUTHENTICATED` / `SESSION_EXPIRED`. El guard usa exactamente esa misma regla —
 `closesSession(status, code)` (`src/constants/api_error_codes/index.ts:34`)—, así que los dos lados
 no pueden divergir. Cubierto en `src/__tests__/components/guards/auth/index.test.tsx` (500, red
@@ -57,7 +57,7 @@ almacenamiento ya lo vació el interceptor al ver el 401.
 Con `networkMode: "online"`, React Query **pausa** el reintento cuando `focusManager.isFocused()`
 es `false`. Verificado en el navegador: con la pestaña en `visibilityState: "hidden"` el estado de
 la query se queda en `{ status: "pending", fetchStatus: "paused" }` y `<Auth>` se queda en el
-splash indefinidamente; al forzar `focusManager.setFocused(true)` la query falla y el guard resuelve
+skeleton indefinidamente; al forzar `focusManager.setFocused(true)` la query falla y el guard resuelve
 en menos de un segundo (a E7, a login o al `ErrorScreen`, según el motivo). **No es un bug del guard**: es el comportamiento de
-React Query y solo se ve en pestañas de fondo o en automatización. Antes de perseguir un splash
+React Query y solo se ve en pestañas de fondo o en automatización. Antes de perseguir un skeleton
 eterno, comprueba `document.hasFocus()`.

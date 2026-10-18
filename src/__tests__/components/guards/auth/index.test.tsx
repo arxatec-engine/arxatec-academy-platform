@@ -1,5 +1,4 @@
 import { screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -11,7 +10,10 @@ import { ROUTES, RouteHelpers } from "@/routes/routes";
 import { useUserStore } from "@/store/user";
 
 import { buildApiUser } from "../../../mocks/fixtures";
-import { axiosInstanceMock, resetInterceptorsMock } from "../../../mocks/interceptors";
+import {
+  axiosInstanceMock,
+  resetInterceptorsMock,
+} from "../../../mocks/interceptors";
 import { renderWithProviders } from "../../../utils/render_with_providers";
 
 vi.mock("@/interceptors", async () => {
@@ -20,7 +22,13 @@ vi.mock("@/interceptors", async () => {
 });
 
 const apiError = (status: number, code: string | null): ApiError =>
-  new ApiError({ status, code, description: "fallo", fields: null, retryAfterSeconds: null });
+  new ApiError({
+    status,
+    code,
+    description: "fallo",
+    fields: null,
+    retryAfterSeconds: null,
+  });
 
 const tree = (
   <Routes>
@@ -34,13 +42,20 @@ const tree = (
 
 const seedSession = (): void => {
   window.localStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH, "un-token");
-  window.localStorage.setItem(LOCAL_STORAGE_KEYS.USER_AUTH, JSON.stringify(buildApiUser()));
+  window.localStorage.setItem(
+    LOCAL_STORAGE_KEYS.USER_AUTH,
+    JSON.stringify(buildApiUser()),
+  );
 };
 
 const renderGuard = () =>
-  renderWithProviders(tree, { route: RouteHelpers.checkEmail(), user: buildApiUser() });
+  renderWithProviders(tree, {
+    route: RouteHelpers.checkEmail(),
+    user: buildApiUser(),
+  });
 
-const token = (): string | null => window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH);
+const token = (): string | null =>
+  window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH);
 
 describe("guard <Auth>", () => {
   beforeEach(() => {
@@ -51,37 +66,50 @@ describe("guard <Auth>", () => {
 
   it("deja pasar cuando el perfil responde", async () => {
     seedSession();
-    axiosInstanceMock.get.mockResolvedValue({ data: { data: { user: buildApiUser() } } });
+    axiosInstanceMock.get.mockResolvedValue({
+      data: { data: { user: buildApiUser() } },
+    });
 
     renderGuard();
 
-    expect(await screen.findByRole("heading", { name: "zona privada" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "zona privada" }),
+    ).toBeInTheDocument();
   });
 
   it("manda a iniciar sesion cuando no hay usuario en el store", async () => {
     renderWithProviders(tree, { route: RouteHelpers.checkEmail(), user: null });
 
-    expect(await screen.findByRole("heading", { name: "pantalla de login" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "pantalla de login" }),
+    ).toBeInTheDocument();
     expect(axiosInstanceMock.get).not.toHaveBeenCalled();
   });
 
-  it("no cierra la sesion ante un 500: conserva el token y ofrece volver a intentarlo", async () => {
+  it("ante un 500 conserva la sesion y muestra el error con acceso al catalogo", async () => {
     seedSession();
-    axiosInstanceMock.get
-      .mockRejectedValueOnce(apiError(500, API_ERROR_CODES.INTERNAL_ERROR))
-      .mockResolvedValueOnce({ data: { data: { user: buildApiUser() } } });
+    axiosInstanceMock.get.mockRejectedValue(
+      apiError(500, API_ERROR_CODES.INTERNAL_ERROR),
+    );
 
     renderGuard();
 
-    const retry = await screen.findByRole("button", { name: "Volver a intentarlo" });
+    expect(
+      await screen.findByRole("heading", { name: "Algo se rompió" }),
+    ).toBeInTheDocument();
 
     expect(token()).toBe("un-token");
     expect(useUserStore.getState().user).not.toBeNull();
-    expect(screen.queryByRole("heading", { name: "pantalla de login" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "pantalla de login" }),
+    ).not.toBeInTheDocument();
 
-    await userEvent.click(retry);
-
-    expect(await screen.findByRole("heading", { name: "zona privada" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Ir al catálogo" }),
+    ).toHaveAttribute("href", RouteHelpers.home());
+    expect(
+      screen.queryByRole("button", { name: "Volver a intentarlo" }),
+    ).not.toBeInTheDocument();
   });
 
   it("no cierra la sesion cuando se cae la red", async () => {
@@ -90,18 +118,24 @@ describe("guard <Auth>", () => {
 
     renderGuard();
 
-    expect(await screen.findByRole("heading", { name: "Algo se rompió" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Algo se rompió" }),
+    ).toBeInTheDocument();
     expect(token()).toBe("un-token");
     expect(useUserStore.getState().user).not.toBeNull();
   });
 
   it("con SESSION_EXPIRED lleva a E7 y guarda el destino de retorno", async () => {
     seedSession();
-    axiosInstanceMock.get.mockRejectedValue(apiError(401, API_ERROR_CODES.SESSION_EXPIRED));
+    axiosInstanceMock.get.mockRejectedValue(
+      apiError(401, API_ERROR_CODES.SESSION_EXPIRED),
+    );
 
     renderGuard();
 
-    expect(await screen.findByRole("heading", { name: "pantalla E7" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "pantalla E7" }),
+    ).toBeInTheDocument();
     expect(window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO)).toBe(
       RouteHelpers.checkEmail(),
     );
@@ -109,11 +143,15 @@ describe("guard <Auth>", () => {
 
   it("con UNAUTHENTICATED limpia la sesion y lleva a iniciar sesion", async () => {
     seedSession();
-    axiosInstanceMock.get.mockRejectedValue(apiError(401, API_ERROR_CODES.UNAUTHENTICATED));
+    axiosInstanceMock.get.mockRejectedValue(
+      apiError(401, API_ERROR_CODES.UNAUTHENTICATED),
+    );
 
     renderGuard();
 
-    expect(await screen.findByRole("heading", { name: "pantalla de login" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "pantalla de login" }),
+    ).toBeInTheDocument();
     await waitFor(() => {
       expect(token()).toBeNull();
     });

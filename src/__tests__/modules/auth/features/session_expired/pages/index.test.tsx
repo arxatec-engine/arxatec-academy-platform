@@ -11,7 +11,10 @@ import { ROUTES, RouteHelpers } from "@/routes/routes";
 import { useUserStore } from "@/store/user";
 
 import { buildApiUser } from "../../../../../mocks/fixtures";
-import { axiosInstanceMock, resetInterceptorsMock } from "../../../../../mocks/interceptors";
+import {
+  axiosInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../mocks/interceptors";
 import { renderWithProviders } from "../../../../../utils/render_with_providers";
 
 vi.mock("@/interceptors", async () => {
@@ -60,14 +63,20 @@ describe("SessionExpiredPage", () => {
   it("pinta los textos literales del tablero y las dos acciones", () => {
     render();
 
-    expect(screen.getByRole("heading", { name: "Tu sesión venció" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Tu sesión venció" }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(
         "Por seguridad cerramos la sesión tras 30 días sin uso. Inicia sesión y vuelves a esta misma lección, en el minuto donde la dejaste.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Seguir sin cuenta" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Iniciar sesión" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Seguir sin cuenta" }),
+    ).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
@@ -75,14 +84,19 @@ describe("SessionExpiredPage", () => {
     ["es", "Tu sesión venció", "Seguir sin cuenta"],
     ["en", "Your session expired", "Keep going without an account"],
     ["pt", "A sua sessão venceu", "Seguir sem conta"],
-  ])("carga %s sin claves crudas a la vista", async (language, title, secondary) => {
-    await i18n.changeLanguage(language);
-    render();
+  ])(
+    "carga %s sin claves crudas a la vista",
+    async (language, title, secondary) => {
+      await i18n.changeLanguage(language);
+      render();
 
-    expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: secondary })).toBeInTheDocument();
-    expect(screen.queryByText(/session_expired\./)).not.toBeInTheDocument();
-  });
+      expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: secondary }),
+      ).toBeInTheDocument();
+      expect(screen.queryByText(/session_expired\./)).not.toBeInTheDocument();
+    },
+  );
 
   it("revoca la sesion, la limpia y lleva al login conservando el destino de retorno", async () => {
     const user = userEvent.setup();
@@ -94,7 +108,9 @@ describe("SessionExpiredPage", () => {
 
     expect(await screen.findByText("pantalla de login")).toBeInTheDocument();
     expect(axiosInstanceMock.post).toHaveBeenCalledWith("/auth/logout");
-    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBeNull();
+    expect(
+      window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH),
+    ).toBeNull();
     expect(useUserStore.getState().user).toBeNull();
     expect(storedReturnPath()).toBe("/curso/fundamentos/leccion/3");
   });
@@ -128,12 +144,14 @@ describe("SessionExpiredPage", () => {
   });
 
   it("descarta un destino con host: el login no puede ser un redirector abierto", () => {
-    render(`${RouteHelpers.sessionExpired()}?redirect_to=https%3A%2F%2Fmalo.pe`);
+    render(
+      `${RouteHelpers.sessionExpired()}?redirect_to=https%3A%2F%2Fmalo.pe`,
+    );
 
     expect(storedReturnPath()).toBeNull();
   });
 
-  it("cuando falla la revocacion se queda en la pantalla, explica el fallo y ofrece reintentar", async () => {
+  it("cuando falla la revocacion explica el fallo y mantiene las dos acciones", async () => {
     const user = userEvent.setup();
     withOpenSession();
     axiosInstanceMock.post.mockRejectedValueOnce(
@@ -150,11 +168,21 @@ describe("SessionExpiredPage", () => {
     await user.click(screen.getByRole("button", { name: "Iniciar sesión" }));
 
     const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent("Algo falló de nuestro lado. Vuelve a intentarlo.");
-    expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Seguir sin cuenta" })).toBeEnabled();
+    expect(alert).toHaveTextContent(
+      "Algo falló de nuestro lado. Vuelve a intentarlo.",
+    );
+    expect(
+      screen.getByRole("button", { name: "Iniciar sesión" }),
+    ).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "Seguir sin cuenta" }),
+    ).toBeEnabled();
 
-    await user.click(screen.getByRole("button", { name: "Volver a intentarlo" }));
+    expect(
+      screen.queryByRole("button", { name: "Volver a intentarlo" }),
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Iniciar sesión" }));
 
     expect(await screen.findByText("pantalla de login")).toBeInTheDocument();
   });
@@ -168,7 +196,9 @@ describe("SessionExpiredPage", () => {
     expect(primary).toHaveFocus();
 
     await user.tab();
-    expect(screen.getByRole("button", { name: "Seguir sin cuenta" })).toHaveFocus();
+    expect(
+      screen.getByRole("button", { name: "Seguir sin cuenta" }),
+    ).toHaveFocus();
 
     primary.focus();
     await user.keyboard("{Enter}");
@@ -193,12 +223,13 @@ describe("SessionExpiredPage", () => {
     await user.click(screen.getByRole("button", { name: "Iniciar sesión" }));
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Iniciar sesión" })).toHaveAttribute(
-        "aria-busy",
-        "true",
-      );
+      expect(
+        screen.getByRole("button", { name: "Iniciar sesión" }),
+      ).toHaveAttribute("aria-busy", "true");
     });
-    expect(screen.getByRole("button", { name: "Seguir sin cuenta" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Seguir sin cuenta" }),
+    ).toBeDisabled();
 
     release();
     expect(await screen.findByText("pantalla de login")).toBeInTheDocument();

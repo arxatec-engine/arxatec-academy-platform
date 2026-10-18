@@ -11,10 +11,10 @@ es un bug esperando (`harness/03_reglas_frontend.md` §7).
 
 El contrato (`harness/04_contrato_api_auth.md` §3) reparte el token según `remember_me`:
 
-| `remember_me` | Dónde | Qué implica |
-| --- | --- | --- |
-| `true` (marcado por defecto en la pantalla 05) | `localStorage` | sobrevive a cerrar el navegador; 30 días de inactividad tolerada |
-| `false` | `sessionStorage` | al cerrar la pestaña, fuera; 12 h de inactividad |
+| `remember_me`                                  | Dónde            | Qué implica                                                      |
+| ---------------------------------------------- | ---------------- | ---------------------------------------------------------------- |
+| `true` (marcado por defecto en la pantalla 05) | `localStorage`   | sobrevive a cerrar el navegador; 30 días de inactividad tolerada |
+| `false`                                        | `sessionStorage` | al cerrar la pestaña, fuera; 12 h de inactividad                 |
 
 Por eso la lectura recorre los dos (`index.ts:69` vía `readFirst`) y el borrado limpia los dos
 (`index.ts:90`). Escribir en uno y borrar solo del otro deja un token huérfano que resucita la

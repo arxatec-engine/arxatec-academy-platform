@@ -4,7 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ResendVerificationButton } from "@/modules/auth/features/verify_email/components/resend_verification_button";
 
-import { axiosInstanceMock, resetInterceptorsMock } from "../../../../../../mocks/interceptors";
+import {
+  axiosInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../../mocks/interceptors";
 import { renderWithProviders } from "../../../../../../utils/render_with_providers";
 
 vi.mock("@/interceptors", async () => {
@@ -41,25 +44,30 @@ describe("ResendVerificationButton", () => {
     try {
       renderWithProviders(<ResendVerificationButton />);
 
-      fireEvent.click(screen.getByRole("button", { name: "Reenviar el enlace" }));
+      fireEvent.click(
+        screen.getByRole("button", { name: "Reenviar el enlace" }),
+      );
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(0);
       });
-      expect(screen.getByRole("button", { name: "Reenviar en 45 s" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Reenviar en 45 s" }),
+      ).toBeInTheDocument();
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(44_000);
       });
-      expect(screen.getByRole("button", { name: "Reenviar en 1 s" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Reenviar en 1 s" }),
+      ).toBeInTheDocument();
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(1_000);
       });
-      expect(screen.getByRole("button", { name: "Reenviar el enlace" })).toHaveAttribute(
-        "aria-disabled",
-        "false",
-      );
+      expect(
+        screen.getByRole("button", { name: "Reenviar el enlace" }),
+      ).toHaveAttribute("aria-disabled", "false");
     } finally {
       vi.useRealTimers();
     }
@@ -69,11 +77,15 @@ describe("ResendVerificationButton", () => {
     renderWithProviders(<ResendVerificationButton />);
 
     await userEvent.tab();
-    expect(screen.getByRole("button", { name: "Reenviar el enlace" })).toHaveFocus();
+    expect(
+      screen.getByRole("button", { name: "Reenviar el enlace" }),
+    ).toHaveFocus();
 
     await userEvent.keyboard("{Enter}");
 
-    expect(await screen.findByRole("button", { name: "Reenviar en 45 s" })).toHaveFocus();
+    expect(
+      await screen.findByRole("button", { name: "Reenviar en 45 s" }),
+    ).toHaveFocus();
     expect(axiosInstanceMock.post).toHaveBeenCalledWith("/auth/email/resend");
   });
 });

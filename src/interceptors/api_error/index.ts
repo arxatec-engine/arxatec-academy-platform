@@ -6,6 +6,7 @@ export interface ApiErrorDetails {
   description: string;
   fields: Record<string, string> | null;
   retryAfterSeconds: number | null;
+  data?: unknown;
 }
 
 export class ApiError extends Error {
@@ -13,6 +14,7 @@ export class ApiError extends Error {
   readonly code: string | null;
   readonly fields: Record<string, string> | null;
   readonly retryAfterSeconds: number | null;
+  readonly data: unknown;
 
   constructor(details: ApiErrorDetails) {
     super(details.description);
@@ -21,10 +23,12 @@ export class ApiError extends Error {
     this.code = details.code;
     this.fields = details.fields;
     this.retryAfterSeconds = details.retryAfterSeconds;
+    this.data = details.data;
   }
 }
 
-export const isApiError = (error: unknown): error is ApiError => error instanceof ApiError;
+export const isApiError = (error: unknown): error is ApiError =>
+  error instanceof ApiError;
 
 export const isClientError = (error: unknown): boolean =>
   isApiError(error) && error.status >= 400 && error.status < 500;

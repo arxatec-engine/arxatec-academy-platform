@@ -12,7 +12,9 @@ export const HighlightedEmail = ({ text, email }: HighlightedEmailProps) => {
     <>
       {parts.map((part, index) => (
         <Fragment key={`${String(index)}:${part}`}>
-          {index === 0 ? null : <strong className="font-medium text-foreground">{email}</strong>}
+          {index === 0 ? null : (
+            <strong className="font-normal text-foreground">{email}</strong>
+          )}
           {part}
         </Fragment>
       ))}

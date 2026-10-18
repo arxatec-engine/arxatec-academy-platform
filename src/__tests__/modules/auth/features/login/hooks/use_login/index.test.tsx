@@ -9,8 +9,14 @@ import { useUserStore } from "@/store/user";
 import type { ApiUser } from "@/types/auth";
 
 import { buildApiSession } from "../../../../../../mocks/fixtures";
-import { axiosPublicInstanceMock, resetInterceptorsMock } from "../../../../../../mocks/interceptors";
-import { createTestQueryClient, createWrapper } from "../../../../../../utils/render_with_providers";
+import {
+  axiosPublicInstanceMock,
+  resetInterceptorsMock,
+} from "../../../../../../mocks/interceptors";
+import {
+  createTestQueryClient,
+  createWrapper,
+} from "../../../../../../utils/render_with_providers";
 
 vi.mock("@/interceptors", async () => {
   const module = await import("../../../../../../mocks/interceptors");
@@ -53,9 +59,13 @@ describe("useLogin", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBe(session.token);
+    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBe(
+      session.token,
+    );
     expect(useUserStore.getState().user).toEqual(session.user);
-    expect(queryClient.getQueryData<ApiUser>(authKeys.me())).toEqual(session.user);
+    expect(queryClient.getQueryData<ApiUser>(authKeys.me())).toEqual(
+      session.user,
+    );
   });
 
   it("respeta la casilla desmarcada y escribe en sessionStorage", async () => {
@@ -73,8 +83,12 @@ describe("useLogin", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBe(session.token);
-    expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBeNull();
+    expect(window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH)).toBe(
+      session.token,
+    );
+    expect(
+      window.localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN_AUTH),
+    ).toBeNull();
   });
 
   it("tira la cache del usuario anterior antes de sembrar la nueva", async () => {

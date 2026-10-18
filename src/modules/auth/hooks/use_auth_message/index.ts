@@ -3,9 +3,14 @@ import { useTranslation } from "react-i18next";
 
 import { NS } from "@/locales/namespaces";
 
-import { AUTH_GENERIC_FIELD_MESSAGE_KEY, isAuthMessageKey } from "../../utils/messages";
+import {
+  AUTH_GENERIC_FIELD_MESSAGE_KEY,
+  isAuthMessageKey,
+} from "../../utils/messages";
 
-export type AuthMessageReader = (message: string | undefined) => string | undefined;
+export type AuthMessageReader = (
+  message: string | undefined,
+) => string | undefined;
 
 export const useAuthMessage = (): AuthMessageReader => {
   const { t } = useTranslation(NS.auth);
@@ -13,7 +18,9 @@ export const useAuthMessage = (): AuthMessageReader => {
   return useCallback(
     (message: string | undefined) => {
       if (message === undefined) return undefined;
-      return t(isAuthMessageKey(message) ? message : AUTH_GENERIC_FIELD_MESSAGE_KEY);
+      return t(
+        isAuthMessageKey(message) ? message : AUTH_GENERIC_FIELD_MESSAGE_KEY,
+      );
     },
     [t],
   );

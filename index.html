@@ -2,15 +2,23 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      id="app-favicon"
+      rel="icon"
+      type="image/svg+xml"
+      href="/favicon.svg"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
     <title>Arxatec Academy</title>
     <script>
       (function () {
         try {
-          var stored = window.localStorage.getItem("arxatec_academy.theme_mode");
-          var mode = stored === "light" || stored === "dark" ? stored : "system";
+          var stored = window.localStorage.getItem(
+            "arxatec_academy.theme_mode",
+          );
+          var mode =
+            stored === "light" || stored === "dark" ? stored : "system";
           var dark =
             mode === "dark" ||
             (mode === "system" &&
@@ -18,14 +26,99 @@
           var root = document.documentElement;
           root.classList.toggle("dark", dark);
           root.style.colorScheme = dark ? "dark" : "light";
+          var favicon = document.querySelector("#app-favicon");
+          if (favicon)
+            favicon.href = dark ? "/favicon_dark.svg" : "/favicon_light.svg";
         } catch (error) {
           void error;
         }
       })();
     </script>
+    <style>
+      #app-splash {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: Canvas;
+        color: CanvasText;
+      }
+      #app-splash .splash-mark {
+        position: relative;
+        width: 32px;
+        height: 32px;
+      }
+      #app-splash .splash-base {
+        opacity: 0.3;
+      }
+      #app-splash .splash-shimmer {
+        position: absolute;
+        inset: 0;
+        -webkit-mask-image: linear-gradient(
+          135deg,
+          transparent 35%,
+          black 50%,
+          transparent 65%
+        );
+        mask-image: linear-gradient(
+          135deg,
+          transparent 35%,
+          black 50%,
+          transparent 65%
+        );
+        -webkit-mask-size: 250% 250%;
+        mask-size: 250% 250%;
+        animation: app-splash-shimmer 2.4s ease-in-out infinite;
+      }
+      @keyframes app-splash-shimmer {
+        from {
+          -webkit-mask-position: 100% 100%;
+          mask-position: 100% 100%;
+        }
+        to {
+          -webkit-mask-position: 0 0;
+          mask-position: 0 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #app-splash .splash-shimmer {
+          animation: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="app-splash" role="status" aria-label="Cargando" aria-busy="true">
+        <div class="splash-mark" aria-hidden="true">
+          <svg
+            class="splash-base"
+            width="32"
+            height="32"
+            viewBox="0 0 535 500"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              id="app-splash-isotype"
+              d="M426.814 0C429.186 1.52488e-05 431.557 0.79035 433.928 2.37012C437.089 3.94988 438.275 5.13393 437.484 5.92383L435.113 379.146C434.323 397.314 435.904 411.138 439.856 420.616C444.599 430.095 451.317 434.834 460.011 434.834C467.915 434.834 477.4 431.28 488.466 424.171C499.531 416.272 510.597 406.003 521.662 393.365C522.453 392.575 523.638 392.18 525.219 392.18C527.59 392.18 529.961 393.76 532.332 396.919C534.703 399.289 535.494 401.264 534.703 402.844C512.572 433.649 491.232 456.951 470.682 472.749C450.131 487.757 429.185 495.261 407.845 495.261C379.391 495.261 358.049 485.782 343.822 466.824C329.595 447.867 322.482 418.641 322.482 379.146V298.578C301.142 361.769 271.106 411.138 232.377 446.683C193.648 482.228 152.547 500 109.075 500C76.6689 500 50.19 489.337 29.6396 468.01C9.87976 445.893 3.76761e-05 412.322 0 367.299C0 315.166 14.2273 261.453 42.6816 206.161C71.1359 150.079 107.494 103.87 151.756 67.5352C196.808 30.4104 242.652 11.8487 289.285 11.8486C305.883 11.8486 322.877 14.6134 340.266 20.1426C358.445 24.8819 374.648 32.3858 388.875 42.6543C403.892 30.806 414.959 17.3779 422.072 2.37012C423.653 0.790335 425.234 0 426.814 0ZM232.377 69.9053C192.067 69.9053 160.451 89.6523 137.529 129.146C114.608 167.851 103.146 218.404 103.146 280.806C103.937 327.409 111.051 361.374 124.487 382.701C137.924 403.238 155.313 413.507 176.653 413.507C202.736 413.507 226.844 400.869 248.975 375.593C271.896 350.316 289.681 319.511 302.327 283.176C315.764 246.051 322.482 212.085 322.482 181.279C322.482 146.525 314.183 119.274 297.585 99.5264C281.777 79.7792 260.041 69.9053 232.377 69.9053Z"
+              fill="currentColor"
+            />
+          </svg>
+          <div class="splash-shimmer">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 535 500"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <use href="#app-splash-isotype" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

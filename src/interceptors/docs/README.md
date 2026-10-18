@@ -4,14 +4,14 @@ Aquí viven **las dos únicas instancias de axios del proyecto** y **el único s
 sesión**. Todo lo demás (servicios de feature, hooks de React Query) las consume; nadie crea una
 tercera y nadie llama a `fetch`.
 
-| Export | Qué es | Cuándo se usa |
-| --- | --- | --- |
-| `axiosInstance` (`index.ts:30`) | instancia autenticada | todo endpoint con `Bearer` |
-| `axiosPublicInstance` (`index.ts:31`) | instancia sin token | login, registro, forgot, reset, verify, exchange |
-| `ApiError` (`api_error/index.ts:11`) | el error normalizado | `catch` de servicios y hooks |
-| `isApiError`, `isClientError` (`api_error/index.ts:27-30`) | guardas | ramificación y política de reintentos |
-| `isSessionClosingError` (`api_error/index.ts:32`) | guarda del 401 que cierra sesión | el guard `<Auth>`, para no confundir un 500 con una sesión muerta |
-| `resetSessionCloseGuard` (`index.ts:166`) | reinicia el cerrojo de cierre único | solo tests |
+| Export                                                     | Qué es                              | Cuándo se usa                                                     |
+| ---------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------- |
+| `axiosInstance` (`index.ts:30`)                            | instancia autenticada               | todo endpoint con `Bearer`                                        |
+| `axiosPublicInstance` (`index.ts:31`)                      | instancia sin token                 | login, registro, forgot, reset, verify, exchange                  |
+| `ApiError` (`api_error/index.ts:11`)                       | el error normalizado                | `catch` de servicios y hooks                                      |
+| `isApiError`, `isClientError` (`api_error/index.ts:27-30`) | guardas                             | ramificación y política de reintentos                             |
+| `isSessionClosingError` (`api_error/index.ts:32`)          | guarda del 401 que cierra sesión    | el guard `<Auth>`, para no confundir un 500 con una sesión muerta |
+| `resetSessionCloseGuard` (`index.ts:166`)                  | reinicia el cerrojo de cierre único | solo tests                                                        |
 
 ## Por qué el token se lee en cada petición y no al arrancar
 
@@ -53,10 +53,10 @@ visitante anónimo.
 
 ## SESSION_EXPIRED y UNAUTHENTICATED no llevan al mismo sitio
 
-| `meta.code` | Destino | Por qué |
-| --- | --- | --- |
-| `SESSION_EXPIRED` | `RouteHelpers.sessionExpired()` (pantalla E7) | el brief promete volver "a esta misma lección": antes de redirigir se guarda el destino de retorno con `writeRedirectTo` (`index.ts:124`) |
-| `UNAUTHENTICATED` o 401 sin código | `RouteHelpers.login()` | no hay sesión que recuperar |
+| `meta.code`                        | Destino                                       | Por qué                                                                                                                                   |
+| ---------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `SESSION_EXPIRED`                  | `RouteHelpers.sessionExpired()` (pantalla E7) | el brief promete volver "a esta misma lección": antes de redirigir se guarda el destino de retorno con `writeRedirectTo` (`index.ts:124`) |
+| `UNAUTHENTICATED` o 401 sin código | `RouteHelpers.login()`                        | no hay sesión que recuperar                                                                                                               |
 
 El destino de retorno **no** se guarda si el usuario ya estaba en una pantalla de auth
 (`NO_RETURN_ROUTES`, `index.ts:18`): volver a `/ingresar` después de iniciar sesión es un bucle.
@@ -82,10 +82,10 @@ de un `Blob`) y cuando el cuerpo llega como string sin parsear. Sin esto el usua
 El contrato promete el tiempo de espera por dos caminos distintos y el interceptor lee **los dos**
 (`index.ts:100-102`):
 
-| Código | Dónde viene el número | Quién lo pinta |
-| --- | --- | --- |
+| Código                | Dónde viene el número                                          | Quién lo pinta                    |
+| --------------------- | -------------------------------------------------------------- | --------------------------------- |
 | `429 RESEND_COOLDOWN` | `meta.retry_after_seconds` del sobre (contrato §4, endpoint 8) | la cuenta atrás de la pantalla 07 |
-| `429 RATE_LIMITED` | cabecera **`Retry-After`** (contrato §6) | el toast de `authErrorMessage` |
+| `429 RATE_LIMITED`    | cabecera **`Retry-After`** (contrato §6)                       | el toast de `authErrorMessage`    |
 
 Leer solo `meta` dejaba `retryAfterSeconds` en `null` para `RATE_LIMITED`, y el toast caía siempre
 en `errors.retry_later` ("Espera un momento y vuelve a intentarlo") aunque el servidor estuviera
