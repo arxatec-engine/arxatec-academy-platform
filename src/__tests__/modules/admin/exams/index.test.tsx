@@ -77,7 +77,7 @@ describe("configuración administrativa del examen", () => {
       screen.getByRole("button", { name: "Guardar examen" }),
     ).toBeDisabled();
     const input = screen.getByRole("textbox", {
-      name: "Enunciado de la pregunta 1",
+      name: "Enunciado",
     });
     await user.clear(input);
     await user.type(input, "Pregunta revisada");
@@ -124,7 +124,7 @@ describe("configuración administrativa del examen", () => {
       />,
     );
     const input = screen.getByRole("textbox", {
-      name: "Enunciado de la pregunta 1",
+      name: "Enunciado",
     });
     await user.type(input, " revisada");
     await user.click(screen.getByRole("button", { name: "Guardar examen" }));

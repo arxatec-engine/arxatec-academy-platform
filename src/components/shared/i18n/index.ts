@@ -1,6 +1,7 @@
 export const UI_TEXT = {
   account: "navigation.account",
   administration: "navigation.administration",
+  adminMode: "navigation.admin_mode",
   brand: "app.name",
   catalog: "navigation.catalog",
   close: "actions.close",
@@ -30,6 +31,7 @@ export const UI_TEXT = {
   skipToContent: "navigation.skip_to_content",
   tagline: "app.tagline",
   terms: "legal.terms.title",
+  userMode: "navigation.user_mode",
   theme: "theme.label",
   themes: {
     dark: "theme.dark",

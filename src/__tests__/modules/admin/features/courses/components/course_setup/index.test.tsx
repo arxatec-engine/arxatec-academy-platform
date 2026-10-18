@@ -109,6 +109,14 @@ describe("preparación de cursos por pasos", () => {
     const title = await screen.findByRole("textbox", {
       name: "Título del curso",
     });
+    expect(
+      screen.queryByRole("heading", { name: "Información", level: 2 }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        "Cuenta de qué trata el curso y qué aprenderán los estudiantes. Guarda para continuar con el siguiente paso.",
+      ),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole("combobox", { name: "Docente" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Crear lección" })).toBeNull();
     expect(axiosInstanceMock.get).not.toHaveBeenCalledWith("/admin/teachers");
@@ -158,7 +166,7 @@ describe("preparación de cursos por pasos", () => {
     await actor.click(
       screen.getByRole("button", { name: "Guardar y continuar" }),
     );
-    await screen.findByRole("heading", { name: "Docente", level: 2 });
+    await screen.findByText("Paso 2 de 6");
     expect(axiosInstanceMock.patch).toHaveBeenLastCalledWith(
       "/admin/courses/course-1",
       expect.objectContaining({
@@ -173,7 +181,7 @@ describe("preparación de cursos por pasos", () => {
     await actor.click(
       screen.getByRole("button", { name: "Guardar y continuar" }),
     );
-    await screen.findByRole("heading", { name: "Portada", level: 2 });
+    await screen.findByText("Paso 3 de 6");
     expect(axiosInstanceMock.patch).toHaveBeenLastCalledWith(
       "/admin/courses/course-1",
       expect.objectContaining({
@@ -189,12 +197,12 @@ describe("preparación de cursos por pasos", () => {
     await actor.click(
       screen.getByRole("button", { name: "Subir y continuar" }),
     );
-    await screen.findByRole("heading", { name: "Lecciones", level: 2 });
+    await screen.findByText("Paso 4 de 6");
     await actor.click(stepButton("Información"));
     await actor.click(
       screen.getByRole("button", { name: "Guardar y continuar" }),
     );
-    await screen.findByRole("heading", { name: "Docente", level: 2 });
+    await screen.findByText("Paso 2 de 6");
     expect(axiosInstanceMock.patch).toHaveBeenLastCalledWith(
       "/admin/courses/course-1",
       expect.objectContaining({
@@ -223,7 +231,7 @@ describe("preparación de cursos por pasos", () => {
     );
     expect(title).toHaveValue("Fundamentos sin guardar");
     expect(
-      screen.getByRole("heading", { name: "Información", level: 2 }),
+      screen.getByText("Paso 1 de 6"),
     ).toBeVisible();
     expect(stepButton("Información")).toHaveAttribute("aria-current", "step");
   });
@@ -231,7 +239,7 @@ describe("preparación de cursos por pasos", () => {
   it("abre el paso de la URL y permite continuar sin añadir una portada", async () => {
     const actor = userEvent.setup();
     renderEditor("cover");
-    await screen.findByRole("heading", { name: "Portada", level: 2 });
+    await screen.findByText("Paso 3 de 6");
     await actor.click(screen.getByRole("button", { name: "Continuar" }));
     expect(
       await screen.findByRole("button", { name: "Crear lección" }),
@@ -245,7 +253,7 @@ describe("preparación de cursos por pasos", () => {
     view.course.can_publish = true;
     renderEditor("exam");
     const question = await screen.findByRole("textbox", {
-      name: "Enunciado de la pregunta 1",
+      name: "Enunciado",
     });
     await actor.type(question, "Pregunta pendiente");
     await actor.click(screen.getByRole("button", { name: "Continuar" }));
@@ -257,7 +265,7 @@ describe("preparación de cursos por pasos", () => {
     await actor.click(stepButton("Examen"));
     expect(
       screen.getByRole("textbox", {
-        name: "Enunciado de la pregunta 1",
+        name: "Enunciado",
       }),
     ).toHaveValue("Pregunta pendiente");
     await actor.click(stepButton("Publicación"));
@@ -269,7 +277,7 @@ describe("preparación de cursos por pasos", () => {
     await actor.click(stepButton("Examen"));
     expect(
       await screen.findByRole("textbox", {
-        name: "Enunciado de la pregunta 1",
+        name: "Enunciado",
       }),
     ).toHaveValue("");
   });

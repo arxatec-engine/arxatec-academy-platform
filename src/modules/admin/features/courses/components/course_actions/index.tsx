@@ -46,7 +46,7 @@ export const CourseActions = ({ course, publishDisabled }: Props) => {
     );
   };
   return (
-    <div className="flex flex-wrap gap-2 border-t border-border pt-4">
+    <div className="-mx-(--admin-content-padding) flex flex-wrap gap-2 border-t border-border px-(--admin-content-padding) pt-4">
       {course.status === "PUBLISHED" ? (
         <Button
           size="sm"

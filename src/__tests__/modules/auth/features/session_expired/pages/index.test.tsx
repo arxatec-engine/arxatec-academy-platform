@@ -1,6 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Route, Routes } from "react-router-dom";
+import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LOCAL_STORAGE_KEYS } from "@/constants/local_storage";
@@ -21,6 +22,8 @@ vi.mock("@/interceptors", async () => {
   const module = await import("../../../../../mocks/interceptors");
   return module.interceptorsModuleMock;
 });
+
+vi.mock("sonner", () => ({ toast: { error: vi.fn() } }));
 
 const tree = (
   <Routes>
@@ -57,6 +60,7 @@ const render = (route: string = RouteHelpers.sessionExpired()) =>
 describe("SessionExpiredPage", () => {
   beforeEach(() => {
     resetInterceptorsMock();
+    vi.mocked(toast.error).mockReset();
     axiosInstanceMock.post.mockResolvedValue(okEnvelope);
   });
 
@@ -167,10 +171,12 @@ describe("SessionExpiredPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Iniciar sesión" }));
 
-    const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent(
-      "Algo falló de nuestro lado. Vuelve a intentarlo.",
-    );
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        "Algo falló de nuestro lado. Vuelve a intentarlo.",
+      );
+    });
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Iniciar sesión" }),
     ).toBeEnabled();

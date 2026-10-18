@@ -17,3 +17,4 @@ La página declara su título traducido mediante `useTitle` de `@/hooks`; el hoo
 Las tarjetas muestran nombre, correo y badges de cursos completados y verificación, sin
 la línea de organización, trabajo independiente o ciudad. El avatar usa `size-12` y
 `border border-border`, centrado verticalmente junto al nombre y correo.
+La lista muestra tres columnas en escritorio, dos en pantallas intermedias y una en móvil.

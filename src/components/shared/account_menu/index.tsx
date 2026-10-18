@@ -6,30 +6,20 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "arxatec-ui";
 import {
-  BookOpen,
   ChevronDown,
   GraduationCap,
   LogOut,
-  Mail,
-  MessageSquare,
+  ShieldCheck,
   UserRound,
-  UsersRound,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
-import {
-  ADMIN_TEXT,
-  DIRECTORY_TEXT,
-  MODERATION_TEXT,
-  NOTICES_TEXT,
-} from "@/modules/admin/i18n";
 import { useLogout } from "@/modules/auth/hooks/use_logout";
 import { PROFILE_TEXT } from "@/modules/profile/i18n";
 import { PROGRESS_TEXT } from "@/modules/progress/i18n";
@@ -38,9 +28,10 @@ import type { ApiUser } from "@/types/auth";
 
 interface Props {
   user: ApiUser;
+  adminMode?: boolean;
 }
 
-export const AccountMenu = ({ user }: Props) => {
+export const AccountMenu = ({ user, adminMode = false }: Props) => {
   const { t } = useTranslation(NS.common);
   const { logout, isPending } = useLogout();
   return (
@@ -76,12 +67,14 @@ export const AccountMenu = ({ user }: Props) => {
           </p>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to={RouteHelpers.myCourses()}>
-            <GraduationCap />
-            {t(PROGRESS_TEXT.myCourses)}
-          </Link>
-        </DropdownMenuItem>
+        {!adminMode && (
+          <DropdownMenuItem asChild>
+            <Link to={RouteHelpers.myCourses()}>
+              <GraduationCap />
+              {t(PROGRESS_TEXT.myCourses)}
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
           <Link to={RouteHelpers.profile()}>
             <UserRound />
@@ -89,36 +82,14 @@ export const AccountMenu = ({ user }: Props) => {
           </Link>
         </DropdownMenuItem>
         {user.role === "ADMIN" && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-sm font-medium text-muted-foreground">
-              {t(UI_TEXT.administration)}
-            </DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              <Link to={RouteHelpers.adminCourses()}>
-                <BookOpen />
-                {t(ADMIN_TEXT.courses)}
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to={RouteHelpers.adminComments()}>
-                <MessageSquare />
-                {t(MODERATION_TEXT.title)}
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to={RouteHelpers.adminUsers()}>
-                <UsersRound />
-                {t(DIRECTORY_TEXT.title)}
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to={RouteHelpers.adminNotifications()}>
-                <Mail />
-                {t(NOTICES_TEXT.title)}
-              </Link>
-            </DropdownMenuItem>
-          </>
+          <DropdownMenuItem asChild>
+            <Link
+              to={adminMode ? RouteHelpers.home() : RouteHelpers.adminCourses()}
+            >
+              {adminMode ? <GraduationCap /> : <ShieldCheck />}
+              {t(adminMode ? UI_TEXT.userMode : UI_TEXT.adminMode)}
+            </Link>
+          </DropdownMenuItem>
         )}
         <DropdownMenuItem
           className="text-sm"

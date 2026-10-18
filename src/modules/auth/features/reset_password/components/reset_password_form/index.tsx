@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import { NS } from "@/locales/namespaces";
-import { AuthFormError } from "@/modules/auth/components/auth_form_error";
 import { AuthSubmitButton } from "@/modules/auth/components/auth_submit_button";
 import { PasswordField } from "@/modules/auth/components/password_field";
 import { resetPassword } from "@/modules/auth/features/reset_password/i18n";
@@ -17,13 +16,11 @@ import {
 
 export interface ResetPasswordFormProps {
   isPending: boolean;
-  errorMessage: string | null;
   onSubmit: (values: ResetPasswordFormValues) => void;
 }
 
 export const ResetPasswordForm = ({
   isPending,
-  errorMessage,
   onSubmit,
 }: ResetPasswordFormProps) => {
   const { t } = useTranslation(NS.auth);
@@ -59,7 +56,6 @@ export const ResetPasswordForm = ({
         registration={register("confirmPassword")}
         error={readMessage(errors.confirmPassword?.message)}
       />
-      {errorMessage === null ? null : <AuthFormError message={errorMessage} />}
       <AuthSubmitButton
         label={t(resetPassword.submit)}
         loadingLabel={t(resetPassword.submitting)}

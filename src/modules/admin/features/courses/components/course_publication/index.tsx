@@ -80,9 +80,9 @@ export const CoursePublication = ({
           {t(COURSE_LEVEL_LABELS[course.level])}
         </p>
       </div>
-      <ul className="divide-y divide-border rounded-md border border-border px-3">
+      <ul className="divide-y divide-border rounded-md border border-border">
         {checklist.map((item) => (
-          <li key={item.id}>
+          <li key={item.id} className="px-3">
             <Button
               type="button"
               size="sm"

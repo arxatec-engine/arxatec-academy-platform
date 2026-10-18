@@ -62,7 +62,7 @@ export const CourseExamQuestion = ({
       <CollapsibleContent className="space-y-3 border-t border-border p-3">
         <div className="space-y-1">
           <Label htmlFor={`${id}-text`}>
-            {t(EXAM_TEXT.questionText, { number })}
+            {t(EXAM_TEXT.questionText)}
           </Label>
           <Textarea
             id={`${id}-text`}
@@ -81,7 +81,7 @@ export const CourseExamQuestion = ({
             return (
               <div key={optionIndex} className="space-y-1">
                 <Label htmlFor={`${id}-option-${optionIndex}`}>
-                  {t(EXAM_TEXT.option, { number, letter })}
+                  {t(EXAM_TEXT.option, { letter })}
                 </Label>
                 <Input
                   id={`${id}-option-${optionIndex}`}
@@ -104,7 +104,7 @@ export const CourseExamQuestion = ({
         </div>
         <div className="space-y-1">
           <p id={`${id}-correct`} className="text-sm">
-            {t(EXAM_TEXT.correctOption, { number })}
+            {t(EXAM_TEXT.correctOption)}
           </p>
           <RadioGroup
             aria-labelledby={`${id}-correct`}

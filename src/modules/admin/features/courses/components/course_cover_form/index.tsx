@@ -50,7 +50,7 @@ export const CourseCoverForm = ({
   return (
     <AdminSection
       title={t(ADMIN_TEXT.cover)}
-      description={t(ADMIN_TEXT.coverHint)}
+      description={onContinue ? undefined : t(ADMIN_TEXT.coverHint)}
       showHeading={!onContinue}
       className={onContinue ? "border-0 pt-0" : undefined}
     >

@@ -82,7 +82,7 @@ export const DirectoryContent = () => {
                 {t(DIRECTORY_TEXT.empty)}
               </p>
             ) : (
-              <ol className="grid gap-2 sm:grid-cols-2">
+              <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {data.users.map((user) => (
                   <DirectoryUser key={user.id} user={user} />
                 ))}

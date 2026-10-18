@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/__tests__/utils/render_with_providers";
 import { i18n } from "@/locales/i18n";
@@ -28,8 +28,11 @@ describe("MarkNoticesForm", () => {
 
   it("no permite marcar sin una exportación previa", () => {
     renderWithProviders(<MarkNoticesForm cutoff={null} />);
+    fireEvent.click(screen.getByRole("button", { name: /Marcar anteriores/ }));
     expect(
-      screen.getByRole("button", { name: /Marcar anteriores/ }),
+      within(
+        screen.getByRole("region", { name: /Marcar anteriores/ }),
+      ).getByRole("button", { name: /Marcar anteriores/ }),
     ).toBeDisabled();
   });
 
@@ -37,6 +40,17 @@ describe("MarkNoticesForm", () => {
     const cutoff = "2026-09-24T16:00:00.000Z";
     renderWithProviders(<MarkNoticesForm cutoff={cutoff} />);
     fireEvent.click(screen.getByRole("button", { name: /Marcar anteriores/ }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /Marcar anteriores/, expanded: true }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /Marcar anteriores/, expanded: false }),
+    );
+    fireEvent.click(
+      within(
+        screen.getByRole("region", { name: /Marcar anteriores/ }),
+      ).getByRole("button", { name: /Marcar anteriores/ }),
+    );
     expect(mutateAsync).toHaveBeenCalledWith({
       courseId: null,
       signedUpBefore: cutoff,

@@ -11,9 +11,15 @@ interface Props {
   children: ReactNode;
   className?: string;
   navigation?: ReactNode;
+  adminMode?: boolean;
 }
 
-export const PageShell = ({ children, className, navigation }: Props) => {
+export const PageShell = ({
+  children,
+  className,
+  navigation,
+  adminMode = false,
+}: Props) => {
   const { t } = useTranslation(NS.common);
   return (
     <div className="flex min-h-svh w-full min-w-0 flex-col bg-card font-sans text-sm text-foreground">
@@ -24,7 +30,7 @@ export const PageShell = ({ children, className, navigation }: Props) => {
       >
         <a href="#main-content">{t(UI_TEXT.skipToContent)}</a>
       </Button>
-      <SiteHeader />
+      <SiteHeader adminMode={adminMode} />
       {navigation}
       <main
         id="main-content"

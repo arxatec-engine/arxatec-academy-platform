@@ -158,7 +158,7 @@ describe("LoginPage", () => {
     ).toBeNull();
   });
 
-  it("pinta INVALID_CREDENTIALS bajo el formulario, sin toast y sin vaciar lo escrito", async () => {
+  it("avisa INVALID_CREDENTIALS con un toast y conserva lo escrito", async () => {
     const user = userEvent.setup();
     axiosPublicInstanceMock.post.mockRejectedValue(
       apiError(401, "INVALID_CREDENTIALS"),
@@ -169,10 +169,12 @@ describe("LoginPage", () => {
     await user.type(passwordField(), "claveIncorrecta");
     await user.click(submitButton());
 
-    const alert = await screen.findByRole("alert");
-
-    expect(alert).toHaveTextContent("El correo o la contraseña no coinciden.");
-    expect(toast.error).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        "El correo o la contraseña no coinciden.",
+      );
+    });
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(emailField()).toHaveValue("maria@estudioqp.pe");
     expect(passwordField()).toHaveValue("claveIncorrecta");
   });
@@ -188,15 +190,15 @@ describe("LoginPage", () => {
     await user.type(passwordField(), "unaClaveLarga");
     await user.click(submitButton());
 
-    const alert = await screen.findByRole("alert");
-
-    expect(alert).toHaveTextContent(
-      "Esta cuenta se creó con Google. Entra con Google y listo.",
-    );
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        "Esta cuenta se creó con Google. Entra con Google.",
+      );
+    });
     expect(
       screen.getAllByRole("button", { name: "Continuar con Google" }).length,
     ).toBe(1);
-    expect(toast.error).not.toHaveBeenCalled();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("valida en el navegador antes de llamar al contrato", async () => {

@@ -4,14 +4,13 @@ import { NS } from "@/locales/namespaces";
 import { AuthCard } from "@/modules/auth/components/auth_card";
 import { sessionExpired } from "@/modules/auth/features/session_expired/i18n";
 import { SessionExpiredActions } from "../components/session_expired_actions";
-import { SessionExpiredError } from "../components/session_expired_error";
 import { useReturnPath } from "../hooks/use_return_path";
 import { useSessionClose } from "../hooks/use_session_close";
 
 const SessionExpiredPage = () => {
   const { t } = useTranslation(NS.auth);
   useTitle(t(sessionExpired.title));
-  const { close, pendingTarget, error } = useSessionClose();
+  const { close, pendingTarget } = useSessionClose();
 
   useReturnPath();
 
@@ -26,9 +25,6 @@ const SessionExpiredPage = () => {
         pendingTarget={pendingTarget}
         onSelect={close}
       />
-      {error === null ? null : (
-        <SessionExpiredError error={error} />
-      )}
     </AuthCard>
   );
 };

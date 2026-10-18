@@ -70,6 +70,7 @@ export const ADMIN_TEXT = {
   youtube: "admin.youtube",
 } as const;
 export const MODERATION_TEXT = {
+  actions: "moderation.actions",
   counts: "moderation.counts",
   deletedAuthor: "comments.deleted_author",
   delete: "moderation.delete",

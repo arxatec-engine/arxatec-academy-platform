@@ -56,12 +56,12 @@ el render: pintar un toast durante el render lo dispara otra vez en cada re-rend
 
 ### Un solo lugar decide qué se ve de cada error
 
-`hooks/use_reset_password_feedback/index.ts` traduce un `ApiError` a una de cuatro cosas:
-`expired` (pantalla), `inline` (error bajo el formulario), `toast` o nada. La página usa la
+`hooks/use_reset_password_feedback/index.ts` traduce un `ApiError` a `expired` (pantalla),
+`toast` o nada. La página usa la
 **misma** función para pintar y para notificar (`pages/index.tsx:24` y `pages/index.tsx:35`), así
 que ningún error se cuenta dos veces. El reparto sigue `05_diseno_y_ux.md` §5: sin conexión
-(`status === 0`) y `500` van a toast con el formulario intacto; `VALIDATION_ERROR` va bajo el
-formulario; `TOKEN_INVALID` es pantalla propia.
+(`status === 0`), `500` y `VALIDATION_ERROR` van a toast con el formulario intacto;
+`TOKEN_INVALID` es pantalla propia.
 
 Todo lo que no es `TOKEN_INVALID` ni `VALIDATION_ERROR` se traduce con `authErrorMessage`
 (`src/modules/auth/utils/auth_error_message`), compartido por las 7 pantallas. `RATE_LIMITED` solo
@@ -80,7 +80,7 @@ largo es un `refine` que se salta el caso vacío (`schemas/index.ts:21`).
 
 `meta.fields` del `422` no se pinta por campo en esta pantalla: el único campo del formulario es la
 contraseña y el backend no manda ahí nada distinto de lo que ya valida el cliente. Se muestra
-`errors.validation_error` bajo el formulario, que es el resumen honesto. El mapa clave-del-backend →
+`errors.validation_error` en un toast, que es el resumen honesto. El mapa clave-del-backend →
 clave tipada, para las pantallas que sí lo necesitan, vive en `src/modules/auth/utils/messages`.
 
 ### Accesibilidad y teclado

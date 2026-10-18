@@ -19,15 +19,7 @@ import {
   type LoginFormValues,
 } from "../../schemas";
 
-type LoginFormErrorKind = "credentials" | "google" | null;
 type LoginFormFieldName = "email" | "password";
-
-const describeFormError = (error: unknown): LoginFormErrorKind => {
-  if (!isApiError(error)) return null;
-  if (error.code === API_ERROR_CODES.INVALID_CREDENTIALS) return "credentials";
-  if (error.code === API_ERROR_CODES.ACCOUNT_USES_GOOGLE) return "google";
-  return null;
-};
 
 const toFormFieldName = (field: string): LoginFormFieldName | null => {
   if (field === "email") return "email";
@@ -69,12 +61,6 @@ export const useLoginForm = () => {
   const notifyError = (error: unknown): void => {
     if (isApiError(error)) {
       if (
-        error.code === API_ERROR_CODES.INVALID_CREDENTIALS ||
-        error.code === API_ERROR_CODES.ACCOUNT_USES_GOOGLE
-      ) {
-        return;
-      }
-      if (
         error.code === API_ERROR_CODES.VALIDATION_ERROR &&
         applyFieldErrors(error.fields)
       ) {
@@ -88,7 +74,9 @@ export const useLoginForm = () => {
     errors,
     register,
     isPending: mutation.isPending,
-    formErrorKind: describeFormError(mutation.error),
+    showGoogleLogin:
+      isApiError(mutation.error) &&
+      mutation.error.code === API_ERROR_CODES.ACCOUNT_USES_GOOGLE,
     submit: handleSubmit((values) => {
       mutation.mutate(values, {
         onSuccess: () => {

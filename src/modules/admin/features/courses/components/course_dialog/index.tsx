@@ -39,6 +39,7 @@ export const CourseDialog = ({ courseId }: { courseId?: string }) => {
       >
         <DialogContent
           showCloseButton={false}
+          aria-describedby={undefined}
           className="flex max-h-[calc(100svh-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl"
           onEscapeKeyDown={(event) => {
             if (isSaving) event.preventDefault();
@@ -48,10 +49,9 @@ export const CourseDialog = ({ courseId }: { courseId?: string }) => {
             <DialogTitle className="text-xl font-normal">
               {t(courseId ? PAGE_TITLE_TEXT.editCourse : ADMIN_TEXT.create)}
             </DialogTitle>
-            <DialogDescription>{t(COURSE_SETUP_TEXT.title)}</DialogDescription>
           </DialogHeader>
           <ScrollArea className="min-h-0 w-full [&>[data-slot=scroll-area-viewport]]:max-h-[calc(100svh-2rem-2px)] [&>[data-slot=scroll-area-viewport]]:overscroll-contain">
-            <div className="min-w-0 p-4 sm:p-6">
+            <div className="min-w-0 p-(--admin-content-padding) [--admin-content-padding:1rem] sm:[--admin-content-padding:1.5rem]">
               {courseId ? <CourseEditor /> : <CreateCourseForm />}
             </div>
           </ScrollArea>

@@ -34,6 +34,8 @@
   "navigation": {
     "account": "My account",
     "administration": "Administration",
+    "admin_mode": "Administrator mode",
+    "user_mode": "User mode",
     "catalog": "Catalog",
     "create_account": "Create a free account",
     "learning": "Learning",
@@ -114,11 +116,11 @@
     "admin_hint": "Configure 15 questions, each with four options and one correct answer. Students must pass the exam to receive their certificate.",
     "enabled": "Exam available to students",
     "passing_score": "Correct answers required to pass",
-    "question_text": "Question {{number}} text",
+    "question_text": "Question text",
     "question_placeholder": "Write a question about the course",
-    "option": "Option {{letter}} for question {{number}}",
+    "option": "Option {{letter}}",
     "option_placeholder": "Write option {{letter}}",
-    "correct_option": "Correct answer for question {{number}}",
+    "correct_option": "Correct answer",
     "save": "Save exam",
     "saved": "Exam saved",
     "save_failed": "We could not save the exam. Your changes are kept on this screen.",
@@ -374,6 +376,7 @@
     "vimeo": "Vimeo"
   },
   "moderation": {
+    "actions": "Comment actions",
     "subtitle": "Keep conversations helpful and review community reports.",
     "title": "Comment moderation",
     "tab": "View",

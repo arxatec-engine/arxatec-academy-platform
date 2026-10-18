@@ -20,7 +20,7 @@ export const CourseExam = ({ course, embedded, onDirtyChange }: Props) => {
   return (
     <AdminSection
       title={t(EXAM_TEXT.adminTitle)}
-      description={t(EXAM_TEXT.adminHint)}
+      description={embedded ? undefined : t(EXAM_TEXT.adminHint)}
       showHeading={!embedded}
       className={embedded ? "border-0 pt-0" : undefined}
     >

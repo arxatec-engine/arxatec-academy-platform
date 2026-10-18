@@ -2,6 +2,7 @@ import {
   AsyncBoundary,
   Badge,
   Button,
+  PaginationController,
   Select,
   SelectContent,
   SelectItem,
@@ -15,14 +16,13 @@ import { toast } from "sonner";
 import { ErrorScreen } from "@/components/shared/error_screen";
 import { LoadingScreen } from "@/components/shared/loading_screen";
 import { NS } from "@/locales/namespaces";
-import { AdminPagination } from "@/modules/admin/components/admin_pagination";
-import { AdminSection } from "@/modules/admin/components/admin_section";
 import {
   useExportNoticeSignups,
   useNoticeSignups,
 } from "@/modules/admin/hooks/notifications";
 import { ADMIN_TEXT, NOTICES_TEXT } from "@/modules/admin/i18n";
 import type { SignupFilters } from "@/modules/admin/types/notifications";
+import { NotificationSection } from "../notification_section";
 
 interface Props {
   onExported: (cutoff: string) => void;
@@ -45,7 +45,7 @@ export const SignupList = ({ onExported }: Props) => {
     );
   };
   return (
-    <AdminSection title={t(NOTICES_TEXT.signups)} className="border-t-0 pt-0">
+    <NotificationSection title={t(NOTICES_TEXT.signups)}>
       <div className="flex flex-wrap gap-2">
         <Select
           value={
@@ -96,11 +96,11 @@ export const SignupList = ({ onExported }: Props) => {
                 {t(NOTICES_TEXT.empty)}
               </p>
             ) : (
-              <ol className="divide-y divide-border">
+              <ol className="-mx-3 divide-y divide-border sm:-mx-4">
                 {data.signups.map((signup) => (
                   <li
                     key={signup.id}
-                    className="flex flex-wrap items-start justify-between gap-2 py-3 text-sm"
+                    className="flex flex-wrap items-start justify-between gap-2 px-3 py-3 text-sm sm:px-4"
                   >
                     <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
                       <p>{signup.email}</p>
@@ -122,14 +122,28 @@ export const SignupList = ({ onExported }: Props) => {
                 ))}
               </ol>
             )}
-            <AdminPagination
-              page={filters.page}
-              hasNext={data.pagination.has_next}
-              onPageChange={(page) => setFilters({ ...filters, page })}
-            />
+            <div className="mt-4">
+              <PaginationController
+                pagination={{
+                  page: filters.page,
+                  limit: data.pagination.per_page,
+                  total: data.pagination.total,
+                  total_pages: Math.ceil(
+                    data.pagination.total / data.pagination.per_page,
+                  ),
+                }}
+                setPage={(page) => {
+                  const totalPages = Math.ceil(
+                    data.pagination.total / data.pagination.per_page,
+                  );
+                  if (page >= 1 && page <= totalPages)
+                    setFilters((previous) => ({ ...previous, page }));
+                }}
+              />
+            </div>
           </>
         )}
       </AsyncBoundary>
-    </AdminSection>
+    </NotificationSection>
   );
 };

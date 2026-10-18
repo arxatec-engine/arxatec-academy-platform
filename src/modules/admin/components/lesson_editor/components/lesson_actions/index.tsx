@@ -52,7 +52,7 @@ export const LessonActions = ({ view, publishDisabled, onDeleted }: Props) => {
     );
   };
   return (
-    <div className="flex flex-wrap gap-2 border-t border-border pt-4">
+    <div className="-mx-(--admin-content-padding) flex flex-wrap gap-2 border-t border-border px-(--admin-content-padding) pt-4">
       {view.lesson.status === "PUBLISHED" ? (
         <Button
           size="sm"

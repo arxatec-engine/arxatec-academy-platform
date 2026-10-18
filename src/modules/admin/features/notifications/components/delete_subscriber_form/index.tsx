@@ -15,9 +15,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { NS } from "@/locales/namespaces";
-import { AdminSection } from "@/modules/admin/components/admin_section";
 import { useDeleteNoticeSubscriber } from "@/modules/admin/hooks/notifications";
 import { ADMIN_TEXT, NOTICES_TEXT } from "@/modules/admin/i18n";
+import { NotificationSection } from "../notification_section";
 
 export const DeleteSubscriberForm = () => {
   const { t } = useTranslation(NS.common);
@@ -38,7 +38,7 @@ export const DeleteSubscriberForm = () => {
     );
   };
   return (
-    <AdminSection title={t(NOTICES_TEXT.delete)}>
+    <NotificationSection title={t(NOTICES_TEXT.delete)}>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
         <div className="min-w-0 flex-1">
           <Label htmlFor="subscriber-email">{t(NOTICES_TEXT.email)}</Label>
@@ -91,6 +91,6 @@ export const DeleteSubscriberForm = () => {
           </DialogContent>
         </Dialog>
       </div>
-    </AdminSection>
+    </NotificationSection>
   );
 };

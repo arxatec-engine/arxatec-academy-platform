@@ -20,10 +20,15 @@ se muestra mientras guarda; ante un error se restaura el anterior. Los cursos ar
 quedan al final y fuera del orden editable. Los controles se deshabilitan mientras se
 guarda y una lista con menos de dos cursos activos no permite arrastrar.
 
-La interfaz usa `AdminPage` sobre `PageShell`, con navegación discreta y títulos de peso normal, como el catálogo. Crear y editar abren el mismo diálogo de seis pasos desde el inicio: información, docente, portada, lecciones, examen y publicación. `CourseSetup` muestra una etapa a la vez, con instrucciones breves y navegación anterior/continuar. Al crear, «Guardar y continuar» del primer paso envía título, descripciones, tema y nivel; el borrador resultante se conserva en caché y el mismo diálogo avanza a docente. No hay un formulario preliminar ni una pantalla separada. Los otros pasos se habilitan tras guardar la información inicial. Docente, portada y examen se pueden completar después. Los controles de orden usan iconos con nombre accesible. La vista previa de portada usa `Image` y los campos se adaptan al ancho disponible.
+La interfaz usa `AdminPage` sobre `PageShell`, con navegación discreta y títulos de peso normal, como el catálogo. Crear y editar abren el mismo diálogo de seis pasos desde el inicio: información, docente, portada, lecciones, examen y publicación. `CourseSetup` muestra una etapa a la vez, con pestañas numeradas, contador de paso y navegación anterior/continuar. El contenido no repite el título ni la descripción de cada paso; su nombre accesible se conserva y el contador recibe el foco al cambiar de etapa. Al crear, «Guardar y continuar» del primer paso envía título, descripciones, tema y nivel; el borrador resultante se conserva en caché y el mismo diálogo avanza a docente. No hay un formulario preliminar ni una pantalla separada. Los otros pasos se habilitan tras guardar la información inicial. Docente, portada y examen se pueden completar después. Los controles de orden usan iconos con nombre accesible. La vista previa de portada usa `Image` y los campos se adaptan al ancho disponible.
 
 El formulario de cada paso se presenta directamente en el diálogo, sin una tarjeta
 adicional con borde, fondo o relleno alrededor. El espaciado exterior lo aporta el diálogo.
+El diálogo define `--admin-content-padding` y cada lección desplegada lo ajusta a su propio
+relleno. Los separadores compensan ese espacio para llegar de borde a borde, manteniendo
+el relleno de los campos y botones tanto en móvil como en escritorio.
+Todos los pasos comparten una línea superior antes del formulario y una inferior antes
+de los botones de navegación.
 
 El paso actual se conserva en `?paso=...`; los valores desconocidos abren información.
 La lección desplegada se conserva en `?paso=lessons&leccion=...`. Los paneles se montan al visitarlos y

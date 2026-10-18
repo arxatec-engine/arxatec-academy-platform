@@ -165,7 +165,7 @@ export const CourseLessons = ({ view, embedded, onDirtyChange }: Props) => {
                   hidden={openId !== lesson.id}
                   role="region"
                   aria-label={`${t(ADMIN_TEXT.edit)}: ${lesson.title}`}
-                  className="border-t border-border p-3 sm:p-4"
+                  className="border-t border-border p-(--admin-content-padding) [--admin-content-padding:0.75rem] sm:[--admin-content-padding:1rem]"
                 >
                   <AdminLessonEditor
                     lessonId={lesson.id}

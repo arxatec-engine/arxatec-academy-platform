@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -24,7 +23,6 @@ export const useForgotPasswordForm = ({
 }: UseForgotPasswordFormOptions) => {
   const { t } = useTranslation(NS.auth);
   const mutation = useForgotPassword();
-  const [hasGlobalError, setHasGlobalError] = useState(false);
   const {
     register,
     handleSubmit,
@@ -38,7 +36,7 @@ export const useForgotPasswordForm = ({
   const reportFailure = (error: Error): void => {
     if (isApiError(error) && error.code === API_ERROR_CODES.VALIDATION_ERROR) {
       const serverKey = error.fields?.email;
-      if (serverKey === undefined) setHasGlobalError(true);
+      if (serverKey === undefined) toast.error(authErrorMessage(error, t));
       else
         setError(
           "email",
@@ -54,10 +52,8 @@ export const useForgotPasswordForm = ({
   return {
     register,
     errors,
-    hasGlobalError,
     isPending: mutation.isPending,
     submit: handleSubmit(({ email }) => {
-      setHasGlobalError(false);
       mutation.mutate(email, {
         onSuccess: () => onSent(email),
         onError: reportFailure,

@@ -10,10 +10,10 @@ Componentes de dominio que cruzan módulos. Los átomos que no están en `arxate
 | `loading_screen`            | Cargas de datos con un único bloque simple de `Skeleton`.                                       |
 | `route_fallback`            | Fallback de rutas con `LoaderSplash size={2}` a pantalla completa.                               |
 | `error_screen`              | Pantalla de error: 404 y fallo inesperado, con acción al lado.                                  |
-| `site_header`               | Cabecera compartida del catálogo, perfil y administración; adapta los enlaces al rol.           |
+| `site_header`               | Cabecera con marca y cuenta o acceso; sin enlaces centrales ni texto de modo para ningún rol.    |
 | `brand_link`, `site_footer` | Marca y pie comunes, con espaciado adaptable.                                                   |
-| `account_menu`              | Menú de cuenta con Mis cursos, perfil, salida y destinos administrativos según el rol.          |
-| `admin_navigation`          | Franja desplazable con las cuatro áreas de administración.                                      |
+| `account_menu`              | Menú con perfil, salida, Mis cursos en modo usuario y un cambio de modo para cuentas ADMIN.       |
+| `admin_navigation`          | Franja desplazable con las cuatro áreas de administración, debajo de la cabecera.               |
 | `page_heading`              | Título, descripción y acción de página con una jerarquía consistente.                           |
 | `course_cover`              | Portadas de Pexels locales mediante `Image`, con respaldo por tema.                             |
 | `lesson_list`               | Filas del temario compartidas entre ficha de curso y lección bloqueada.                         |

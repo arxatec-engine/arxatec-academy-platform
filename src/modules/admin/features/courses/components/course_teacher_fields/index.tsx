@@ -32,7 +32,7 @@ export const CourseTeacherFields = ({ value, onChange, disabled }: Props) => {
   return (
     <fieldset
       disabled={disabled}
-      className="min-w-0 space-y-3 border-t border-border pt-4"
+      className="min-w-0 space-y-3"
     >
       <legend className="sr-only">{t(ADMIN_TEXT.teacher)}</legend>
       <div className="space-y-1.5">

@@ -266,7 +266,7 @@ describe("ForgotPasswordPage", () => {
     expect(emailField()).toHaveValue(EMAIL);
   });
 
-  it("pinta bajo el formulario el 422 que no trae un campo conocido", async () => {
+  it("avisa con un toast el 422 que no trae un campo conocido", async () => {
     const user = userEvent.setup();
     axiosPublicInstanceMock.post.mockRejectedValue(
       new ApiError({
@@ -282,9 +282,10 @@ describe("ForgotPasswordPage", () => {
     await user.type(emailField(), EMAIL);
     await user.click(submitButton());
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Revisa los campos marcados.",
-    );
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("Revisa los campos marcados.");
+    });
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(emailField()).toHaveValue(EMAIL);
   });
 

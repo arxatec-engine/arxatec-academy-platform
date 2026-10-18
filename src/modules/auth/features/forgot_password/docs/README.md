@@ -64,7 +64,7 @@ y sigue la tabla de `05_diseno_y_ux.md` §5:
 | -------------------------------- | ----------------------- | ---------------------------------------------------------- |
 | Campo vacío o correo mal escrito | — (Zod, antes de salir) | error bajo el campo, `aria-invalid`, foco al campo         |
 | `422` con `fields.email`         | `VALIDATION_ERROR`      | error **en el campo correo** (`:81-83`)                    |
-| `422` sin campo reconocible      | `VALIDATION_ERROR`      | error bajo el formulario con `role="alert"` (`:82`)        |
+| `422` sin campo reconocible      | `VALIDATION_ERROR`      | toast con el error de validación                            |
 | `429`                            | `RATE_LIMITED`          | toast con los segundos de `retry_after_seconds` (`:74-78`) |
 | `500` / `INTERNAL_ERROR`         | `INTERNAL_ERROR`        | toast genérico (`:87-90`)                                  |
 | Sin respuesta (status 0)         | —                       | toast de "sin conexión" (`:69-72`)                         |
@@ -76,7 +76,7 @@ Dos detalles medidos, no de estilo:
   explícito backend → clave propia, compartido por todo el módulo en
   `src/modules/auth/utils/messages` (`toAuthMessageKey`), y lo que no está en el mapa cae a
   `errors.validation_error` en vez de pintar una clave cruda en pantalla. Un `422` que ni siquiera
-  nombre el campo `email` se pinta como error global bajo el formulario.
+  nombre el campo `email` se notifica con un toast.
 - **El formulario nunca se vacía tras un error.** `react-hook-form` conserva los valores y ninguna
   rama de `reportFailure` llama a `reset()`; hay tests que lo comprueban en el 422, en el 500 y en
   el fallo de red.

@@ -73,7 +73,7 @@ export const ResourceRow = ({
     );
   };
   return (
-    <li className="flex min-w-0 flex-wrap items-center gap-2 py-3">
+    <li className="flex min-w-0 flex-wrap items-center gap-2 px-(--admin-content-padding) py-3">
       <Input
         size="sm"
         aria-label={t(ADMIN_TEXT.resourceTitle)}

@@ -5,13 +5,12 @@ import { Link } from "react-router-dom";
 
 import { NS } from "@/locales/namespaces";
 import { AuthField } from "@/modules/auth/components/auth_field";
-import { AuthFormError } from "@/modules/auth/components/auth_form_error";
 import { GoogleButton } from "@/modules/auth/components/google_button";
 import { PasswordField } from "@/modules/auth/components/password_field";
 import { login } from "@/modules/auth/features/login/i18n";
 import { useLoginForm } from "@/modules/auth/features/login/hooks/use_login_form";
 import { useAuthMessage } from "@/modules/auth/hooks/use_auth_message";
-import { errors as authErrors, shared } from "@/modules/auth/i18n";
+import { shared } from "@/modules/auth/i18n";
 import { RouteHelpers } from "@/routes/routes";
 
 const EMAIL_FIELD_ID = "login-email";
@@ -24,7 +23,7 @@ export interface LoginFormProps {
 export const LoginForm = ({ onGoogleLogin }: LoginFormProps) => {
   const { t } = useTranslation(NS.auth);
   const readMessage = useAuthMessage();
-  const { errors, register, submit, isPending, formErrorKind } = useLoginForm();
+  const { errors, register, submit, isPending, showGoogleLogin } = useLoginForm();
 
   const emailRegistration = register("email");
   const passwordRegistration = register("password");
@@ -66,19 +65,10 @@ export const LoginForm = ({ onGoogleLogin }: LoginFormProps) => {
           </Link>
         </div>
 
-        {formErrorKind === "credentials" ? (
-          <AuthFormError message={t(authErrors.invalidCredentials)} />
-        ) : null}
-
-        {formErrorKind === "google" ? (
-          <AuthFormError
-            message={t(login.googleAccount.message)}
-            action={
-              <GoogleButton
-                label={t(login.googleAccount.action)}
-                onClick={onGoogleLogin}
-              />
-            }
+        {showGoogleLogin ? (
+          <GoogleButton
+            label={t(login.googleAccount.action)}
+            onClick={onGoogleLogin}
           />
         ) : null}
 

@@ -1,6 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Route, Routes } from "react-router-dom";
+import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { API_ERROR_CODES } from "@/constants/api_error_codes";
@@ -25,6 +26,8 @@ vi.mock("@/interceptors", async () => {
   const module = await import("../../../../../mocks/interceptors");
   return module.interceptorsModuleMock;
 });
+
+vi.mock("sonner", () => ({ toast: { error: vi.fn() } }));
 
 const LESSON_PATH = "/curso/fundamentos";
 
@@ -70,6 +73,7 @@ const apiError = (
 describe("OauthCallbackPage", () => {
   beforeEach(() => {
     resetInterceptorsMock();
+    vi.mocked(toast.error).mockReset();
   });
 
   it("pinta el estado de carga con su salida mientras canjea el codigo", () => {
@@ -157,7 +161,9 @@ describe("OauthCallbackPage", () => {
     renderWithProviders(tree, { route: callbackRoute("abc123") });
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toBeInTheDocument();
+      expect(toast.error).toHaveBeenCalledWith(
+        "Ese enlace ya no sirve: venció o alguien ya lo usó.",
+      );
     });
 
     expect(window.sessionStorage.getItem(LOCAL_STORAGE_KEYS.REDIRECT_TO)).toBe(
@@ -174,7 +180,7 @@ describe("OauthCallbackPage", () => {
     renderWithProviders(tree, { route: callbackRoute("abc123") });
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toBeInTheDocument();
+      expect(toast.error).toHaveBeenCalled();
     });
 
     await user.tab();
@@ -203,9 +209,10 @@ describe("OauthCallbackPage", () => {
       ).toBeInTheDocument();
     });
 
-    expect(screen.getByRole("alert")).toHaveTextContent(
+    expect(toast.error).toHaveBeenCalledWith(
       "Ese enlace ya no sirve: venció o alguien ya lo usó.",
     );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Volver a iniciar sesión" }),
     ).toHaveAttribute("href", RouteHelpers.login());
@@ -220,7 +227,7 @@ describe("OauthCallbackPage", () => {
     renderWithProviders(tree, { route: callbackRoute("abc123") });
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toBeInTheDocument();
+      expect(toast.error).toHaveBeenCalled();
     });
 
     expect(axiosPublicInstanceMock.post).toHaveBeenCalledTimes(1);
@@ -234,7 +241,7 @@ describe("OauthCallbackPage", () => {
     renderWithProviders(tree, { route: callbackRoute("abc123") });
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent(
+      expect(toast.error).toHaveBeenCalledWith(
         "Demasiados intentos. Prueba de nuevo en 120 s.",
       );
     });
@@ -246,7 +253,7 @@ describe("OauthCallbackPage", () => {
     renderWithProviders(tree, { route: callbackRoute("abc123") });
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent(
+      expect(toast.error).toHaveBeenCalledWith(
         "No hay conexión. Revisa tu internet y vuelve a intentarlo.",
       );
     });
@@ -258,7 +265,7 @@ describe("OauthCallbackPage", () => {
     expect(
       screen.getByRole("heading", { name: "No pudimos entrar con Google" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("alert")).toHaveTextContent(
+    expect(toast.error).toHaveBeenCalledWith(
       "Necesitas iniciar sesión para seguir.",
     );
     expect(axiosPublicInstanceMock.post).not.toHaveBeenCalled();

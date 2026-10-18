@@ -108,10 +108,8 @@ acabaría en el catálogo en vez de en su lección.
   define dos comportamientos; se toma el mismo que el registro, que también devuelve la sesión ya
   iniciada con `remember_me: true` (contrato §4, endpoint 1). Token en `localStorage`, 30 días de
   inactividad. Cambiarlo es la constante `OAUTH_REMEMBER_ME` (`hooks/use_oauth_exchange/index.ts:14`).
-- **Sin toast.** `05_` §5 reserva el toast para "sin conexión / 500" en pantallas **con formulario**,
-  donde el error tiene que caber sin tapar lo escrito. Aquí la pantalla entera es el mensaje y ya
-  lleva su acción al lado: un toast diría la misma frase dos veces, y el `<Toaster>` está en
-  `visibleToasts={1}`.
+- **Errores en toast.** El detalle traducido se notifica una vez al mostrar el estado de error;
+  la tarjeta conserva la acción para volver al acceso.
 - **El estado de carga también tiene salida.** El pie lleva `shared.back_to_login`: si el canje se
   queda colgado, el usuario no se queda encerrado mirando el skeleton.
 - **Fuera de `<Guest>`**: se puede llegar aquí con una sesión vieja, y este flujo la sustituye.
@@ -125,7 +123,7 @@ acabaría en el catálogo en vez de en su lección.
 | Estado                  | Qué se pinta                                                                                                                | Acción                                         |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
 | Carga                   | `oauth_callback.loading.*` + `role="status" aria-live="polite" aria-busy="true"` con el texto `shared.loading` en `sr-only` | pie "Volver a iniciar sesión"                  |
-| Error (los dos motivos) | `oauth_callback.error.*` + detalle en `AuthFormError` (`role="alert"`)                                                      | botón `size="lg"` ancho completo a `/ingresar` |
+| Error (los dos motivos) | `oauth_callback.error.*` + detalle en un toast                                                                           | botón `size="sm"` ancho completo a `/ingresar` |
 
 No hay estado vacío distinto del de error: la URL sin `code` **es** el vacío de esta pantalla y se
 pinta como `missing_code`, con la misma acción.

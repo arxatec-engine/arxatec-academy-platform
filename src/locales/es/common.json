@@ -34,6 +34,8 @@
   "navigation": {
     "account": "Mi cuenta",
     "administration": "Administración",
+    "admin_mode": "Modo administrador",
+    "user_mode": "Modo usuario",
     "catalog": "Catálogo",
     "create_account": "Crear cuenta gratis",
     "learning": "Aprendizaje",
@@ -114,11 +116,11 @@
     "admin_hint": "Configura 15 preguntas, cada una con cuatro opciones y una respuesta correcta. El alumno debe aprobar el examen para recibir su certificado.",
     "enabled": "Examen disponible para los alumnos",
     "passing_score": "Respuestas correctas para aprobar",
-    "question_text": "Enunciado de la pregunta {{number}}",
+    "question_text": "Enunciado",
     "question_placeholder": "Escribe una pregunta sobre el curso",
-    "option": "Opción {{letter}} de la pregunta {{number}}",
+    "option": "Opción {{letter}}",
     "option_placeholder": "Escribe la opción {{letter}}",
-    "correct_option": "Respuesta correcta de la pregunta {{number}}",
+    "correct_option": "Respuesta correcta",
     "save": "Guardar examen",
     "saved": "Examen guardado",
     "save_failed": "No pudimos guardar el examen. Tus cambios se conservan.",
@@ -374,6 +376,7 @@
     "vimeo": "Vimeo"
   },
   "moderation": {
+    "actions": "Acciones del comentario",
     "subtitle": "Cuida las conversaciones y resuelve los reportes de la comunidad.",
     "title": "Moderación de comentarios",
     "tab": "Vista",

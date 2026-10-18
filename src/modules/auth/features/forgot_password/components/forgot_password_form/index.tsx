@@ -5,12 +5,11 @@ import { NS } from "@/locales/namespaces";
 import { AuthBackButton } from "@/modules/auth/components/auth_back_button";
 import { AuthCard } from "@/modules/auth/components/auth_card";
 import { AuthField } from "@/modules/auth/components/auth_field";
-import { AuthFormError } from "@/modules/auth/components/auth_form_error";
 import { AuthSubmitButton } from "@/modules/auth/components/auth_submit_button";
 import { useForgotPasswordForm } from "@/modules/auth/features/forgot_password/hooks/use_forgot_password_form";
 import { forgotPassword } from "@/modules/auth/features/forgot_password/i18n";
 import { useAuthMessage } from "@/modules/auth/hooks/use_auth_message";
-import { errors as authErrors, shared } from "@/modules/auth/i18n";
+import { shared } from "@/modules/auth/i18n";
 
 const EMAIL_FIELD_ID = "forgot-password-email";
 
@@ -27,7 +26,7 @@ export const ForgotPasswordForm = ({
 }: ForgotPasswordFormProps) => {
   const { t } = useTranslation(NS.auth);
   const readMessage = useAuthMessage();
-  const { register, errors, submit, hasGlobalError, isPending } =
+  const { register, errors, submit, isPending } =
     useForgotPasswordForm({ defaultEmail, onSent });
 
   return (
@@ -56,9 +55,6 @@ export const ForgotPasswordForm = ({
               />
             )}
           </AuthField>
-          {hasGlobalError ? (
-            <AuthFormError message={t(authErrors.validationError)} />
-          ) : null}
           <AuthSubmitButton
             label={t(forgotPassword.submit)}
             loadingLabel={t(forgotPassword.submitting)}

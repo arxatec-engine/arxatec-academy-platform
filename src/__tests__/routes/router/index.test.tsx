@@ -114,6 +114,9 @@ describe("arbol de rutas real", () => {
         name: "Idioma y apariencia",
       }),
     ).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole("banner")).queryByRole("navigation"),
+    ).not.toBeInTheDocument();
   });
 
   it("conserva la barra activa y la navegación al cambiar de sección administrativa", async () => {
@@ -167,6 +170,108 @@ describe("arbol de rutas real", () => {
     ).toHaveLength(1);
     expect(screen.getAllByRole("main")).toHaveLength(1);
     expect(screen.getAllByRole("contentinfo")).toHaveLength(1);
+  });
+
+  it("cambia entre modo usuario y administrador desde Mi cuenta y adapta la cabecera", async () => {
+    const actor = userEvent.setup();
+    const account = buildApiUser({ role: "ADMIN" });
+    axiosInstanceMock.get.mockImplementation((url: string) =>
+      Promise.resolve({
+        data: {
+          data:
+            url === "/admin/courses"
+              ? {
+                  courses: [],
+                  counts: { total: 0, published: 0, draft: 0, archived: 0 },
+                }
+              : { user: account },
+        },
+      }),
+    );
+    const router = renderRoute(RouteHelpers.home(), account);
+    await expectHeading("Catálogo de cursos");
+
+    expect(
+      within(screen.getByRole("banner")).queryByRole("navigation"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("navigation", { name: "Administración" }),
+    ).not.toBeInTheDocument();
+
+    await actor.click(screen.getByRole("button", { name: "Mi cuenta" }));
+    expect(screen.getAllByRole("menuitem")).toHaveLength(4);
+    expect(
+      screen.getByRole("menuitem", { name: "Modo administrador" }),
+    ).toHaveAttribute("href", RouteHelpers.adminCourses());
+    expect(
+      screen.queryByRole("menuitem", { name: "Administrar cursos" }),
+    ).not.toBeInTheDocument();
+    await actor.click(
+      screen.getByRole("menuitem", { name: "Modo administrador" }),
+    );
+    await expectHeading("Administrar cursos");
+
+    const [header] = screen
+      .getAllByRole("banner")
+      .filter((element) => !element.closest("main"));
+    expect(within(header).queryByRole("navigation")).not.toBeInTheDocument();
+    expect(
+      within(header).queryByText("Modo administrador"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Administración" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("navigation", { name: "Aprendizaje" }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(header).getByRole("link", { name: "Arxatec Academy" }),
+    ).toHaveAttribute("href", RouteHelpers.adminCourses());
+    expect(router.state.location.pathname).toBe(RouteHelpers.adminCourses());
+    expect(useUserStore.getState().user?.role).toBe("ADMIN");
+
+    await actor.click(screen.getByRole("button", { name: "Mi cuenta" }));
+    expect(screen.getAllByRole("menuitem")).toHaveLength(3);
+    expect(
+      screen.queryByRole("menuitem", { name: "Mis cursos" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("menuitem", { name: "Mi perfil" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("menuitem", { name: "Cerrar sesión" }),
+    ).toBeInTheDocument();
+    await actor.click(screen.getByRole("menuitem", { name: "Modo usuario" }));
+    await expectHeading("Catálogo de cursos");
+
+    expect(router.state.location.pathname).toBe(RouteHelpers.home());
+    expect(
+      within(screen.getByRole("banner")).queryByRole("navigation"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("navigation", { name: "Administración" }),
+    ).not.toBeInTheDocument();
+    expect(useUserStore.getState().user?.role).toBe("ADMIN");
+  });
+
+  it("no ofrece el modo administrador a estudiantes", async () => {
+    const actor = userEvent.setup();
+    renderRoute(RouteHelpers.home(), buildApiUser());
+    await expectHeading("Catálogo de cursos");
+
+    expect(
+      within(screen.getByRole("banner")).queryByRole("navigation"),
+    ).not.toBeInTheDocument();
+    await actor.click(screen.getByRole("button", { name: "Mi cuenta" }));
+    expect(
+      screen.queryByRole("menuitem", { name: "Modo administrador" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("menuitem", { name: "Modo usuario" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("menuitem", { name: "Mis cursos" }),
+    ).toBeInTheDocument();
   });
 
   it.each([

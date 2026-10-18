@@ -5,7 +5,7 @@ Mis cursos y administración. Mantiene un ancho máximo común, márgenes adapta
 sans. Acepta `className` para las páginas con una medida de lectura más estrecha.
 La prop opcional `navigation` coloca la navegación secundaria inmediatamente debajo de
 `SiteHeader` y antes de `main`. `AdminLayout` la usa para `AdminNavigation`, alineada al mismo
-ancho y márgenes que la cabecera y el contenido.
+ancho y márgenes que la cabecera y el contenido, y activa la prop `adminMode`.
 El layout administrativo permanece montado entre secciones; solo cambia su contenido y las
 cargas de ruta muestran un esqueleto dentro de `main`. La barra activa se desplaza y ajusta
 su ancho con una transición de 300 ms, también al cambiar idioma o tamaño de pantalla.
@@ -20,9 +20,18 @@ definido en `src/index.css`. Todos los radios usan `rounded-md`; el tema tambié
 radios predeterminados de los controles de la librería, incluidos los menús y los portales.
 
 El enlace “Saltar al contenido” aparece al recibir foco y apunta a `main-content`. La cabecera
-conserva marca y navegación; el menú de cuenta enlaza al perfil, que reúne los datos personales
-y los ajustes de idioma y apariencia, y muestra los destinos según el rol. `AdminNavigation` reúne las cuatro áreas
-administrativas en una franja desplazable. Los controles vienen de `arxatec-ui`.
+conserva solo la marca y el menú de cuenta o las acciones de acceso, en dos columnas.
+No muestra enlaces de navegación ni un texto de modo, con o sin sesión y para ambos roles.
+El menú de cuenta enlaza al perfil, que reúne los datos personales y los ajustes de idioma
+y apariencia. Las cuentas `ADMIN` ven una única opción «Modo administrador» en el menú:
+abre la gestión de cursos, con las cuatro áreas de `AdminNavigation` debajo de la cabecera.
+El botón de cuenta conserva el mismo aspecto en ambos modos. En administración,
+«Modo usuario» vuelve al catálogo y la marca lleva a la gestión de cursos. Mis cursos solo
+aparece en modo usuario; Perfil y Cerrar sesión siguen disponibles en ambos modos.
+El modo corresponde al área de la ruta, por lo que recargar o usar el historial conserva
+la cabecera adecuada sin guardar otro estado. Entrar al perfil abre el área de usuario.
+El rol de la cuenta y la autorización de las rutas siguen controlados por los guards.
+Los controles vienen de `arxatec-ui`.
 
 La navegación, los botones de formulario y las acciones secundarias usan `size="sm"`.
 Los inputs y los selectores comparten ese tamaño para alinear las filas de controles.

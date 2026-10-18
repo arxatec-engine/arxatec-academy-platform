@@ -17,7 +17,9 @@ control accesible compartido: mostrar u ocultar no cambia el valor, el foco ni e
 `useLogin` llama al servicio de `POST /auth/login`. El formulario traduce los errores de campo,
 conserva las credenciales al fallar y ofrece Google si el backend responde `ACCOUNT_USES_GOOGLE`.
 Tras el éxito se guarda la sesión y se consume el destino de retorno interno, o se abre el catálogo.
-Los errores generales muestran un toast. Las claves de validación se traducen con `useAuthMessage`.
+Los errores de credenciales y demás fallos de la solicitud muestran un toast. Si la cuenta usa
+Google, el formulario conserva el botón para entrar con ese proveedor. Las claves de validación
+por campo se traducen con `useAuthMessage`.
 
 Las pruebas cubren validación y foco, envío con Enter, payload y sesión recordada, destino de
 retorno, errores de credenciales y Google, red, teclado, visibilidad de contraseña e idiomas.

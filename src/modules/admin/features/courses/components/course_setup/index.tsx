@@ -1,6 +1,6 @@
 import { useIsMutating } from "@tanstack/react-query";
 import { Badge, Button } from "arxatec-ui";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { NS } from "@/locales/namespaces";
@@ -24,32 +24,26 @@ const steps = [
   {
     id: COURSE_SETUP_STEP.details,
     title: COURSE_SETUP_TEXT.details,
-    hint: COURSE_SETUP_TEXT.detailsHint,
   },
   {
     id: COURSE_SETUP_STEP.teacher,
     title: ADMIN_TEXT.teacher,
-    hint: COURSE_SETUP_TEXT.teacherHint,
   },
   {
     id: COURSE_SETUP_STEP.cover,
     title: ADMIN_TEXT.cover,
-    hint: COURSE_SETUP_TEXT.coverHint,
   },
   {
     id: COURSE_SETUP_STEP.lessons,
     title: ADMIN_TEXT.lessons,
-    hint: COURSE_SETUP_TEXT.lessonsHint,
   },
   {
     id: COURSE_SETUP_STEP.exam,
     title: COURSE_SETUP_TEXT.exam,
-    hint: COURSE_SETUP_TEXT.examHint,
   },
   {
     id: COURSE_SETUP_STEP.publication,
     title: COURSE_SETUP_TEXT.publication,
-    hint: COURSE_SETUP_TEXT.publicationHint,
   },
 ] as const;
 
@@ -69,11 +63,10 @@ export const CourseSetup = ({ view }: { view?: AdminCourseView }) => {
   );
   const [dirty, setDirty] = useState<Set<CourseSetupStep>>(() => new Set());
   const isSaving = useIsMutating() > 0;
-  const headingId = useId();
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const stepRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    headingRef.current?.focus();
+    stepRef.current?.focus();
   }, [step.id]);
 
   const goTo = (next: CourseSetupStep) => {
@@ -222,9 +215,6 @@ export const CourseSetup = ({ view }: { view?: AdminCourseView }) => {
             </Badge>
           )}
         </div>
-        <p className="text-sm text-muted-foreground">
-          {t(COURSE_SETUP_TEXT.title)}
-        </p>
       </header>
       <nav aria-label={t(COURSE_SETUP_TEXT.navigation)}>
         <ol className="grid grid-cols-3 gap-1 sm:grid-cols-6">
@@ -268,31 +258,27 @@ export const CourseSetup = ({ view }: { view?: AdminCourseView }) => {
         </ol>
       </nav>
       <section
-        aria-labelledby={headingId}
+        aria-label={t(step.title)}
         className="min-w-0 space-y-5"
       >
-        <header className="space-y-2">
-          <p className="text-xs text-muted-foreground" aria-live="polite">
-            {t(COURSE_SETUP_TEXT.step, {
-              current: index + 1,
-              total: steps.length,
-            })}
-          </p>
-          <h2
-            id={headingId}
-            ref={headingRef}
-            tabIndex={-1}
-            className="text-lg font-normal outline-none"
-          >
-            {t(step.title)}
-          </h2>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {t(step.hint)}
-          </p>
-        </header>
+        <p
+          ref={stepRef}
+          tabIndex={-1}
+          className="text-xs text-muted-foreground outline-none"
+          aria-live="polite"
+        >
+          {t(COURSE_SETUP_TEXT.step, {
+            current: index + 1,
+            total: steps.length,
+          })}
+        </p>
         {steps.map((entry) =>
           visited.has(entry.id) || entry.id === step.id ? (
-            <div key={entry.id} hidden={entry.id !== step.id}>
+            <div
+              key={entry.id}
+              hidden={entry.id !== step.id}
+              className="-mx-(--admin-content-padding) min-w-0 border-t border-border px-(--admin-content-padding) pt-4"
+            >
               {content(entry.id)}
             </div>
           ) : null,

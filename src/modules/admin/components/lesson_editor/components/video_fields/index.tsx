@@ -39,7 +39,7 @@ export const VideoFields = ({ id, draft, onChange }: Props) => {
     );
   };
   return (
-    <div className="grid gap-4 border-y border-border py-4 sm:grid-cols-2">
+    <div className="-mx-(--admin-content-padding) grid gap-4 border-y border-border px-(--admin-content-padding) py-4 sm:grid-cols-2">
       <div className="min-w-0">
         <Label htmlFor={`${id}-video-provider`}>
           {t(ADMIN_TEXT.videoProvider)}

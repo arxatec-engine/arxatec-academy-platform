@@ -69,11 +69,10 @@ que de otro modo parecería un bug de esta feature.
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | Normal   | título, párrafo y los dos botones                                                                                                      |
 | Cerrando | el botón pulsado con spinner y `aria-busy`, el otro deshabilitado (`components/session_expired_actions`)                               |
-| Error    | `role="alert"` bajo los botones con el mensaje traducido; los dos botones vuelven a estar activos                                      |
+| Error    | toast con el mensaje traducido; los dos botones vuelven a estar activos                                                                  |
 | "Vacío"  | no hay destino de retorno guardado: la pantalla es la misma y las dos acciones siguen siendo válidas                                   |
 
-El error se muestra bajo los dos botones para mantener el mensaje visible mientras se elige
-"Iniciar sesión" o "Seguir sin cuenta". El mensaje se elige por `meta.code` con `authErrorMessage`
+El error se notifica con un toast mientras las dos acciones siguen disponibles. El mensaje se elige por `meta.code` con `authErrorMessage`
 (`src/modules/auth/utils/auth_error_message`), el mismo traductor que usan las otras seis
 pantallas: un `Record<ApiErrorCode, clave>` explícito, porque las claves de i18n están tipadas y
 `t(variable)` no compila.

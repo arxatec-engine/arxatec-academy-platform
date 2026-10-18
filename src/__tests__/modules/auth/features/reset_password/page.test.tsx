@@ -190,7 +190,7 @@ describe("ResetPasswordPage", () => {
     );
   });
 
-  it("pinta el error bajo el formulario cuando el backend rechaza la entrada", async () => {
+  it("avisa con un toast cuando el backend rechaza la entrada", async () => {
     axiosPublicInstanceMock.post.mockRejectedValue(
       apiError(422, API_ERROR_CODES.VALIDATION_ERROR),
     );
@@ -198,9 +198,10 @@ describe("ResetPasswordPage", () => {
 
     await fillForm("unaClaveLarga", "unaClaveLarga");
 
-    expect(
-      await screen.findByText("Revisa los campos marcados."),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith("Revisa los campos marcados.");
+    });
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(screen.getByLabelText("Nueva contraseña")).toHaveValue(
       "unaClaveLarga",
     );

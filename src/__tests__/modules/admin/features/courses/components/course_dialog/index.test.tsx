@@ -167,7 +167,7 @@ describe("diálogo de creación y edición de cursos", () => {
     const editor = await screen.findByRole("dialog", { name: "Editar curso" });
     expect(editor).toBe(dialog);
     expect(
-      await within(editor).findByRole("heading", { name: "Docente", level: 2 }),
+      await within(editor).findByText("Paso 2 de 6"),
     ).toBeVisible();
     expect(axiosInstanceMock.post).toHaveBeenCalledWith("/admin/courses", {
       title: "Nuevo curso",
@@ -198,33 +198,27 @@ describe("diálogo de creación y edición de cursos", () => {
       within(editor).getByRole("button", { name: "Guardar y continuar" }),
     );
     expect(
-      await within(editor).findByRole("heading", { name: "Portada", level: 2 }),
+      await within(editor).findByText("Paso 3 de 6"),
     ).toBeVisible();
     await actor.click(
       within(editor).getByRole("button", { name: "Continuar" }),
     );
     expect(
-      await within(editor).findByRole("heading", {
-        name: "Lecciones",
-        level: 2,
-      }),
+      await within(editor).findByText("Paso 4 de 6"),
     ).toBeVisible();
     await actor.click(
       within(editor).getByRole("button", { name: "Continuar" }),
     );
     expect(
       await within(editor).findByRole("textbox", {
-        name: "Enunciado de la pregunta 1",
+        name: "Enunciado",
       }),
     ).toBeVisible();
     await actor.click(
       within(editor).getByRole("button", { name: "Continuar" }),
     );
     expect(
-      await within(editor).findByRole("heading", {
-        name: "Publicación",
-        level: 2,
-      }),
+      await within(editor).findByText("Paso 6 de 6"),
     ).toBeVisible();
     expect(screen.getByRole("dialog", { name: "Editar curso" })).toBe(dialog);
     await act(() => router.navigate(-1));
@@ -437,7 +431,7 @@ describe("diálogo de creación y edición de cursos", () => {
       expect(screen.getByRole("button", { name: "Cerrar" })).toBeEnabled(),
     );
     expect(
-      await screen.findByRole("heading", { name: "Docente", level: 2 }),
+      await screen.findByText("Paso 2 de 6"),
     ).toBeVisible();
   });
 });

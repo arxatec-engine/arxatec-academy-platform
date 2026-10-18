@@ -54,7 +54,6 @@ const ResetPasswordPage = () => {
     >
       <ResetPasswordForm
         isPending={isPending}
-        errorMessage={feedback.kind === "inline" ? feedback.message : null}
         onSubmit={handleSubmit}
       />
     </AuthCard>

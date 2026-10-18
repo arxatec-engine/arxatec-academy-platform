@@ -35,8 +35,11 @@ export const LessonResources = ({ lesson, onDirtyChange }: Props) => {
     });
   };
   return (
-    <AdminSection title={t(ADMIN_TEXT.resources)}>
-      <ol className="divide-y divide-border">
+    <AdminSection
+      title={t(ADMIN_TEXT.resources)}
+      className="-mx-(--admin-content-padding) px-(--admin-content-padding)"
+    >
+      <ol className="-mx-(--admin-content-padding) divide-y divide-border">
         {lesson.resources.map((resource, index) => (
           <ResourceRow
             key={resource.id}

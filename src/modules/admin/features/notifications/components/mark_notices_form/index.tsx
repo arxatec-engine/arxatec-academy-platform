@@ -10,10 +10,10 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { NS } from "@/locales/namespaces";
-import { AdminSection } from "@/modules/admin/components/admin_section";
 import { useAdminCourses } from "@/modules/admin/hooks";
 import { useMarkNoticeSignups } from "@/modules/admin/hooks/notifications";
 import { NOTICES_TEXT } from "@/modules/admin/i18n";
+import { NotificationSection } from "../notification_section";
 
 interface Props {
   cutoff: string | null;
@@ -39,7 +39,7 @@ export const MarkNoticesForm = ({ cutoff }: Props) => {
     );
   };
   return (
-    <AdminSection
+    <NotificationSection
       title={t(NOTICES_TEXT.mark)}
       description={t(NOTICES_TEXT.markInfo)}
     >
@@ -75,6 +75,6 @@ export const MarkNoticesForm = ({ cutoff }: Props) => {
           {t(NOTICES_TEXT.mark)}
         </Button>
       </div>
-    </AdminSection>
+    </NotificationSection>
   );
 };

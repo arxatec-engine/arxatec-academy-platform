@@ -21,7 +21,7 @@ export const CourseStepActions = ({
 }: Props) => {
   const { t } = useTranslation(NS.common);
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+    <div className="-mx-(--admin-content-padding) flex flex-wrap items-center justify-between gap-3 border-t border-border px-(--admin-content-padding) pt-4">
       {onBack ? (
         <Button
           size="sm"
