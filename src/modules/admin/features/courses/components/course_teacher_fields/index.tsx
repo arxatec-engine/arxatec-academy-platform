@@ -9,7 +9,9 @@ import {
   StatusMessage,
   Textarea,
 } from "arxatec-ui";
+import { Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
 import { useAdminTeachers } from "@/modules/admin/hooks";
 import { ADMIN_TEXT } from "@/modules/admin/i18n";
@@ -70,6 +72,17 @@ export const CourseTeacherFields = ({ value, onChange, disabled }: Props) => {
             size="sm"
             title={t(ADMIN_TEXT.teacher)}
             description={t(ADMIN_TEXT.teachersLoadFailed)}
+          />
+        </div>
+      )}
+      {query.isSuccess && teachers.length === 0 && (
+        <div role="status">
+          <StatusMessage
+            size="sm"
+            color="white"
+            icon={Users}
+            title={t(ADMIN_TEXT.teacher)}
+            description={t(UI_TEXT.empty)}
           />
         </div>
       )}

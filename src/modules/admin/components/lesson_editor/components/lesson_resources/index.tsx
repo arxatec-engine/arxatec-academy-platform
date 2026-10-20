@@ -1,6 +1,9 @@
+import { StatusMessage } from "arxatec-ui";
+import { FolderOpen } from "lucide-react";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
 import { AdminSection } from "@/modules/admin/components/admin_section";
 import { useReorderAdminResources } from "@/modules/admin/hooks/lessons";
@@ -39,6 +42,17 @@ export const LessonResources = ({ lesson, onDirtyChange }: Props) => {
       title={t(ADMIN_TEXT.resources)}
       className="-mx-(--admin-content-padding) px-(--admin-content-padding)"
     >
+      {lesson.resources.length === 0 && (
+        <div role="status">
+          <StatusMessage
+            size="sm"
+            color="white"
+            icon={FolderOpen}
+            title={t(ADMIN_TEXT.resources)}
+            description={t(UI_TEXT.empty)}
+          />
+        </div>
+      )}
       <ol className="-mx-(--admin-content-padding) divide-y divide-border">
         {lesson.resources.map((resource, index) => (
           <ResourceRow

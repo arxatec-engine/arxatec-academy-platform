@@ -1,5 +1,11 @@
-import { AsyncBoundary, Card, CardContent, Skeleton } from "arxatec-ui";
-import { CalendarDays, GraduationCap } from "lucide-react";
+import {
+  AsyncBoundary,
+  Card,
+  CardContent,
+  Skeleton,
+  StatusMessage,
+} from "arxatec-ui";
+import { CalendarDays, GraduationCap, TriangleAlert } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NS } from "@/locales/namespaces";
 import { useProfileSummary } from "@/modules/profile/hooks";
@@ -22,9 +28,15 @@ export const ProfileSummary = () => {
         />
       }
       ErrorComponent={
-        <p className="text-sm text-muted-foreground">
-          {t(PROFILE_TEXT.failed)}
-        </p>
+        <div role="alert">
+          <StatusMessage
+            size="sm"
+            color="rose"
+            icon={TriangleAlert}
+            title={t(PROFILE_TEXT.title)}
+            description={t(PROFILE_TEXT.summaryLoadFailed)}
+          />
+        </div>
       }
     >
       {(summary) => (

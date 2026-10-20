@@ -1,8 +1,8 @@
 import { AsyncBoundary, StatusMessage } from "arxatec-ui";
 import { BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ErrorScreen } from "@/components/shared/error_screen";
 import { LoadingScreen } from "@/components/shared/loading_screen";
+import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
 import { useMyCourses } from "@/modules/progress/hooks";
 import { PROGRESS_TEXT } from "@/modules/progress/i18n";
@@ -11,22 +11,22 @@ import { MyCourseCard } from "../my_course_card";
 export const MyCoursesContent = () => {
   const { t } = useTranslation(NS.common);
   const query = useMyCourses();
+  if (query.isError) throw query.error;
   return (
     <AsyncBoundary
       isLoading={query.isPending}
       isError={query.isError}
       data={query.data}
       LoadingComponent={<LoadingScreen />}
-      ErrorComponent={<ErrorScreen />}
     >
       {(courses) =>
         courses.inProgress.length === 0 && courses.completed.length === 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-3" role="status">
             <StatusMessage
               size="sm"
               color="white"
               icon={BookOpen}
-              title={t(PROGRESS_TEXT.myCourses)}
+              title={t(UI_TEXT.emptyTitle)}
               description={t(PROGRESS_TEXT.empty)}
             />
           </div>

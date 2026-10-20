@@ -26,6 +26,7 @@ export const ResetLinkInvalid = ({ reason }: ResetLinkInvalidProps) => {
 
   return (
     <AuthCard
+      status="error"
       title={t(copy.title)}
       subtitle={t(copy.description)}
       footer={
@@ -35,7 +36,7 @@ export const ResetLinkInvalid = ({ reason }: ResetLinkInvalidProps) => {
         />
       }
     >
-      <div role="status" className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         <Button asChild size="sm" className="w-full">
           <Link to={RouteHelpers.forgotPassword()}>{t(copy.action)}</Link>
         </Button>

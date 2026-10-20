@@ -62,7 +62,7 @@ export const LessonComments = ({ lessonId, grouped = false }: Props) => {
               type="button"
               className={cn(
                 buttonVariants({ variant: "ghost" }),
-                "group h-auto w-full justify-between p-2 text-sm",
+                "group h-auto w-full justify-between px-4 py-2 text-sm has-[>svg]:px-4",
                 grouped ? "rounded-none" : "rounded-md",
               )}
             >
@@ -87,7 +87,7 @@ export const LessonComments = ({ lessonId, grouped = false }: Props) => {
           >
             <div className={motion.persistentGrid}>
               <div className={motion.persistentClip}>
-                <CardContent className="border-t border-border p-2">
+                <CardContent className="border-t border-border px-4 py-2">
                   {canWrite ? (
                     <>
                       {!query.isError && (
@@ -101,8 +101,8 @@ export const LessonComments = ({ lessonId, grouped = false }: Props) => {
                     <div className="space-y-2">
                       <StatusMessage
                         size="sm"
-                          color="white"
-                          classNameCard="bg-muted!"
+                        color="white"
+                        classNameCard="bg-muted!"
                         icon={user ? MailCheck : LogIn}
                         title={t(user ? COMMENTS_TEXT.verifyEmail : UI_TEXT.signIn)}
                         description={t(
@@ -147,14 +147,20 @@ export const LessonComments = ({ lessonId, grouped = false }: Props) => {
                     }
                     EmptyComponent={
                       canWrite ? (
-                        <p className="mt-6 text-sm text-muted-foreground">
-                          {t(COMMENTS_TEXT.empty)}
-                        </p>
+                        <div className="mt-6" role="status">
+                          <StatusMessage
+                            size="sm"
+                            color="white"
+                            icon={MessageCircle}
+                            title={t(UI_TEXT.emptyTitle)}
+                            description={t(COMMENTS_TEXT.empty)}
+                          />
+                        </div>
                       ) : null
                     }
                   >
                     {(threads) => (
-                      <ol className="mt-8 space-y-6">
+                      <ol className="-mx-4 mt-6 divide-y divide-border">
                         {threads.map((thread) => (
                           <CommentThread
                             key={thread.id}

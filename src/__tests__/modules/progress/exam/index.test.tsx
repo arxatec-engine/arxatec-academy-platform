@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { act, fireEvent, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "@/interceptors/api_error";
@@ -15,6 +15,8 @@ vi.mock(
   async () =>
     (await import("../../../mocks/interceptors")).interceptorsModuleMock,
 );
+const options = ["Opción A", "Opción B", "Opción C", "Opción D"];
+const selectedAnswers = Array.from({ length: 15 }, (_, index) => index % 4);
 const exam: CourseExam = {
   course: { slug: "curso-legal", title: "Curso legal" },
   status: "ready",
@@ -25,7 +27,7 @@ const exam: CourseExam = {
   last_result: null,
   questions: Array.from({ length: 15 }, (_, index) => ({
     text: `Pregunta del curso ${index + 1}`,
-    options: ["Opción A", "Opción B", "Opción C", "Opción D"],
+    options,
   })),
 };
 const envelope = (score: number, certificate_id: string | null = null) => ({
@@ -43,13 +45,60 @@ const envelope = (score: number, certificate_id: string | null = null) => ({
 });
 const answerAll = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.click(screen.getByRole("button", { name: "Comenzar examen" }));
-  for (const group of screen.getAllByRole("radiogroup")) {
-    await user.click(within(group).getByRole("radio", { name: "Opción A" }));
+  for (let index = 0; index < exam.question_count; index++) {
+    await user.click(
+      screen.getByRole("radio", { name: options[selectedAnswers[index]!]! }),
+    );
+    if (index < exam.question_count - 1)
+      await user.click(screen.getByRole("button", { name: "Siguiente" }));
   }
 };
 
 describe("examen final", () => {
   beforeEach(resetInterceptorsMock);
+
+  it("muestra una pregunta a la vez y conserva las respuestas al navegar", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ExamForm exam={exam} onReload={vi.fn()} />);
+    await user.click(screen.getByRole("button", { name: "Comenzar examen" }));
+    expect(screen.getAllByRole("radiogroup")).toHaveLength(1);
+    expect(screen.getAllByRole("radio")).toHaveLength(4);
+    expect(
+      screen.getByRole("heading", { name: "Pregunta del curso 1" }),
+    ).toHaveFocus();
+    expect(
+      screen.queryByRole("heading", { name: "Pregunta del curso 2" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+    expect(
+      screen.queryByRole("button", { name: "Enviar examen" }),
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("radio", { name: "Opción A" }));
+    await user.click(screen.getByRole("button", { name: "Siguiente" }));
+    expect(
+      screen.getByRole("heading", { name: "Pregunta del curso 2" }),
+    ).toHaveFocus();
+    expect(
+      screen.getByRole("group", { name: "Pregunta 2 de 15" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("1 de 15 respondidas")).toBeInTheDocument();
+    expect(screen.queryAllByRole("radio", { checked: true })).toHaveLength(0);
+    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+
+    await user.click(screen.getByRole("button", { name: "Anterior" }));
+    expect(screen.getByRole("radio", { name: "Opción A" })).toBeChecked();
+    await user.click(screen.getByRole("radio", { name: "Opción D" }));
+    await user.click(screen.getByRole("button", { name: "Siguiente" }));
+    await user.click(screen.getByRole("radio", { name: "Opción B" }));
+    await user.click(screen.getByRole("button", { name: "Anterior" }));
+    expect(screen.getByRole("radio", { name: "Opción D" })).toBeChecked();
+    await user.click(screen.getByRole("button", { name: "Siguiente" }));
+    expect(screen.getByRole("radio", { name: "Opción B" })).toBeChecked();
+    expect(screen.getByText("2 de 15 respondidas")).toBeInTheDocument();
+    expect(axiosInstanceMock.post).not.toHaveBeenCalled();
+  });
 
   it("exige responder las 15 preguntas y usa la nota que devuelve el servidor", async () => {
     axiosInstanceMock.post.mockResolvedValue(envelope(12, "certificate-1"));
@@ -59,20 +108,36 @@ describe("examen final", () => {
       screen.getByText(/12 respuestas correctas \(80 %\)/),
     ).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Comenzar examen" }));
+    for (let index = 0; index < exam.question_count - 1; index++) {
+      expect(
+        screen.queryByRole("button", { name: "Enviar examen" }),
+      ).not.toBeInTheDocument();
+      await user.click(
+        screen.getByRole("radio", { name: options[selectedAnswers[index]!]! }),
+      );
+      await user.click(screen.getByRole("button", { name: "Siguiente" }));
+    }
     expect(
-      screen.getByRole("button", { name: "Enviar respuestas" }),
-    ).toBeDisabled();
-    const groups = screen.getAllByRole("radiogroup");
-    expect(groups).toHaveLength(15);
-    for (const group of groups.slice(0, 14))
-      await user.click(within(group).getByRole("radio", { name: "Opción A" }));
+      screen.getByRole("heading", { name: "Pregunta del curso 15" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("14 de 15 respondidas")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Enviar respuestas" }),
+      screen.getByRole("button", { name: "Enviar examen" }),
     ).toBeDisabled();
-    await user.click(
-      within(groups[14]!).getByRole("radio", { name: "Opción A" }),
-    );
-    await user.click(screen.getByRole("button", { name: "Enviar respuestas" }));
+    fireEvent.submit(screen.getByRole("form", { name: "Examen final" }));
+    expect(axiosInstanceMock.post).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("radio", { name: "Opción C" }));
+    expect(screen.getByText("15 de 15 respondidas")).toBeInTheDocument();
+    expect(axiosInstanceMock.post).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "Anterior" }));
+    expect(
+      screen.queryByRole("button", { name: "Enviar examen" }),
+    ).not.toBeInTheDocument();
+    fireEvent.submit(screen.getByRole("form", { name: "Examen final" }));
+    expect(axiosInstanceMock.post).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Siguiente" }));
+    await user.click(screen.getByRole("button", { name: "Enviar examen" }));
     expect(
       await screen.findByRole("heading", { name: "Examen aprobado" }),
     ).toBeInTheDocument();
@@ -84,7 +149,7 @@ describe("examen final", () => {
     ).toHaveAttribute("href", "/certificados/certificate-1");
     expect(axiosInstanceMock.post).toHaveBeenCalledWith(
       "/courses/curso-legal/exam/attempts",
-      { version: 1, answers: Array.from({ length: 15 }, () => 0) },
+      { version: 1, answers: selectedAnswers },
     );
   });
 
@@ -93,7 +158,7 @@ describe("examen final", () => {
     const user = userEvent.setup();
     renderWithProviders(<ExamForm exam={exam} onReload={vi.fn()} />);
     await answerAll(user);
-    await user.click(screen.getByRole("button", { name: "Enviar respuestas" }));
+    await user.click(screen.getByRole("button", { name: "Enviar examen" }));
     expect(
       await screen.findByRole("heading", {
         name: "No alcanzaste la nota mínima",
@@ -106,8 +171,10 @@ describe("examen final", () => {
     await user.click(screen.getByRole("button", { name: "Comenzar examen" }));
     expect(screen.getByText("0 de 15 respondidas")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Enviar respuestas" }),
-    ).toBeDisabled();
+      screen.getByRole("heading", { name: "Pregunta del curso 1" }),
+    ).toHaveFocus();
+    expect(screen.queryAllByRole("radio", { checked: true })).toHaveLength(0);
+    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
   });
 
   it("conserva las respuestas cuando falla la conexión y permite reenviarlas", async () => {
@@ -117,16 +184,56 @@ describe("examen final", () => {
     const user = userEvent.setup();
     renderWithProviders(<ExamForm exam={exam} onReload={vi.fn()} />);
     await answerAll(user);
-    await user.click(screen.getByRole("button", { name: "Enviar respuestas" }));
+    await user.click(screen.getByRole("button", { name: "Enviar examen" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Tus respuestas se conservan",
     );
-    expect(screen.getAllByRole("radio", { checked: true })).toHaveLength(15);
-    await user.click(screen.getByRole("button", { name: "Enviar respuestas" }));
+    expect(screen.getByText("15 de 15 respondidas")).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Opción C" })).toBeChecked();
+    await user.click(screen.getByRole("button", { name: "Anterior" }));
+    expect(screen.getByRole("radio", { name: "Opción B" })).toBeChecked();
+    await user.click(screen.getByRole("button", { name: "Siguiente" }));
+    expect(screen.getByRole("radio", { name: "Opción C" })).toBeChecked();
+    await user.click(screen.getByRole("button", { name: "Enviar examen" }));
     expect(
       await screen.findByRole("heading", { name: "Examen aprobado" }),
     ).toBeInTheDocument();
     expect(axiosInstanceMock.post).toHaveBeenCalledTimes(2);
+    for (const attempt of [1, 2])
+      expect(axiosInstanceMock.post).toHaveBeenNthCalledWith(
+        attempt,
+        "/courses/curso-legal/exam/attempts",
+        { version: 1, answers: selectedAnswers },
+      );
+  });
+
+  it("bloquea la navegación y las opciones mientras se corrige el examen", async () => {
+    let resolveAttempt:
+      ((value: ReturnType<typeof envelope>) => void) | undefined;
+    axiosInstanceMock.post.mockReturnValueOnce(
+      new Promise<ReturnType<typeof envelope>>((resolve) => {
+        resolveAttempt = resolve;
+      }),
+    );
+    const user = userEvent.setup();
+    renderWithProviders(<ExamForm exam={exam} onReload={vi.fn()} />);
+    await answerAll(user);
+    await user.click(screen.getByRole("button", { name: "Enviar examen" }));
+    expect(
+      screen.getByRole("button", { name: "Corrigiendo examen" }),
+    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled();
+    for (const option of screen.getAllByRole("radio"))
+      expect(option).toBeDisabled();
+    await user.click(screen.getByRole("button", { name: "Anterior" }));
+    expect(
+      screen.getByRole("heading", { name: "Pregunta del curso 15" }),
+    ).toBeInTheDocument();
+    await act(async () => resolveAttempt?.(envelope(12, "certificate-1")));
+    expect(
+      await screen.findByRole("heading", { name: "Examen aprobado" }),
+    ).toBeInTheDocument();
+    expect(axiosInstanceMock.post).toHaveBeenCalledOnce();
   });
 
   it("pide recargar si administración cambia el examen durante el intento", async () => {
@@ -143,13 +250,16 @@ describe("examen final", () => {
     const user = userEvent.setup();
     renderWithProviders(<ExamForm exam={exam} onReload={reload} />);
     await answerAll(user);
-    await user.click(screen.getByRole("button", { name: "Enviar respuestas" }));
+    await user.click(screen.getByRole("button", { name: "Enviar examen" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "El examen cambió",
     );
     expect(
-      screen.getByRole("button", { name: "Enviar respuestas" }),
+      screen.getByRole("button", { name: "Enviar examen" }),
     ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled();
+    for (const option of screen.getAllByRole("radio"))
+      expect(option).toBeDisabled();
     await user.click(screen.getByRole("button", { name: "Recargar examen" }));
     expect(reload).toHaveBeenCalledOnce();
   });

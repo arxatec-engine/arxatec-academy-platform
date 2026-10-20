@@ -6,10 +6,13 @@ Los scripts disponibles están definidos en `package.json`. Desde la raíz del p
 pnpm lint
 pnpm typecheck
 pnpm test:unit
-pnpm build
+pnpm build:local
 ```
 
-`typecheck` ejecuta `tsc -b --noEmit`; `build` ejecuta `tsc -b && vite build`. Las pruebas usan Vitest, Testing Library y jsdom. Los tests de interfaz no sustituyen la comprobación manual de navegación, estilos y comportamiento en navegador real.
+`typecheck` ejecuta `tsc -b --noEmit`; `build:local` ejecuta `tsc -b && vite build` sin consultar
+Infisical. `build` es un alias de `build:prod`; `build:dev` y `build:prod` cargan sus variables
+desde Infisical. Las pruebas usan Vitest, Testing Library y jsdom. Los tests de interfaz no
+sustituyen la comprobación manual de navegación, estilos y comportamiento en navegador real.
 
 ## Cobertura presente
 

@@ -1,7 +1,7 @@
 # Página no encontrada
 
 La ruta comodín `ROUTES.not_found` usa una página dedicada inspirada en el 404 de
-`arxatec-public-web`: código pequeño, título de peso normal, una descripción breve y
+`arxatec-public-web`: código pequeño, título y descripción centrados, y
 una única acción para volver al inicio. `PageShell` aporta la cabecera, el pie y
 el tema de Academy; el contenido queda centrado en el espacio disponible.
 
@@ -10,9 +10,11 @@ La página se importa de forma directa desde `error_routes`, sin carga diferida.
 parámetros de una ruta no permiten identificar el recurso. Sustituye la pantalla
 completa, incluida la navegación administrativa, y conserva la URL solicitada.
 Así `/cursos/ofds`, una lección inexistente y una ruta desconocida comparten el mismo
-layout, centrado y acción de regreso. Los errores de conexión y de servidor siguen
-su tratamiento habitual.
+layout, centrado y acción de regreso. Los errores de conexión y de servidor usan la misma
+página con su mensaje correspondiente.
 
-`NotFoundContent` contiene el diseño compartido. Los textos usan las claves tipadas
+`ErrorScreen kind="not_found"` contiene el diseño compartido. Su variante `unexpected`
+conserva la misma estructura y botón compacto, con la etiqueta «Error» y una descripción del fallo.
+Estas páginas no usan `StatusMessage`. Los textos usan las claves tipadas
 de `error_screen` en español, inglés y portugués. `useTitle` actualiza el título de
 la pestaña. La animación de entrada solo se aplica cuando el sistema permite movimiento.

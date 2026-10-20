@@ -11,6 +11,8 @@
     "close": "Close"
   },
   "states": {
+    "empty": "No records found.",
+    "empty_title": "No records",
     "loading": "Loading",
     "loading_session": "Checking your session"
   },
@@ -95,8 +97,11 @@
     "intro": "Answer all {{total}} questions. You need {{required}} correct answers ({{percent}}%) to receive your certificate.",
     "begin": "Start exam",
     "question": "Question {{number}}",
+    "question_position": "Question {{number}} of {{total}}",
+    "previous": "Previous",
+    "next": "Next",
     "answered": "{{answered}} of {{total}} answered",
-    "submit": "Submit answers",
+    "submit": "Submit exam",
     "submitting": "Grading exam",
     "passed": "Exam passed",
     "failed": "You did not reach the passing score",
@@ -125,7 +130,11 @@
     "saved": "Exam saved",
     "save_failed": "We could not save the exam. Your changes are kept on this screen.",
     "invalid": "Complete all 15 questions with four different options, one correct answer, and a passing score between 1 and 15.",
-    "invalid_question": "Check question {{number}}: enter its text, four different options, and select the correct answer."
+    "invalid_question": "Check question {{number}}: enter its text, four different options, and select the correct answer.",
+    "take_for_certificate": "Take the exam to earn my certificate",
+    "lessons_completed": "You completed all the lessons",
+    "certificate_hint": "Pass the final exam to earn your certificate.",
+    "certificate_ready_hint": "You passed the exam. You can now view and download your certificate."
   },
   "progress": {
     "subtitle": "Pick up where you left off and keep learning at your own pace.",
@@ -174,6 +183,9 @@
     "posted": "Comment posted",
     "failed": "We couldn't post your comment.",
     "reply": "Reply",
+    "show_replies_one": "Show {{count}} reply",
+    "show_replies_other": "Show {{count}} replies",
+    "hide_replies": "Hide replies",
     "report": "Report",
     "reporting": "Sending report…",
     "reported": "Report sent",
@@ -216,6 +228,7 @@
     "email": "Email address",
     "independent": "I work independently",
     "loading": "Loading summary…",
+    "summary_load_failed": "We couldn't load your profile summary. Please try again.",
     "city_lima": "Lima",
     "city_arequipa": "Arequipa",
     "city_trujillo": "Trujillo",
@@ -444,8 +457,9 @@
       "action": "Back to home"
     },
     "unexpected": {
+      "label": "Error",
       "title": "Something broke",
-      "description": "We could not paint this screen. Load it again and, if it stays the same, write to us at hola@arxatec.pe.",
+      "description": "We couldn't load this page. Please try again in a few minutes.",
       "action": "Go to the catalog"
     }
   },

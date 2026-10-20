@@ -10,7 +10,7 @@ const ExamPage = () => {
   const { t } = useTranslation(NS.common);
   useTitle(t(EXAM_TEXT.title));
   return (
-    <PageShell>
+    <PageShell className="flex flex-col">
       <PageHeading title={t(EXAM_TEXT.title)} />
       <ExamContent />
     </PageShell>

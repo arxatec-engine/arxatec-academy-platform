@@ -1,4 +1,5 @@
-import { Button, Card, CardContent } from "arxatec-ui";
+import { Button, StatusMessage } from "arxatec-ui";
+import { CircleAlert, CircleCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { NS } from "@/locales/namespaces";
@@ -16,49 +17,50 @@ export const ExamResult = ({
 }) => {
   const { t } = useTranslation(NS.common);
   return (
-    <Card className="py-4 shadow-none">
-      <CardContent className="space-y-3" role="status">
-        <h2 className="text-base font-medium">
-          {t(
-            result.passed
-              ? result.score === null
-                ? EXAM_TEXT.certificateAvailable
-                : EXAM_TEXT.passed
-              : EXAM_TEXT.failed,
-          )}
-        </h2>
-        {result.score !== null && (
-          <p className="text-sm">
-            {t(EXAM_TEXT.score, {
-              score: result.score,
-              total: result.question_count,
-            })}
-          </p>
+    <div className="space-y-3" role="status">
+      <StatusMessage
+        size="sm"
+        color={result.passed ? "white" : "rose"}
+        icon={result.passed ? CircleCheck : CircleAlert}
+        title={t(
+          result.passed
+            ? result.score === null
+              ? EXAM_TEXT.certificateAvailable
+              : EXAM_TEXT.passed
+            : EXAM_TEXT.failed,
         )}
-        {!result.passed && (
-          <p className="text-sm text-muted-foreground">
-            {t(EXAM_TEXT.intro, {
-              total: result.question_count,
-              required: result.passing_score,
-              percent: Math.round(
-                (result.passing_score / result.question_count) * 100,
-              ),
-            })}
-          </p>
-        )}
-        {result.certificate_id && (
-          <Button size="sm" asChild>
-            <Link to={RouteHelpers.certificate(result.certificate_id)}>
-              {t(CERTIFICATE_TEXT.view)}
-            </Link>
-          </Button>
-        )}
-        {!result.passed && onRetry && (
-          <Button size="sm" type="button" onClick={onRetry}>
-            {t(EXAM_TEXT.retry)}
-          </Button>
-        )}
-      </CardContent>
-    </Card>
+        description={
+          result.score === null
+            ? t(CERTIFICATE_TEXT.verified)
+            : t(EXAM_TEXT.score, {
+                score: result.score,
+                total: result.question_count,
+              })
+        }
+      />
+      {!result.passed && (
+        <p className="text-sm text-muted-foreground">
+          {t(EXAM_TEXT.intro, {
+            total: result.question_count,
+            required: result.passing_score,
+            percent: Math.round(
+              (result.passing_score / result.question_count) * 100,
+            ),
+          })}
+        </p>
+      )}
+      {result.certificate_id && (
+        <Button size="sm" asChild>
+          <Link to={RouteHelpers.certificate(result.certificate_id)}>
+            {t(CERTIFICATE_TEXT.view)}
+          </Link>
+        </Button>
+      )}
+      {!result.passed && onRetry && (
+        <Button size="sm" type="button" onClick={onRetry}>
+          {t(EXAM_TEXT.retry)}
+        </Button>
+      )}
+    </div>
   );
 };

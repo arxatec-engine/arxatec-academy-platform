@@ -98,6 +98,11 @@ describe("guard <Auth>", () => {
       await screen.findByRole("heading", { name: "Algo se rompió" }),
     ).toBeInTheDocument();
 
+    expect(screen.getAllByRole("banner")).toHaveLength(1);
+    expect(screen.getAllByRole("main")).toHaveLength(1);
+    expect(screen.getAllByRole("contentinfo")).toHaveLength(1);
+    expect(document.title).toBe("Algo se rompió - Arxatec Academy");
+
     expect(token()).toBe("un-token");
     expect(useUserStore.getState().user).not.toBeNull();
     expect(

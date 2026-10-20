@@ -1,5 +1,4 @@
 import { AsyncBoundary } from "arxatec-ui";
-import { ErrorScreen } from "@/components/shared/error_screen";
 import { LoadingScreen } from "@/components/shared/loading_screen";
 import { useLesson } from "@/modules/catalog/hooks";
 import { useCatalogRoute } from "@/modules/catalog/hooks/use_catalog_route";
@@ -10,13 +9,13 @@ export const LessonContent = () => {
   const { courseSlug, lessonSlug } = useCatalogRoute();
   const query = useLesson(courseSlug, lessonSlug);
   if (!courseSlug || !lessonSlug) throw new Response(null, { status: 404 });
+  if (query.isError) throw query.error;
   return (
     <AsyncBoundary
       isLoading={query.isPending}
       isError={query.isError}
       data={query.data}
       LoadingComponent={<LoadingScreen />}
-      ErrorComponent={<ErrorScreen />}
     >
       {(view) =>
         view.locked ? (

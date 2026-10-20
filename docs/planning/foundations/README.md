@@ -20,6 +20,6 @@ El cliente no es fuente de verdad para permisos, inscripción, publicación, mod
 
 - Pantallas y módulos reales: `src/routes`, `src/modules` y sus documentos de feature.
 - Contratos de servicio: repositorio hermano `arxatec-academy-service`.
-- Variables de arranque: `.env.example` y `src/config/env`.
+- Variables de arranque: [Entorno](../../ENV.md), `.infisical.json` y `src/config/env`.
 
 Si un documento planea una capacidad y el código no la implementa, debe presentarla como pendiente.

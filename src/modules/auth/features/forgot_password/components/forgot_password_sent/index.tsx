@@ -1,4 +1,5 @@
 import { Button } from "arxatec-ui";
+import { MailCheck } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -29,6 +30,8 @@ export const ForgotPasswordSent = ({ onResend }: ForgotPasswordSentProps) => {
       className="flex w-full max-w-sm justify-center outline-none"
     >
       <AuthCard
+        status="info"
+        icon={MailCheck}
         title={t(forgotPassword.sent.title)}
         subtitle={t(forgotPassword.sent.description)}
       >

@@ -1,9 +1,9 @@
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
 import { Accessibility } from "@dnd-kit/dom";
 import { DragDropProvider } from "@dnd-kit/react";
-import { AsyncBoundary } from "arxatec-ui";
+import { AsyncBoundary, StatusMessage } from "arxatec-ui";
+import { BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ErrorScreen } from "@/components/shared/error_screen";
 import { LoadingScreen } from "@/components/shared/loading_screen";
 import { NS } from "@/locales/namespaces";
 import { ADMIN_TEXT } from "@/modules/admin/i18n";
@@ -23,6 +23,7 @@ export const CourseList = () => {
     endDrag,
     move,
   } = useCourseSorting();
+  if (query.isError && !query.data) throw query.error;
 
   return (
     <AsyncBoundary
@@ -30,7 +31,6 @@ export const CourseList = () => {
       isError={query.isError && !query.data}
       data={query.data}
       LoadingComponent={<LoadingScreen className="mt-5" />}
-      ErrorComponent={<ErrorScreen />}
     >
       {(data) => (
         <section className="mt-5 space-y-3" aria-label={t(ADMIN_TEXT.courses)}>
@@ -38,9 +38,15 @@ export const CourseList = () => {
             {t(CATALOG_TEXT.coursesCount, { count: data.courses.length })}
           </p>
           {courses.length === 0 && (
-            <p className="rounded-md border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-              {t(CATALOG_TEXT.noCourses)}
-            </p>
+            <div role="status">
+              <StatusMessage
+                size="sm"
+                color="white"
+                icon={BookOpen}
+                title={t(CATALOG_TEXT.noCourses)}
+                description={t(CATALOG_TEXT.noCoursesHint)}
+              />
+            </div>
           )}
           <DragDropProvider
             modifiers={[RestrictToVerticalAxis]}

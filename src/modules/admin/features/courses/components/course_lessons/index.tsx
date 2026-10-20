@@ -4,12 +4,14 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  StatusMessage,
 } from "arxatec-ui";
-import { ArrowDown, ArrowUp, ChevronDown } from "lucide-react";
+import { ArrowDown, ArrowUp, BookOpen, ChevronDown } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
 import { AdminSection } from "@/modules/admin/components/admin_section";
 import { AdminLessonEditor } from "@/modules/admin/components/lesson_editor";
@@ -82,6 +84,17 @@ export const CourseLessons = ({ view, embedded, onDirtyChange }: Props) => {
       showHeading={!embedded}
       className={embedded ? "border-0 pt-0" : undefined}
     >
+      {view.lessons.length === 0 && (
+        <div role="status">
+          <StatusMessage
+            size="sm"
+            color="white"
+            icon={BookOpen}
+            title={t(ADMIN_TEXT.lessons)}
+            description={t(UI_TEXT.empty)}
+          />
+        </div>
+      )}
       <ol className="space-y-3">
         {view.lessons.map((lesson, index) => (
           <Collapsible

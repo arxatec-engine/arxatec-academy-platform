@@ -28,8 +28,8 @@ el parámetro de búsqueda reemplaza la entrada actual del historial; los select
 demás parámetros. Cada selector ofrece una opción «Todos» y el campo permite borrar el texto.
 `CourseCover` comparte las fotos de Pexels con la ficha de curso. El enlace de cada tarjeta
 tiene un nombre accesible que incluye el título, sin controles interactivos anidados.
-El estado sin cursos y el error de carga usan `StatusMessage` de `arxatec-ui`; el error
-mantiene visibles los filtros y el mensaje del fallo.
+El estado sin cursos usa `StatusMessage` de `arxatec-ui`. Un fallo de carga muestra la página
+de error compartida con el 404; la URL conserva la búsqueda y los filtros.
 Durante la carga de cursos, `LoadingScreen` muestra un único bloque simple de `Skeleton`,
 manteniendo la cabecera y los filtros visibles.
 

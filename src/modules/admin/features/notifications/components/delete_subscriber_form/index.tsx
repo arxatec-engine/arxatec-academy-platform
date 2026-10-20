@@ -63,9 +63,9 @@ export const DeleteSubscriberForm = () => {
               {t(NOTICES_TEXT.delete)}
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="text-sm">
             <DialogHeader>
-              <DialogTitle className="text-lg font-normal">
+              <DialogTitle className="text-sm font-normal">
                 {t(NOTICES_TEXT.delete)}
               </DialogTitle>
               <DialogDescription>

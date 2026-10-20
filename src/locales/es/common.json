@@ -11,6 +11,8 @@
     "close": "Cerrar"
   },
   "states": {
+    "empty": "No hay registros.",
+    "empty_title": "Sin registros",
     "loading": "Cargando",
     "loading_session": "Comprobando tu sesión"
   },
@@ -95,8 +97,11 @@
     "intro": "Responde las {{total}} preguntas. Necesitas {{required}} respuestas correctas ({{percent}} %) para recibir tu certificado.",
     "begin": "Comenzar examen",
     "question": "Pregunta {{number}}",
+    "question_position": "Pregunta {{number}} de {{total}}",
+    "previous": "Anterior",
+    "next": "Siguiente",
     "answered": "{{answered}} de {{total}} respondidas",
-    "submit": "Enviar respuestas",
+    "submit": "Enviar examen",
     "submitting": "Corrigiendo examen",
     "passed": "Examen aprobado",
     "failed": "No alcanzaste la nota mínima",
@@ -125,7 +130,11 @@
     "saved": "Examen guardado",
     "save_failed": "No pudimos guardar el examen. Tus cambios se conservan.",
     "invalid": "Completa las 15 preguntas con cuatro opciones distintas, una respuesta correcta y una nota mínima entre 1 y 15.",
-    "invalid_question": "Revisa la pregunta {{number}}: escribe el enunciado, cuatro opciones distintas y selecciona la respuesta correcta."
+    "invalid_question": "Revisa la pregunta {{number}}: escribe el enunciado, cuatro opciones distintas y selecciona la respuesta correcta.",
+    "take_for_certificate": "Dar examen para obtener mi certificado",
+    "lessons_completed": "Completaste todas las lecciones",
+    "certificate_hint": "El siguiente paso es aprobar el examen final para obtener tu certificado.",
+    "certificate_ready_hint": "Aprobaste el examen. Ya puedes consultar y descargar tu certificado."
   },
   "progress": {
     "subtitle": "Retoma donde quedaste y sigue avanzando a tu ritmo.",
@@ -174,6 +183,9 @@
     "posted": "Comentario publicado",
     "failed": "No pudimos publicar el comentario.",
     "reply": "Responder",
+    "show_replies_one": "Ver {{count}} respuesta",
+    "show_replies_other": "Ver {{count}} respuestas",
+    "hide_replies": "Ocultar respuestas",
     "report": "Reportar",
     "reporting": "Enviando reporte…",
     "reported": "Reporte enviado",
@@ -216,6 +228,7 @@
     "email": "Correo electrónico",
     "independent": "Trabajo de forma independiente",
     "loading": "Cargando resumen…",
+    "summary_load_failed": "No pudimos cargar el resumen de tu perfil. Vuelve a intentarlo.",
     "city_lima": "Lima",
     "city_arequipa": "Arequipa",
     "city_trujillo": "Trujillo",
@@ -444,8 +457,9 @@
       "action": "Volver al inicio"
     },
     "unexpected": {
+      "label": "Error",
       "title": "Algo se rompió",
-      "description": "No pudimos pintar esta pantalla. Vuelve a cargarla y, si sigue igual, escríbenos a hola@arxatec.pe.",
+      "description": "No pudimos cargar esta página. Vuelve a intentarlo en unos minutos.",
       "action": "Ir al catálogo"
     }
   },

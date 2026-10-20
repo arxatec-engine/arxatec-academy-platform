@@ -6,11 +6,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  StatusMessage,
 } from "arxatec-ui";
+import { MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ErrorScreen } from "@/components/shared/error_screen";
 import { LoadingScreen } from "@/components/shared/loading_screen";
+import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
 import { AdminPage } from "@/modules/admin/components/admin_page";
 import {
@@ -27,6 +29,7 @@ export const ModerationContent = () => {
   const [page, setPage] = useState(1);
   const query = useModeration(tab, page);
   const counts = useModerationCounts();
+  if (query.isError) throw query.error;
   return (
     <AdminPage
       title={t(MODERATION_TEXT.title)}
@@ -74,14 +77,19 @@ export const ModerationContent = () => {
         isError={query.isError}
         data={query.data}
         LoadingComponent={<LoadingScreen />}
-        ErrorComponent={<ErrorScreen />}
       >
         {(data) => (
           <>
             {data.comments.length === 0 ? (
-              <p className="rounded-md border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-                {t(MODERATION_TEXT.empty)}
-              </p>
+              <div role="status">
+                <StatusMessage
+                  size="sm"
+                  color="white"
+                  icon={MessageCircle}
+                  title={t(UI_TEXT.emptyTitle)}
+                  description={t(MODERATION_TEXT.empty)}
+                />
+              </div>
             ) : (
               <ol className="space-y-2">
                 {data.comments.map((comment) => (

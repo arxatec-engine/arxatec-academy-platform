@@ -1,5 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { I18nextProvider } from "react-i18next";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
@@ -38,6 +38,20 @@ const CERTIFICATE = {
   verification_url:
     "https://academy.example.test/certificados/b36b9f31-1234-4b87-a41f-b0a09ee4a123",
   qr_code_data_url: "data:image/png;base64,iVBORw0KGgo=",
+};
+
+const EMPTY_CATALOG = {
+  courses: [],
+  facets: {
+    topic: {
+      ALL: 0,
+      FIRST_STEPS: 0,
+      LEGAL_ENGINEERING: 0,
+      APPLIED_AI: 0,
+      ARXATEC_PRODUCT: 0,
+    },
+    level: { INTRODUCTORY: 0, INTERMEDIATE: 0 },
+  },
 };
 
 Element.prototype.scrollIntoView = function scrollIntoView(): void {
@@ -90,9 +104,11 @@ const mockAccountRequests = (account: ApiUser): void => {
     Promise.resolve({
       data: {
         data:
-          url === "/me/summary"
-            ? { member_since: account.created_at, completed_courses: 0 }
-            : { user: account },
+          url === "/courses"
+            ? EMPTY_CATALOG
+            : url === "/me/summary"
+              ? { member_since: account.created_at, completed_courses: 0 }
+              : { user: account },
       },
     }),
   );
@@ -101,6 +117,7 @@ const mockAccountRequests = (account: ApiUser): void => {
 describe("arbol de rutas real", () => {
   beforeEach(() => {
     resetInterceptorsMock();
+    axiosInstanceMock.get.mockResolvedValue({ data: { data: EMPTY_CATALOG } });
     scrollTo.mockClear();
   });
 
@@ -184,7 +201,9 @@ describe("arbol de rutas real", () => {
                   courses: [],
                   counts: { total: 0, published: 0, draft: 0, archived: 0 },
                 }
-              : { user: account },
+              : url === "/courses"
+                ? EMPTY_CATALOG
+                : { user: account },
         },
       }),
     );
@@ -394,20 +413,48 @@ describe("arbol de rutas real", () => {
     }
   });
 
-  it("conserva el error de carga cuando el servidor devuelve un 500", async () => {
-    axiosInstanceMock.get.mockRejectedValue(
-      new ApiError({
-        status: 500,
-        code: "INTERNAL_ERROR",
-        description: "Error del servidor",
-        fields: null,
-        retryAfterSeconds: null,
-      }),
-    );
-    renderRoute(RouteHelpers.course("ofds"));
-    await expectHeading("Algo se rompió");
-    expect(screen.queryByText("404")).not.toBeInTheDocument();
-  });
+  it.each([
+    { route: RouteHelpers.home(), endpoint: "/courses", status: 0, role: null },
+    { route: RouteHelpers.course("ofds"), endpoint: "/courses/ofds", status: 500, role: null },
+    { route: RouteHelpers.lesson("ofds", "leccion"), endpoint: "/courses/ofds/lessons/leccion", status: 503, role: null },
+    { route: RouteHelpers.adminCourses(), endpoint: "/admin/courses", status: 500, role: "ADMIN" },
+  ] as const)(
+    "usa la página de error completa en $route ante un fallo $status",
+    async ({ route, endpoint, status, role }) => {
+      const account = role === null ? null : buildApiUser({ role });
+      const errorLog = vi.spyOn(console, "error").mockImplementation(() => {});
+      axiosInstanceMock.get.mockImplementation((url: string) =>
+        url === endpoint
+          ? Promise.reject(new ApiError({
+              status,
+              code: status === 0 ? null : "INTERNAL_ERROR",
+              description: "Servicio no disponible",
+              fields: null,
+              retryAfterSeconds: null,
+            }))
+          : Promise.resolve({ data: { data: { user: account } } }),
+      );
+      try {
+        const router = renderRoute(route, account);
+        await expectHeading("Algo se rompió");
+        expect(screen.getByRole("alert")).toHaveTextContent(
+          "No pudimos cargar esta página. Vuelve a intentarlo en unos minutos.",
+        );
+        expect(screen.queryByText("404")).not.toBeInTheDocument();
+        expect(screen.getAllByRole("banner")).toHaveLength(1);
+        expect(screen.getAllByRole("main")).toHaveLength(1);
+        expect(screen.getAllByRole("contentinfo")).toHaveLength(1);
+        expect(screen.queryByRole("navigation", { name: "Administración" })).not.toBeInTheDocument();
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(within(screen.getByRole("main")).getAllByRole("link")).toHaveLength(1);
+        expect(screen.getByRole("link", { name: "Ir al catálogo" })).toHaveAttribute("href", RouteHelpers.home());
+        expect(document.title).toBe("Algo se rompió - Arxatec Academy");
+        expect(router.state.location.pathname).toBe(route);
+      } finally {
+        errorLog.mockRestore();
+      }
+    },
+  );
 
   it("muestra solo el certificado sin sesión, sin cabecera, pie ni controles", async () => {
     axiosPublicInstanceMock.get.mockResolvedValue({
@@ -507,17 +554,27 @@ describe("arbol de rutas real", () => {
     },
   );
 
-  it("permite reintentar la carga pública del certificado si falla la conexión", async () => {
+  it("usa la página de error para el certificado y recupera la carga al volver", async () => {
     const user = userEvent.setup();
+    const errorLog = vi.spyOn(console, "error").mockImplementation(() => {});
     axiosPublicInstanceMock.get
       .mockRejectedValueOnce(new Error("Sin conexión"))
       .mockResolvedValueOnce({ data: { data: { certificate: CERTIFICATE } } });
-    renderRoute(RouteHelpers.certificate(CERTIFICATE.id));
-
-    await expectHeading("No pudimos cargar el certificado");
-    await user.click(screen.getByRole("button", { name: "Volver a intentar" }));
-    await expectHeading("Certificado de finalización");
-    expect(screen.getByText("Certificado verificado")).toBeInTheDocument();
+    try {
+      const router = renderRoute(RouteHelpers.certificate(CERTIFICATE.id));
+      await expectHeading("Algo se rompió");
+      expect(screen.getAllByRole("banner")).toHaveLength(1);
+      expect(screen.getAllByRole("main")).toHaveLength(1);
+      expect(screen.getAllByRole("contentinfo")).toHaveLength(1);
+      expect(router.state.location.pathname).toBe(RouteHelpers.certificate(CERTIFICATE.id));
+      await user.click(screen.getByRole("link", { name: "Ir al catálogo" }));
+      await expectHeading("Catálogo de cursos");
+      await act(() => router.navigate(-1));
+      await expectHeading("Certificado de finalización");
+      expect(screen.getByText("Certificado verificado")).toBeInTheDocument();
+    } finally {
+      errorLog.mockRestore();
+    }
   });
 
   it("ofrece el certificado obtenido desde Mis cursos", async () => {

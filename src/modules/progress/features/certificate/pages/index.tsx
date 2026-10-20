@@ -33,6 +33,7 @@ const CertificatePage = () => {
   const missing =
     query.error instanceof ApiError && [404, 422].includes(query.error.status);
   if (missing) throw new Response(null, { status: 404 });
+  if (query.isError) throw query.error;
   const copyLink = async () => {
     if (!certificate) return;
     try {
@@ -46,19 +47,7 @@ const CertificatePage = () => {
   const content = (
     <>
       {query.isPending && <LoadingScreen />}
-      {query.isError && (
-        <div role="alert" className="space-y-3">
-          <h1 className="text-2xl">{t(CERTIFICATE_TEXT.loadFailed)}</h1>
-          <Button
-            size="sm"
-            type="button"
-            onClick={() => void query.refetch()}
-          >
-            {t(CERTIFICATE_TEXT.retry)}
-          </Button>
-        </div>
-      )}
-      {certificate && !query.isError && (
+      {certificate && (
         <div
           className={
             user

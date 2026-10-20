@@ -1,4 +1,5 @@
 import { Button } from "arxatec-ui";
+import { Flag } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -29,10 +30,12 @@ export const ReportButton = ({ commentId }: Props) => {
     <Button
       size="sm"
       type="button"
-      variant="link"
+      variant="ghost"
+      className="h-8 px-2 text-muted-foreground"
       disabled={report.isPending}
       onClick={reportOne}
     >
+      <Flag aria-hidden="true" className="size-4" />
       {t(COMMENTS_TEXT.report)}
     </Button>
   );

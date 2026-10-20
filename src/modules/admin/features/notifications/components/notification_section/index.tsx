@@ -18,14 +18,14 @@ export const NotificationSection = ({ title, description, children }: Props) => 
   const titleId = useId();
 
   return (
-    <Collapsible className="min-w-0">
+    <Collapsible className="min-w-0 text-sm">
       <h2 id={titleId}>
         <CollapsibleTrigger asChild>
           <Button
             type="button"
             size="sm"
             variant="ghost"
-            className="group h-auto w-full justify-between gap-3 rounded-none p-3 text-left text-sm font-normal whitespace-normal sm:p-4"
+            className="group h-auto w-full justify-between gap-2 rounded-none p-2 text-left text-sm font-normal whitespace-normal "
           >
             <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">
               {title}

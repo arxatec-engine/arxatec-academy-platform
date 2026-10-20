@@ -1,9 +1,10 @@
-import { act, screen } from "@testing-library/react";
+import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { buildApiUser } from "@/__tests__/mocks/fixtures";
 import { renderWithProviders } from "@/__tests__/utils/render_with_providers";
 import { LessonComments } from "@/modules/comments/components/lesson_comments";
+import { replyToComment, reportComment } from "@/modules/comments/services";
 import type { CommentThread } from "@/modules/comments/types";
 import { RouteHelpers } from "@/routes/routes";
 import { useUserStore } from "@/store/user";
@@ -23,6 +24,26 @@ const thread: CommentThread = {
   replies: [],
 };
 
+const reply = {
+  id: "reply-1",
+  parentId: thread.id,
+  body: "Una respuesta del equipo a la pregunta.",
+  author: {
+    fullName: "Admin Arxatec",
+    avatarUrl: null,
+    affiliation: null,
+    isTeam: true,
+  },
+  createdAt: "2026-10-16T11:00:00.000Z",
+};
+
+vi.mock("@/modules/comments/services", () => ({
+  createComment: vi.fn(),
+  getComments: vi.fn(),
+  replyToComment: vi.fn(),
+  reportComment: vi.fn(),
+}));
+
 vi.mock("@/modules/comments/hooks", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   useComments: () => commentsQuery,
@@ -30,6 +51,7 @@ vi.mock("@/modules/comments/hooks", async (importOriginal) => ({
 
 describe("LessonComments", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     commentsQuery.isPending = false;
     commentsQuery.isError = false;
     commentsQuery.data = [];
@@ -157,5 +179,105 @@ describe("LessonComments", () => {
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Iniciar sesión" })).toBeVisible();
     expect(screen.getByText(thread.body)).toBeVisible();
+  });
+
+  it.each([
+    { replies: [reply], label: "Ver 1 respuesta" },
+    {
+      replies: [reply, { ...reply, id: "reply-2", body: "Otra respuesta." }],
+      label: "Ver 2 respuestas",
+    },
+  ])("pliega las respuestas públicas y permite mostrarlas con «$label»", async ({
+    replies,
+    label,
+  }) => {
+    commentsQuery.data = [{ ...thread, replies }];
+    const actor = userEvent.setup();
+    renderWithProviders(<LessonComments lessonId="lesson-1" />, { user: null });
+    await actor.click(screen.getByRole("button", { name: "Comentarios" }));
+
+    const toggle = screen.getByRole("button", { name: label });
+    const repliesPanel = screen.getByText(reply.body).closest('[data-slot="collapsible-content"]');
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(repliesPanel).toHaveAttribute("aria-hidden", "true");
+    expect(repliesPanel).toHaveAttribute("inert");
+    expect(screen.queryByRole("button", { name: "Responder" })).not.toBeInTheDocument();
+
+    await actor.click(toggle);
+    expect(toggle).toHaveAccessibleName("Ocultar respuestas");
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(repliesPanel).toHaveAttribute("aria-hidden", "false");
+    expect(repliesPanel).not.toHaveAttribute("inert");
+    expect(screen.getAllByText("Equipo Arxatec")).toHaveLength(replies.length);
+
+    await actor.click(toggle);
+    expect(toggle).toHaveAccessibleName(label);
+    expect(repliesPanel).toHaveAttribute("aria-hidden", "true");
+    expect(repliesPanel).toHaveAttribute("inert");
+  });
+
+  it("muestra las iniciales del autor cuando no tiene foto", async () => {
+    commentsQuery.data = [{
+      ...thread,
+      author: {
+        fullName: "Valeria Paredes León",
+        avatarUrl: null,
+        affiliation: "Trabajo de forma independiente",
+        isTeam: false,
+      },
+      replies: [reply],
+    }];
+    renderWithProviders(<LessonComments lessonId="lesson-1" />, { user: null });
+    await userEvent.click(screen.getByRole("button", { name: "Comentarios" }));
+
+    expect(screen.getByText("Valeria Paredes León")).toBeVisible();
+    expect(screen.getByText("VP")).toBeVisible();
+    expect(screen.getByText("AA")).toBeInTheDocument();
+    expect(screen.getByText("Trabajo de forma independiente")).toBeVisible();
+  });
+
+  it("abre las respuestas al publicar y cierra el formulario", async () => {
+    commentsQuery.data = [{ ...thread, replies: [reply] }];
+    vi.mocked(replyToComment).mockResolvedValue(reply);
+    const actor = userEvent.setup();
+    renderWithProviders(<LessonComments lessonId="lesson-1" />, {
+      user: buildApiUser({ email_verified_at: "2026-10-16T10:00:00.000Z" }),
+    });
+    await actor.click(screen.getByRole("button", { name: "Comentarios" }));
+    await actor.click(screen.getByRole("button", { name: "Responder" }));
+    const composer = screen.getByRole("textbox", { name: "Responder" });
+    await actor.type(composer, "Mi respuesta");
+    const form = composer.closest("form");
+    if (!form) throw new Error("No se encontró el formulario de respuesta");
+    await actor.click(within(form).getByRole("button", { name: "Publicar" }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole("textbox", { name: "Responder" })).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Ocultar respuestas" })).toHaveAttribute("aria-expanded", "true");
+    });
+    expect(replyToComment).toHaveBeenCalledWith(
+      { commentId: thread.id, body: "Mi respuesta" },
+      expect.anything(),
+    );
+  });
+
+  it("conserva el reporte de una respuesta al plegar y volver a abrir el hilo", async () => {
+    commentsQuery.data = [{ ...thread, replies: [reply] }];
+    vi.mocked(reportComment).mockResolvedValue(undefined);
+    const actor = userEvent.setup();
+    renderWithProviders(<LessonComments lessonId="lesson-1" />, {
+      user: buildApiUser({ email_verified_at: "2026-10-16T10:00:00.000Z" }),
+    });
+    await actor.click(screen.getByRole("button", { name: "Comentarios" }));
+    await actor.click(screen.getByRole("button", { name: "Ver 1 respuesta" }));
+    const replyItem = screen.getByText(reply.body).closest("li");
+    if (!replyItem) throw new Error("No se encontró la respuesta");
+    await actor.click(within(replyItem).getByRole("button", { name: "Reportar" }));
+    await waitFor(() => expect(within(replyItem).queryByRole("button", { name: "Reportar" })).not.toBeInTheDocument());
+
+    await actor.click(screen.getByRole("button", { name: "Ocultar respuestas" }));
+    await actor.click(screen.getByRole("button", { name: "Ver 1 respuesta" }));
+    expect(within(replyItem).queryByRole("button", { name: "Reportar" })).not.toBeInTheDocument();
+    expect(reportComment).toHaveBeenCalledTimes(1);
   });
 });

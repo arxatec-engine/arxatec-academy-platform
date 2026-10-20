@@ -1,4 +1,5 @@
-import { Button } from "arxatec-ui";
+import { Button, StatusMessage } from "arxatec-ui";
+import { LockKeyhole } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { LoadingScreen } from "@/components/shared/loading_screen";
@@ -16,25 +17,10 @@ export const ExamContent = () => {
   const slug = params[ROUTE_PARAM_NAMES.slug] ?? "";
   const query = useCourseExam(slug);
   if (query.isPending) return <LoadingScreen />;
-  if (query.isError)
-    return (
-      <div role="alert" className="space-y-3">
-        <p className="text-sm text-muted-foreground">
-          {t(EXAM_TEXT.loadFailed)}
-        </p>
-        <Button
-          size="sm"
-          type="button"
-          variant="outline"
-          onClick={() => void query.refetch()}
-        >
-          {t(EXAM_TEXT.reload)}
-        </Button>
-      </div>
-    );
+  if (query.isError) throw query.error;
   const exam = query.data;
   return (
-    <div className="space-y-4">
+    <div className="flex flex-1 flex-col gap-4">
       <p className="text-base">{exam.course.title}</p>
       {exam.status === "passed" ? (
         <ExamResult
@@ -56,13 +42,21 @@ export const ExamContent = () => {
           onReload={() => void query.refetch()}
         />
       ) : (
-        <p className="rounded-md border border-border bg-card p-4 text-sm text-muted-foreground">
-          {t(
-            exam.status === "locked" ? EXAM_TEXT.locked : EXAM_TEXT.unavailable,
-          )}
-        </p>
+        <div role="status">
+          <StatusMessage
+            size="sm"
+            color="white"
+            icon={LockKeyhole}
+            title={t(EXAM_TEXT.title)}
+            description={t(
+              exam.status === "locked"
+                ? EXAM_TEXT.locked
+                : EXAM_TEXT.unavailable,
+            )}
+          />
+        </div>
       )}
-      <Button size="sm" asChild variant="outline">
+      <Button size="sm" asChild variant="outline" className="self-start">
         <Link to={RouteHelpers.course(slug)}>{t(EXAM_TEXT.back)}</Link>
       </Button>
     </div>

@@ -2,13 +2,14 @@ import {
   AsyncBoundary,
   Button,
   PaginationController,
+  StatusMessage,
 } from "arxatec-ui";
-import { Download } from "lucide-react";
+import { Download, Users } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { ErrorScreen } from "@/components/shared/error_screen";
 import { LoadingScreen } from "@/components/shared/loading_screen";
+import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
 import { AdminPage } from "@/modules/admin/components/admin_page";
 import { useDirectory, useExportDirectory } from "@/modules/admin/hooks/users";
@@ -27,6 +28,7 @@ export const DirectoryContent = () => {
   });
   const query = useDirectory(filters);
   const download = useExportDirectory();
+  if (query.isError) throw query.error;
   const exportCsv = () => {
     void toast.promise(download.mutateAsync(filters), {
       loading: t(DIRECTORY_TEXT.export),
@@ -58,7 +60,6 @@ export const DirectoryContent = () => {
         isError={query.isError}
         data={query.data}
         LoadingComponent={<LoadingScreen />}
-        ErrorComponent={<ErrorScreen />}
       >
         {(data) => (
           <>
@@ -78,9 +79,15 @@ export const DirectoryContent = () => {
               </span>
             </div>
             {data.users.length === 0 ? (
-              <p className="rounded-md border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-                {t(DIRECTORY_TEXT.empty)}
-              </p>
+              <div role="status">
+                <StatusMessage
+                  size="sm"
+                  color="white"
+                  icon={Users}
+                  title={t(UI_TEXT.emptyTitle)}
+                  description={t(DIRECTORY_TEXT.empty)}
+                />
+              </div>
             ) : (
               <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {data.users.map((user) => (

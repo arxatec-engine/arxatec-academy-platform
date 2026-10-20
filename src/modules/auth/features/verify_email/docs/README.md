@@ -108,14 +108,12 @@ falta de verdad y llega a 0 aunque se pierdan ticks.
   (`components/resend_verification_button/index.tsx:36`): un botón deshabilitado de verdad pierde
   el foco al bloquearse y el teclado se queda huérfano a mitad de la pantalla. El clic se corta
   en el hook (`hooks/use_resend_verification_email/index.ts:51`), no en el DOM.
-- La región viva es **opcional** en la tarjeta (`components/verification_state_card/index.tsx:31`)
-  y solo la enciende `/verificar-correo` (`pages/index.tsx:136`), que es donde el contenido cambia
-  solo. En la pantalla 07 sería una trampa: la etiqueta del botón cambia **cada segundo** y un
-  lector de pantalla la repetiría 45 veces.
-- El correo en negrita se pinta partiendo el texto ya traducido por el propio correo
-  (`components/highlighted_email/index.tsx`), en vez de meter `<strong>` dentro del JSON de i18n.
-  Funciona porque `interpolation.escapeValue` está en `false` (`src/locales/i18n.ts:26`): el valor
-  entra crudo y el `split` lo encuentra tal cual.
+- Los estados resueltos usan `StatusMessage` mediante `AuthCard`, con `role="status"` para
+  información y `role="alert"` para errores. El texto del correo se interpola en la descripción
+  traducida. La carga mantiene un único `Skeleton`.
+- La región viva de toda la tarjeta sigue siendo opcional y solo la activa `/verificar-correo`.
+  En `/revisa-tu-correo`, el anuncio se limita al mensaje: los botones quedan fuera para evitar
+  anunciar la cuenta atrás cada segundo.
 
 ## Textos
 
@@ -133,7 +131,7 @@ Hecha en Chrome contra `pnpm dev` con un stub local de la API (el backend real t
 | ------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Tema claro y oscuro | las dos pantallas correctas en ambos; ningún color fuera de los tokens                                                      |
 | Teclado             | `Tab` llega a los dos botones, `Enter` dispara el reenvío y el foco (anillo de 3 px) **se queda** en el botón al bloquearse |
-| es · en · pt        | las dos pantallas traducidas enteras, sin claves crudas; el correo sigue en negrita en los tres                             |
+| es · en · pt        | las dos pantallas traducidas enteras, sin claves crudas, con el correo dentro del mensaje                                 |
 | Estados             | `success`, `already`, `expired` y `missing_token` pintados con su acción; el `429` reinicia la cuenta atrás                 |
 | 360 px              | sin scroll horizontal (`scrollWidth === clientWidth`), la tarjeta baja a ancho completo                                     |
 

@@ -8,13 +8,14 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  StatusMessage,
 } from "arxatec-ui";
-import { Download } from "lucide-react";
+import { Download, Inbox } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { ErrorScreen } from "@/components/shared/error_screen";
 import { LoadingScreen } from "@/components/shared/loading_screen";
+import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
 import {
   useExportNoticeSignups,
@@ -33,6 +34,7 @@ export const SignupList = ({ onExported }: Props) => {
   const [filters, setFilters] = useState<SignupFilters>({ page: 1 });
   const query = useNoticeSignups(filters);
   const download = useExportNoticeSignups();
+  if (query.isError) throw query.error;
   const exportCsv = () => {
     const cutoff = new Date().toISOString();
     void toast.promise(
@@ -87,20 +89,25 @@ export const SignupList = ({ onExported }: Props) => {
         isError={query.isError}
         data={query.data}
         LoadingComponent={<LoadingScreen />}
-        ErrorComponent={<ErrorScreen />}
       >
         {(data) => (
           <>
             {data.signups.length === 0 ? (
-              <p className="rounded-md border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-                {t(NOTICES_TEXT.empty)}
-              </p>
+              <div role="status">
+                <StatusMessage
+                  size="sm"
+                  color="white"
+                  icon={Inbox}
+                  title={t(UI_TEXT.emptyTitle)}
+                  description={t(NOTICES_TEXT.empty)}
+                />
+              </div>
             ) : (
               <ol className="-mx-3 divide-y divide-border sm:-mx-4">
                 {data.signups.map((signup) => (
                   <li
                     key={signup.id}
-                    className="flex flex-wrap items-start justify-between gap-2 px-3 py-3 text-sm sm:px-4"
+                    className="flex flex-wrap items-start justify-between gap-2 border-border px-3 py-3 text-sm first:border-t last:border-b sm:px-4"
                   >
                     <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
                       <p>{signup.email}</p>
@@ -110,7 +117,7 @@ export const SignupList = ({ onExported }: Props) => {
                     </div>
                     <Badge
                       variant={signup.notified_at ? "outline" : "secondary"}
-                      className="shrink-0 font-normal"
+                      className="shrink-0 text-sm font-normal"
                     >
                       {t(
                         signup.notified_at

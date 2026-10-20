@@ -9,7 +9,7 @@ pasa el lint y en runtime cae en el catch-all (`harness/03_reglas_frontend.md` �
 | `lazy.ts`                                      | `lazyPage(loader)`: devuelve el elemento ya envuelto en `<Suspense>`.                        |
 | `auth_routes/`, `app_routes/`, `error_routes/` | Los tres árboles.                                                                            |
 | `router/`                                      | `routeTree` (los tres árboles + el `errorElement`) y el `createBrowserRouter` que lo monta.  |
-| `error_boundary/`                              | `RouteErrorBoundary`: 404 completo para recursos inexistentes y fallback para otros errores. |
+| `error_boundary/`                              | `RouteErrorBoundary`: página común para el 404 y los fallos de carga, con distinto mensaje. |
 
 ## Parámetros y helpers
 
@@ -38,7 +38,13 @@ en `leccion`. `RouteHelpers.adminCourse(id, step?, lessonId?)` genera esos pará
 parámetros ausentes y los `ApiError` con estado 404. React Query propaga estos últimos
 desde su configuración común. En todos esos casos se monta `NotFoundPage` como página
 completa, con una sola cabecera, contenido principal y pie, conservando la URL original.
-Los demás errores mantienen la pantalla o el estado de carga fallida que les corresponde.
+Los fallos de carga de página también se propagan a este límite: muestra `ErrorScreen` con
+el mismo marco del 404, título y descripción centrados y acción compacta, cambiando etiqueta y mensaje.
+Las páginas 404 y de error de servidor o conexión no usan `StatusMessage`.
+Esto incluye catálogo, detalle de curso o lección, Mis cursos, examen, certificado y las vistas
+administrativas. El guard `Auth` usa la misma página cuando falla la comprobación de sesión,
+sin borrar la sesión por un fallo de red o de servidor. Los errores recuperables al enviar
+formularios o cargar una sección conservan su `StatusMessage` local.
 
 ## Carga diferida
 

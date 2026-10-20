@@ -29,3 +29,11 @@ Después del temario, `CourseTeacher` muestra la foto, el nombre completo y la b
 docente asignado. Lee `course.teacher` de la ficha; el adaptador convierte `full_name` y
 `photo_url` a camelCase. Si el curso no tiene docente, se omite el bloque. La foto usa `Avatar`
 con iniciales como respaldo y la biografía conserva sus saltos de línea.
+
+## Examen y certificado
+
+La ficha incluye `CourseCertification`, compartido con la lección. Con sesión y todas las
+lecciones completadas según Mis cursos, muestra «Dar examen para obtener mi certificado».
+Si el certificado ya fue emitido, muestra «Ver certificado». No ofrece el examen de otro curso
+ni considera terminado un curso sin lecciones. Las respuestas correctas nunca se consultan
+desde esta invitación.

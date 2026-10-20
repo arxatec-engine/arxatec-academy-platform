@@ -35,6 +35,7 @@ export const PROFILE_TEXT = {
   save: "profile.save",
   saved: "profile.saved",
   subtitle: "profile.subtitle",
+  summaryLoadFailed: "profile.summary_load_failed",
   title: "profile.title",
   validation: "profile.validation",
 } as const;

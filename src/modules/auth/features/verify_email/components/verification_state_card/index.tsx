@@ -3,23 +3,21 @@ import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { AuthCard } from "@/modules/auth/components/auth_card";
-import { cn } from "@/utilities/cn";
 
 export interface VerificationStateCardProps {
   icon: LucideIcon;
-  iconClassName?: string;
   title: string;
-  description?: ReactNode;
+  description?: string;
   secondary?: ReactNode;
   busy?: boolean;
   announce?: boolean;
   children?: ReactNode;
   footer?: ReactNode;
+  status?: "info" | "error";
 }
 
 export const VerificationStateCard = ({
-  icon: Icon,
-  iconClassName,
+  icon,
   title,
   description,
   secondary,
@@ -27,29 +25,26 @@ export const VerificationStateCard = ({
   announce = false,
   children,
   footer,
+  status = "info",
 }: VerificationStateCardProps) => (
   <div
     aria-live={announce ? "polite" : undefined}
     aria-busy={busy}
     className="flex w-full justify-center"
   >
-    <AuthCard title={title} footer={footer}>
+    <AuthCard
+      title={title}
+      subtitle={description}
+      status={busy ? undefined : status}
+      icon={icon}
+      footer={footer}
+    >
       {busy ? (
         <Skeleton
           aria-hidden="true"
           className="h-32 w-full motion-reduce:animate-none"
         />
-      ) : (
-        <span
-          aria-hidden="true"
-          className="flex size-8 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground"
-        >
-          <Icon className={cn("size-4", iconClassName)} />
-        </span>
-      )}
-      {description === undefined ? null : (
-        <p className="text-sm text-muted-foreground">{description}</p>
-      )}
+      ) : null}
       {secondary === undefined ? null : (
         <p className="text-sm text-muted-foreground">{secondary}</p>
       )}

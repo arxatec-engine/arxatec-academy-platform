@@ -1,4 +1,5 @@
-import { Button, Card, CardContent } from "arxatec-ui";
+import { Button, StatusMessage } from "arxatec-ui";
+import { BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { UI_TEXT } from "@/components/shared/i18n";
@@ -26,17 +27,23 @@ export const CourseSyllabus = ({ view }: Props) => {
         </h2>
       </div>
       {view.lessons.length === 0 ? (
-        <Card className="border-dashed py-8 shadow-none">
-          <CardContent className="text-center">
-            <p className="text-muted-foreground">{t(COURSE_TEXT.noLessons)}</p>
-            <div className="mx-auto mt-5 max-w-md text-left">
-              <NoticeSignupForm courseSlug={view.course.slug} />
-            </div>
-            <Button size="sm" asChild variant="outline" className="mt-4">
-              <Link to={RouteHelpers.home()}>{t(UI_TEXT.goToCatalog)}</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <div role="status">
+            <StatusMessage
+              size="sm"
+              color="white"
+              icon={BookOpen}
+              title={t(UI_TEXT.emptyTitle)}
+              description={t(COURSE_TEXT.noLessons)}
+            />
+          </div>
+          <div className="max-w-md">
+            <NoticeSignupForm courseSlug={view.course.slug} />
+          </div>
+          <Button size="sm" asChild variant="outline">
+            <Link to={RouteHelpers.home()}>{t(UI_TEXT.goToCatalog)}</Link>
+          </Button>
+        </div>
       ) : (
         <LessonList lessons={view.lessons} courseSlug={view.course.slug} />
       )}

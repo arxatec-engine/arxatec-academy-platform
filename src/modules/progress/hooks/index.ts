@@ -7,8 +7,12 @@ import {
   uncompleteLesson,
 } from "@/modules/progress/services";
 
-export const useMyCourses = () =>
-  useQuery({ queryKey: PROGRESS_KEYS.myCourses(), queryFn: getMyCourses });
+export const useMyCourses = ({ enabled = true } = {}) =>
+  useQuery({
+    queryKey: PROGRESS_KEYS.myCourses(),
+    queryFn: getMyCourses,
+    enabled,
+  });
 
 export const useEnrollCourse = () => {
   const queryClient = useQueryClient();

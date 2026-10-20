@@ -17,8 +17,10 @@ temario de la ficha y la pantalla bloqueada. La finalización es un botón de so
 al título de la lección. Su tooltip explica la acción al pasar el cursor o recibir foco
 con el teclado. El mismo botón permite marcar y desmarcar la lección; el icono cambia
 de círculo vacío a círculo con marca y expone su estado con `aria-pressed`. Se deshabilita
-mientras se guarda el cambio. Al completar las lecciones aparece «Dar examen» con su icono,
-tooltip y nombre accesible. Si ya existe un certificado se conserva el acceso a él; la marca de
+mientras se guarda el cambio. Al completar todas las lecciones, `CourseCertification` muestra un aviso y el botón con texto
+«Dar examen para obtener mi certificado». La disponibilidad se consulta en el progreso guardado
+de Mis cursos y se conserva al recargar o volver a la lección. La misma invitación aparece
+en la ficha del curso. El botón de marca recupera su estado cuando el curso está completo. Si ya existe un certificado se conserva el acceso a él; la marca de
 una lección no emite certificados nuevos.
 Recursos y Comentarios forman un único
 bloque plegable con borde exterior y esquinas comunes, sin espacio entre paneles. Cada panel

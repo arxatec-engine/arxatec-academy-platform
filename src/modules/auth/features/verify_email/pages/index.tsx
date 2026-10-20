@@ -24,7 +24,6 @@ import { useVerifyEmail } from "../hooks/use_verify_email";
 
 interface VerifyEmailView {
   icon: LucideIcon;
-  iconClassName?: string;
   title: string;
   description: string;
   busy?: boolean;
@@ -146,7 +145,11 @@ const VerifyEmailPage = () => {
     <VerificationStateCard
       announce
       icon={view.icon}
-      iconClassName={view.iconClassName}
+      status={
+        status === "success" || status === "already" || status === "loading"
+          ? "info"
+          : "error"
+      }
       busy={view.busy}
       title={view.title}
       description={view.description}

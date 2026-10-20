@@ -1,4 +1,5 @@
-import { AsyncBoundary, Button } from "arxatec-ui";
+import { AsyncBoundary, Button, StatusMessage } from "arxatec-ui";
+import { Info, TriangleAlert } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { LoadingScreen } from "@/components/shared/loading_screen";
@@ -42,9 +43,13 @@ export const AdminLessonEditor = ({
       LoadingComponent={<LoadingScreen />}
       ErrorComponent={
         <div role="alert" className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            {t(ADMIN_TEXT.lessonLoadFailed)}
-          </p>
+          <StatusMessage
+            size="sm"
+            color="rose"
+            icon={TriangleAlert}
+            title={t(ADMIN_TEXT.lessons)}
+            description={t(ADMIN_TEXT.lessonLoadFailed)}
+          />
           <Button
             size="sm"
             type="button"
@@ -68,9 +73,15 @@ export const AdminLessonEditor = ({
             onDirtyChange={(dirty) => markDirty("resources", dirty)}
           />
           {hasUnsavedChanges && (
-            <p role="status" className="text-sm text-muted-foreground">
-              {t(ADMIN_TEXT.lessonUnsaved)}
-            </p>
+            <div role="status">
+              <StatusMessage
+                size="sm"
+                color="white"
+                icon={Info}
+                title={t(ADMIN_TEXT.lessons)}
+                description={t(ADMIN_TEXT.lessonUnsaved)}
+              />
+            </div>
           )}
           <LessonActions
             view={view}

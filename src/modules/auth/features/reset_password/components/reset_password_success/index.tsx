@@ -1,4 +1,5 @@
 import { Button } from "arxatec-ui";
+import { CircleCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -12,10 +13,12 @@ export const ResetPasswordSuccess = () => {
 
   return (
     <AuthCard
+      status="info"
+      icon={CircleCheck}
       title={t(resetPassword.success.title)}
       subtitle={t(resetPassword.success.description)}
     >
-      <div role="status" className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         <Button asChild size="sm" className="w-full">
           <Link to={RouteHelpers.login()}>
             {t(resetPassword.success.action)}

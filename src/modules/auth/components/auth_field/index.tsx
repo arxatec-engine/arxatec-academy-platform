@@ -1,4 +1,5 @@
-import { Label } from "arxatec-ui";
+import { Label, StatusMessage } from "arxatec-ui";
+import { TriangleAlert } from "lucide-react";
 import type { ReactNode } from "react";
 
 export interface AuthFieldControlProps {
@@ -56,9 +57,15 @@ export const AuthField = ({
         </p>
       )}
       {error === undefined ? null : (
-        <p id={errorId} role="alert" className="mt-2 text-sm text-destructive">
-          {error}
-        </p>
+        <div id={errorId} role="alert" className="mt-2">
+          <StatusMessage
+            size="sm"
+            color="rose"
+            icon={TriangleAlert}
+            title={label}
+            description={error}
+          />
+        </div>
       )}
     </div>
   );

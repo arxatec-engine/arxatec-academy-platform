@@ -18,7 +18,8 @@ sobre el fondo blanco de la página.
 «Copiar enlace» copia la URL canónica del backend; si el navegador no permite copiar,
 el campo de solo lectura sigue ofreciendo la URL. El QR de la página y el del PDF abren esa URL.
 
-La consulta diferencia carga y error recuperable. Un certificado inexistente o con identificador
+La consulta diferencia carga y error. Un fallo de conexión o de servidor muestra la página de
+error compartida con el 404, con su mensaje y acción de regreso al catálogo. Un certificado inexistente o con identificador
 inválido (404/422) muestra la página 404 completa, igual que una URL desconocida, con la acción
 para volver al inicio. Nunca presenta un error como certificado verificado.
 No conserva la consulta al desmontar ni la considera fresca entre
@@ -32,4 +33,4 @@ Cambiar el nombre o el curso después no reescribe el documento emitido; elimina
 borra sus certificados y la página deja de verificarlos.
 
 Las pruebas del router real cubren acceso anónimo, PDF, QR, copia del enlace, ausencia, reintento
-por fallo de conexión y acceso desde Mis cursos.
+tras volver desde un fallo de conexión y acceso desde Mis cursos.

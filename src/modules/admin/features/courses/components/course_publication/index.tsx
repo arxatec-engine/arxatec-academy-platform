@@ -1,4 +1,4 @@
-import { Button } from "arxatec-ui";
+import { Button, StatusMessage } from "arxatec-ui";
 import { Check, Circle, CircleAlert } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NS } from "@/locales/namespaces";
@@ -114,7 +114,13 @@ export const CoursePublication = ({
       </ul>
       {unsavedSteps.length > 0 ? (
         <div role="alert" className="space-y-2 text-sm">
-          <p>{t(COURSE_SETUP_TEXT.unsavedHint)}</p>
+          <StatusMessage
+            size="sm"
+            color="white"
+            icon={CircleAlert}
+            title={t(COURSE_SETUP_TEXT.unsaved)}
+            description={t(COURSE_SETUP_TEXT.unsavedHint)}
+          />
           <div className="flex flex-wrap gap-2">
             {unsavedSteps.map((step) => (
               <Button
@@ -132,28 +138,23 @@ export const CoursePublication = ({
           </Button>
         </div>
       ) : (
-        <p
-          role="status"
-          className="flex items-start gap-2 text-sm text-muted-foreground"
-        >
-          {course.can_publish ? (
-            <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-          ) : (
-            <CircleAlert
-              aria-hidden="true"
-              className="mt-0.5 size-4 shrink-0"
-            />
-          )}
-          {t(
-            course.status === "PUBLISHED"
-              ? ADMIN_TEXT.published
-              : course.status === "ARCHIVED"
-                ? ADMIN_TEXT.archived
-                : course.can_publish
-                  ? COURSE_SETUP_TEXT.publishReady
-                  : COURSE_SETUP_TEXT.publishBlocked,
-          )}
-        </p>
+        <div role="status">
+          <StatusMessage
+            size="sm"
+            color="white"
+            icon={course.can_publish ? Check : CircleAlert}
+            title={t(COURSE_SETUP_TEXT.publication)}
+            description={t(
+              course.status === "PUBLISHED"
+                ? ADMIN_TEXT.published
+                : course.status === "ARCHIVED"
+                  ? ADMIN_TEXT.archived
+                  : course.can_publish
+                    ? COURSE_SETUP_TEXT.publishReady
+                    : COURSE_SETUP_TEXT.publishBlocked,
+            )}
+          />
+        </div>
       )}
       <CourseActions
         course={course}

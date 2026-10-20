@@ -1,4 +1,4 @@
-import { Button, Label, Textarea } from "arxatec-ui";
+import { Button, Textarea } from "arxatec-ui";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -39,31 +39,28 @@ export const CommentComposer = ({ lessonId, replyTo, onPosted }: Props) => {
   };
 
   return (
-    <form className="mt-6" onSubmit={submit}>
-      <Label
-        htmlFor={`comment-${replyTo ?? lessonId}`}
-        className="mb-2 block text-sm font-medium"
-      >
-        {t(replyTo ? COMMENTS_TEXT.reply : COMMENTS_TEXT.write)}
-      </Label>
-      <Textarea
-        id={`comment-${replyTo ?? lessonId}`}
-        placeholder={t(replyTo ? COMMENTS_TEXT.reply : COMMENTS_TEXT.write)}
-        value={body}
-        onChange={(event) => setBody(event.target.value)}
-        maxLength={2000}
-        rows={replyTo ? 3 : 4}
-        required
-        className="text-sm"
-      />
-      <Button
-        size="sm"
-        type="submit"
-        className="mt-3"
-        disabled={isPending || !body.trim()}
-      >
-        {t(COMMENTS_TEXT.publish)}
-      </Button>
+    <form className={replyTo ? "mt-3" : "mt-6"} onSubmit={submit}>
+      <div className="relative">
+        <Textarea
+          id={`comment-${replyTo ?? lessonId}`}
+          aria-label={t(replyTo ? COMMENTS_TEXT.reply : COMMENTS_TEXT.write)}
+          placeholder={t(replyTo ? COMMENTS_TEXT.reply : COMMENTS_TEXT.write)}
+          value={body}
+          onChange={(event) => setBody(event.target.value)}
+          maxLength={2000}
+          rows={replyTo ? 3 : 4}
+          required
+          className="pb-14 text-sm"
+        />
+        <Button
+          size="sm"
+          type="submit"
+          className="absolute right-3 bottom-3"
+          disabled={isPending || !body.trim()}
+        >
+          {t(COMMENTS_TEXT.publish)}
+        </Button>
+      </div>
     </form>
   );
 };

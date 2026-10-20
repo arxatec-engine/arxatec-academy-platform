@@ -1,10 +1,5 @@
-import { PageShell } from "@/components/layout/page_shell";
-import { NotFoundContent } from "@/components/shared/error_screen/components/not_found_content";
+import { ErrorScreen } from "@/components/shared/error_screen";
 
-const NotFoundPage = () => (
-  <PageShell className="flex items-center justify-center px-5 py-16 sm:py-20">
-    <NotFoundContent />
-  </PageShell>
-);
+const NotFoundPage = () => <ErrorScreen kind="not_found" />;
 
 export default NotFoundPage;

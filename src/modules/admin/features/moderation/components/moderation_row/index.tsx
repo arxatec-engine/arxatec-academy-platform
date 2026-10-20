@@ -12,7 +12,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Label,
   Textarea,
 } from "arxatec-ui";
 import { Ellipsis, Eye, EyeOff, Trash2 } from "lucide-react";
@@ -60,7 +59,7 @@ export const ModerationRow = ({ comment }: Props) => {
             {comment.author?.full_name ?? t(MODERATION_TEXT.deletedAuthor)} ·{" "}
             {comment.course.title}
           </span>
-          <Badge variant="secondary" className="shrink-0 font-normal">
+          <Badge variant="secondary" className="shrink-0 text-sm font-normal">
             {t(MODERATION_TEXT.reports, { count: comment.report_count })}
           </Badge>
         </div>
@@ -160,32 +159,32 @@ export const ModerationRow = ({ comment }: Props) => {
       )}
       {!comment.is_reply && comment.status === "VISIBLE" && (
         <form
-          className="-mx-4 mt-4 flex flex-col gap-2 border-t border-border px-4 pt-3"
+          className="-mx-4 mt-4 border-t border-border px-4 pt-3"
           onSubmit={(event) => {
             event.preventDefault();
             if (body.trim()) run("reply");
           }}
         >
-          <Label htmlFor={`moderation-reply-${comment.id}`}>
-            {t(MODERATION_TEXT.reply)}
-          </Label>
-          <Textarea
-            className="text-sm"
-            id={`moderation-reply-${comment.id}`}
-            placeholder={t(MODERATION_TEXT.reply)}
-            value={body}
-            maxLength={2000}
-            rows={2}
-            onChange={(event) => setBody(event.target.value)}
-          />
-          <Button
-            type="submit"
-            size="sm"
-            className="self-start"
-            disabled={!body.trim() || action.isPending}
-          >
-            {t(MODERATION_TEXT.reply)}
-          </Button>
+          <div className="relative">
+            <Textarea
+              className="pb-14 text-sm"
+              id={`moderation-reply-${comment.id}`}
+              aria-label={t(MODERATION_TEXT.reply)}
+              placeholder={t(MODERATION_TEXT.reply)}
+              value={body}
+              maxLength={2000}
+              rows={2}
+              onChange={(event) => setBody(event.target.value)}
+            />
+            <Button
+              type="submit"
+              size="sm"
+              className="absolute right-3 bottom-3"
+              disabled={!body.trim() || action.isPending}
+            >
+              {t(MODERATION_TEXT.reply)}
+            </Button>
+          </div>
         </form>
       )}
     </li>

@@ -212,7 +212,9 @@ describe("OauthCallbackPage", () => {
     expect(toast.error).toHaveBeenCalledWith(
       "Ese enlace ya no sirve: venció o alguien ya lo usó.",
     );
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Ese enlace ya no sirve: venció o alguien ya lo usó.",
+    );
     expect(
       screen.getByRole("link", { name: "Volver a iniciar sesión" }),
     ).toHaveAttribute("href", RouteHelpers.login());

@@ -12,7 +12,6 @@ import {
   CHECK_EMAIL_STATE_KEY,
 } from "@/modules/auth/constants";
 import { RouteHelpers } from "@/routes/routes";
-import { HighlightedEmail } from "../../components/highlighted_email";
 import { ResendVerificationButton } from "../../components/resend_verification_button";
 import { VerificationStateCard } from "../../components/verification_state_card";
 
@@ -35,16 +34,14 @@ const CheckEmailPage = () => {
     <VerificationStateCard
       icon={Mail}
       busy={isPending}
+      status={sendFailed ? "error" : "info"}
       title={t(checkEmail.title)}
       description={
-        email === null ? undefined : (
-          <span role={sendFailed ? "alert" : undefined}>
-            <HighlightedEmail
-              text={t(sendFailed ? checkEmail.deliveryFailed : checkEmail.description, { email })}
-              email={email}
-            />
-          </span>
-        )
+        email === null
+          ? undefined
+          : t(sendFailed ? checkEmail.deliveryFailed : checkEmail.description, {
+              email,
+            })
       }
       secondary={t(checkEmail.secondary)}
       footer={<AuthNote text={t(checkEmail.footer)} />}

@@ -6,8 +6,10 @@ import {
   Progress,
   RadioGroup,
   RadioGroupItem,
+  StatusMessage,
 } from "arxatec-ui";
-import { useId, useState, type FormEvent } from "react";
+import { ArrowLeft, ArrowRight, TriangleAlert } from "lucide-react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "@/interceptors/api_error";
 import { NS } from "@/locales/namespaces";
@@ -26,12 +28,19 @@ export const ExamForm = ({
 }) => {
   const { t } = useTranslation(NS.common);
   const id = useId();
+  const questionHeading = useRef<HTMLHeadingElement>(null);
   const submit = useSubmitCourseExam(exam.course.slug);
   const [started, setStarted] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>(() =>
     exam.questions.map(() => null),
   );
+  useEffect(() => {
+    if (started) questionHeading.current?.focus();
+  }, [started, currentQuestion]);
   const answered = answers.filter((value) => value !== null).length;
+  const question = exam.questions[currentQuestion];
+  const isLastQuestion = currentQuestion === exam.questions.length - 1;
   const errorKey =
     submit.error instanceof ApiError
       ? submit.error.code === "EXAM_CHANGED"
@@ -56,6 +65,7 @@ export const ExamForm = ({
         onRetry={() => {
           submit.reset();
           setAnswers(exam.questions.map(() => null));
+          setCurrentQuestion(0);
           setStarted(false);
         }}
       />
@@ -84,11 +94,13 @@ export const ExamForm = ({
         </CardContent>
       </Card>
     );
+  if (!question) return null;
   const send = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const selected = answers.filter((value): value is number => value !== null);
     if (
       exam.version === null ||
+      !isLastQuestion ||
       selected.length !== exam.question_count ||
       submit.isPending ||
       reloadRequired
@@ -97,12 +109,23 @@ export const ExamForm = ({
     submit.mutate({ version: exam.version, answers: selected });
   };
   return (
-    <form onSubmit={send} className="space-y-3">
+    <form
+      onSubmit={send}
+      aria-label={t(EXAM_TEXT.title)}
+      className="flex flex-1 flex-col gap-6"
+    >
       <div className="space-y-2">
-        <p className="text-sm text-muted-foreground">{intro}</p>
-        <p className="text-sm" aria-live="polite">
-          {t(EXAM_TEXT.answered, { answered, total: exam.question_count })}
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+          <p>
+            {t(EXAM_TEXT.questionPosition, {
+              number: currentQuestion + 1,
+              total: exam.question_count,
+            })}
+          </p>
+          <p className="text-muted-foreground" aria-live="polite">
+            {t(EXAM_TEXT.answered, { answered, total: exam.question_count })}
+          </p>
+        </div>
         <Progress
           value={(answered / exam.question_count) * 100}
           aria-label={t(EXAM_TEXT.answered, {
@@ -112,61 +135,75 @@ export const ExamForm = ({
           className="h-1.5"
         />
       </div>
-      {exam.questions.map((question, index) => (
-        <fieldset
-          key={index}
-          disabled={submit.isPending || reloadRequired}
-          className="min-w-0 space-y-3 rounded-md border border-border bg-card p-4"
+      <fieldset
+        key={currentQuestion}
+        disabled={submit.isPending || reloadRequired}
+        className="min-w-0 flex-1 space-y-6 py-4 sm:py-8"
+      >
+        <legend className="sr-only">
+          {t(EXAM_TEXT.questionPosition, {
+            number: currentQuestion + 1,
+            total: exam.question_count,
+          })}
+        </legend>
+        <h2
+          ref={questionHeading}
+          id={`${id}-question-${currentQuestion}`}
+          tabIndex={-1}
+          className="text-xl leading-snug break-words tracking-tight outline-none sm:text-2xl"
         >
-          <legend className="sr-only">
-            {t(EXAM_TEXT.question, { number: index + 1 })}
-          </legend>
-          <p className="text-sm text-muted-foreground">
-            {t(EXAM_TEXT.question, { number: index + 1 })}
-          </p>
-          <p id={`${id}-question-${index}`} className="break-words text-base">
-            {question.text}
-          </p>
-          <RadioGroup
-            aria-labelledby={`${id}-question-${index}`}
-            disabled={submit.isPending || reloadRequired}
-            value={answers[index] === null ? "" : String(answers[index])}
-            onValueChange={(value) =>
-              setAnswers((current) =>
-                current.map((answer, position) =>
-                  position === index ? Number(value) : answer,
-                ),
-              )
-            }
-          >
-            {question.options.map((option, optionIndex) => (
-              <Button
-                key={optionIndex}
-                size="sm"
-                asChild
-                variant="outline"
-                className={cn(
-                  "h-auto min-h-8 w-full justify-start gap-2 py-2 text-left whitespace-normal",
-                  answers[index] === optionIndex &&
-                    "border-foreground bg-muted",
-                )}
-              >
-                <Label htmlFor={`${id}-${index}-${optionIndex}`}>
-                  <RadioGroupItem
-                    id={`${id}-${index}-${optionIndex}`}
-                    value={String(optionIndex)}
-                    className="shrink-0"
-                  />
-                  <span className="min-w-0 break-words">{option}</span>
-                </Label>
-              </Button>
-            ))}
-          </RadioGroup>
-        </fieldset>
-      ))}
+          {question.text}
+        </h2>
+        <RadioGroup
+          aria-labelledby={`${id}-question-${currentQuestion}`}
+          disabled={submit.isPending || reloadRequired}
+          value={
+            answers[currentQuestion] === null
+              ? ""
+              : String(answers[currentQuestion])
+          }
+          onValueChange={(value) =>
+            setAnswers((current) =>
+              current.map((answer, position) =>
+                position === currentQuestion ? Number(value) : answer,
+              ),
+            )
+          }
+          className="gap-3"
+        >
+          {question.options.map((option, optionIndex) => (
+            <Button
+              key={optionIndex}
+              size="sm"
+              asChild
+              variant="outline"
+              className={cn(
+                "h-auto min-h-12 w-full justify-start gap-3 px-4 py-3 text-left whitespace-normal",
+                answers[currentQuestion] === optionIndex &&
+                  "border-foreground bg-muted",
+              )}
+            >
+              <Label htmlFor={`${id}-${currentQuestion}-${optionIndex}`}>
+                <RadioGroupItem
+                  id={`${id}-${currentQuestion}-${optionIndex}`}
+                  value={String(optionIndex)}
+                  className="shrink-0"
+                />
+                <span className="min-w-0 break-words">{option}</span>
+              </Label>
+            </Button>
+          ))}
+        </RadioGroup>
+      </fieldset>
       {submit.isError && (
         <div role="alert" className="space-y-2 text-sm">
-          <p className="text-destructive">{t(errorKey)}</p>
+          <StatusMessage
+            size="sm"
+            color="rose"
+            icon={TriangleAlert}
+            title={t(EXAM_TEXT.title)}
+            description={t(errorKey)}
+          />
           {reloadRequired && (
             <Button
               size="sm"
@@ -179,18 +216,46 @@ export const ExamForm = ({
           )}
         </div>
       )}
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
         <Button
           size="sm"
-          type="submit"
-          disabled={
-            answered !== exam.question_count ||
-            submit.isPending ||
-            reloadRequired
-          }
+          type="button"
+          variant="outline"
+          disabled={currentQuestion === 0 || submit.isPending || reloadRequired}
+          onClick={() => setCurrentQuestion((current) => current - 1)}
         >
-          {t(submit.isPending ? EXAM_TEXT.submitting : EXAM_TEXT.submit)}
+          <ArrowLeft aria-hidden="true" className="size-4" />
+          {t(EXAM_TEXT.previous)}
         </Button>
+        {isLastQuestion ? (
+          <Button
+            key="submit"
+            size="sm"
+            type="submit"
+            disabled={
+              answered !== exam.question_count ||
+              submit.isPending ||
+              reloadRequired
+            }
+          >
+            {t(submit.isPending ? EXAM_TEXT.submitting : EXAM_TEXT.submit)}
+          </Button>
+        ) : (
+          <Button
+            key="next"
+            size="sm"
+            type="button"
+            disabled={
+              answers[currentQuestion] === null ||
+              submit.isPending ||
+              reloadRequired
+            }
+            onClick={() => setCurrentQuestion((current) => current + 1)}
+          >
+            {t(EXAM_TEXT.next)}
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Button>
+        )}
       </div>
     </form>
   );

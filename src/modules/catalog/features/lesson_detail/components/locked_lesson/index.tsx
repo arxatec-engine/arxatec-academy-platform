@@ -26,15 +26,18 @@ export const LockedLesson = ({ view, courseSlug }: Props) => {
           <ArrowLeft aria-hidden="true" className="size-4 shrink-0" />
         </Link>
       </Button>
+      <div role="status">
         <StatusMessage
+          size="sm"
           color="white"
           icon={LockKeyhole}
           title={view.lesson.title}
-        description={t(LESSON_TEXT.lockedDescription)}
-        classNameCard="flex-col justify-center items-center flex py-16"
-        classNameTitle="text-center w-full"
-        classNameDescription="text-center w-full max-w-xs"
+          description={t(LESSON_TEXT.lockedDescription)}
+          classNameCard="flex-col justify-center items-center flex py-16"
+          classNameTitle="text-center w-full"
+          classNameDescription="text-center w-full max-w-xs"
         />
+      </div>
       <section className="mt-4">
         <h2 className="text-xl font-semibold">{t(COURSE_TEXT.syllabus)}</h2>
         <div className="mt-5">

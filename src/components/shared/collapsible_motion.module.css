@@ -14,7 +14,7 @@
   transition: grid-template-rows 220ms ease-out, opacity 220ms ease-out;
 }
 
-.persistentContent[data-state="open"] .persistentGrid {
+.persistentContent[data-state="open"] > .persistentGrid {
   grid-template-rows: 1fr;
   opacity: 1;
 }

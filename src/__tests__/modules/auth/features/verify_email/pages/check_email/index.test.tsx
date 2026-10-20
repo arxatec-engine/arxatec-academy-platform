@@ -55,16 +55,13 @@ describe("pagina /revisa-tu-correo", () => {
     axiosInstanceMock.get.mockResolvedValue(meEnvelope);
   });
 
-  it("pinta el correo del usuario en negrita y las dos acciones", async () => {
+  it("muestra el estado con el correo del usuario y las dos acciones", async () => {
     renderWithProviders(<CheckEmailPage />, { user });
 
     expect(
       screen.getByRole("heading", { name: "Revisa tu correo" }),
     ).toBeInTheDocument();
-    expect(await screen.findByText("maria@estudioqp.pe")).toHaveProperty(
-      "tagName",
-      "STRONG",
-    );
+    expect(await screen.findByRole("status")).toHaveTextContent(user.email);
     expect(
       screen.getByRole("link", { name: "Ir al catálogo" }),
     ).toHaveAttribute("href", "/");
@@ -166,7 +163,7 @@ describe("pantalla 07 en los tres idiomas", () => {
       renderWithProviders(<CheckEmailPage />, { user });
 
       expect(screen.getByRole("heading", { name: title })).toBeInTheDocument();
-      expect(await screen.findByText("maria@estudioqp.pe")).toBeInTheDocument();
+      expect(await screen.findByRole("status")).toHaveTextContent(user.email);
       expect(screen.queryByText(/check_email\./)).not.toBeInTheDocument();
     },
   );

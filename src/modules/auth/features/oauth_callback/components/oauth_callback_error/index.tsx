@@ -34,8 +34,9 @@ export const OauthCallbackError = ({
 
   return (
     <AuthCard
+      status="error"
       title={t(oauthCallback.error.title)}
-      subtitle={t(oauthCallback.error.description)}
+      subtitle={`${t(oauthCallback.error.description)} ${message}`}
     >
       <Button asChild size="sm" className="w-full">
         <Link to={RouteHelpers.login()}>

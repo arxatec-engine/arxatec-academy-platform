@@ -1,4 +1,5 @@
-import { Button } from "arxatec-ui";
+import { Button, StatusMessage } from "arxatec-ui";
+import { TriangleAlert } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LoadingScreen } from "@/components/shared/loading_screen";
 import { NS } from "@/locales/namespaces";
@@ -28,9 +29,13 @@ export const CourseExam = ({ course, embedded, onDirtyChange }: Props) => {
         <LoadingScreen />
       ) : query.isError ? (
         <div role="alert" className="space-y-2">
-          <p className="text-sm text-muted-foreground">
-            {t(EXAM_TEXT.loadFailed)}
-          </p>
+          <StatusMessage
+            size="sm"
+            color="rose"
+            icon={TriangleAlert}
+            title={t(EXAM_TEXT.adminTitle)}
+            description={t(EXAM_TEXT.loadFailed)}
+          />
           <Button
             size="sm"
             type="button"

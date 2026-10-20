@@ -1,3 +1,4 @@
+import { LogIn } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useTitle } from "@/hooks";
 import { NS } from "@/locales/namespaces";
@@ -16,6 +17,8 @@ const SessionExpiredPage = () => {
 
   return (
     <AuthCard
+      status="info"
+      icon={LogIn}
       title={t(sessionExpired.title)}
       subtitle={t(sessionExpired.description)}
     >

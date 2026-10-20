@@ -1,4 +1,5 @@
 export const errorScreen = {
+  label: "errors.unexpected.label",
   copy: {
     not_found: {
       action: "errors.not_found.action",

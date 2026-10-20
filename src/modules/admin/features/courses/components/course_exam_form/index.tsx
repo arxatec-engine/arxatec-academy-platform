@@ -1,4 +1,5 @@
-import { Button, Checkbox, Input, Label } from "arxatec-ui";
+import { Button, Checkbox, Input, Label, StatusMessage } from "arxatec-ui";
+import { TriangleAlert } from "lucide-react";
 import { useId, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -117,14 +118,20 @@ export const CourseExamForm = ({
           />
         </div>
         {invalidQuestion !== undefined && (
-          <p role="alert" className="text-sm text-destructive">
-            {t(
-              invalidQuestion === null
-                ? EXAM_TEXT.invalid
-                : EXAM_TEXT.invalidQuestion,
-              { number: (invalidQuestion ?? 0) + 1 },
-            )}
-          </p>
+          <div role="alert">
+            <StatusMessage
+              size="sm"
+              color="rose"
+              icon={TriangleAlert}
+              title={t(EXAM_TEXT.adminTitle)}
+              description={t(
+                invalidQuestion === null
+                  ? EXAM_TEXT.invalid
+                  : EXAM_TEXT.invalidQuestion,
+                { number: (invalidQuestion ?? 0) + 1 },
+              )}
+            />
+          </div>
         )}
         <div className="space-y-2">
           {form.questions.map((question, index) => (
@@ -154,9 +161,13 @@ export const CourseExamForm = ({
       </fieldset>
       {save.isError && (
         <div role="alert" className="space-y-2 text-sm">
-          <p className="text-destructive">
-            {t(changed ? EXAM_TEXT.changed : EXAM_TEXT.saveFailed)}
-          </p>
+          <StatusMessage
+            size="sm"
+            color="rose"
+            icon={TriangleAlert}
+            title={t(EXAM_TEXT.adminTitle)}
+            description={t(changed ? EXAM_TEXT.changed : EXAM_TEXT.saveFailed)}
+          />
           {changed && (
             <Button
               type="button"

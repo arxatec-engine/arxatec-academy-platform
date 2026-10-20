@@ -8,16 +8,23 @@ La documentación de esta aplicación empieza en [`docs/README.md`](docs/README.
 
 - Node 24
 - **pnpm** (fijado en `packageManager`). Usa los scripts disponibles en `package.json`.
+- Infisical CLI con acceso al proyecto indicado en `.infisical.json`.
 
 ## Arranque
 
 ```bash
 pnpm install
-cp .env.example .env
+infisical login
 pnpm dev
 ```
 
-`VITE_API_URL` apunta a `http://localhost:3001/api/v1` por defecto. Se lee solo desde `src/config/env`; su valor forma parte del bundle público, así que no admite secretos.
+Agrega `VITE_API_URL` al entorno `dev` de Infisical antes de arrancar; en local apunta a
+`http://localhost:3001/api/v1`. El frontend tiene un proyecto Infisical propio. Esta variable
+se lee solo desde `src/config/env`; su valor forma parte del bundle público.
+
+`pnpm build:dev` compila con las variables de `dev`; `pnpm build:prod` y `pnpm build` usan
+`prod`. Las variantes `dev:local`, `build:local` y `preview:local` usan el entorno existente
+y los archivos `.env` de Vite. Más detalles en [Entorno](docs/ENV.md).
 
 ## Verificación
 
@@ -25,7 +32,7 @@ pnpm dev
 pnpm lint
 pnpm typecheck
 pnpm test:unit
-pnpm build
+pnpm build:local
 ```
 
 ## Mapa rápido

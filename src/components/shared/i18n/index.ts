@@ -6,6 +6,8 @@ export const UI_TEXT = {
   catalog: "navigation.catalog",
   close: "actions.close",
   createAccount: "navigation.create_account",
+  empty: "states.empty",
+  emptyTitle: "states.empty_title",
   goToCatalog: "actions.go_to_catalog",
   language: "language.label",
   languages: {

@@ -7,7 +7,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  StatusMessage,
 } from "arxatec-ui";
+import { CircleCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { NS } from "@/locales/namespaces";
@@ -106,13 +108,15 @@ export const VideoFields = ({ id, draft, onChange }: Props) => {
         {t(ADMIN_TEXT.probe)}
       </Button>
       {probe.data && (
-        <p
-          className="text-sm text-muted-foreground sm:col-span-2"
-          role="status"
-        >
-          {t(ADMIN_TEXT.videoFound)}
-          {probe.data.title ? ` · ${probe.data.title}` : ""}
-        </p>
+        <div className="sm:col-span-2" role="status">
+          <StatusMessage
+            size="sm"
+            color="white"
+            icon={CircleCheck}
+            title={t(ADMIN_TEXT.videoFound)}
+            description={probe.data.title ?? t(ADMIN_TEXT.video)}
+          />
+        </div>
       )}
     </div>
   );

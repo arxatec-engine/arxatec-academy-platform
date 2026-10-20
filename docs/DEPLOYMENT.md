@@ -2,18 +2,28 @@
 
 El frontend se compila como archivos estáticos en `dist/`. La API y sus secretos se configuran y despliegan por separado en `arxatec-academy-service`. El navegador recibe únicamente la dirección pública de la API.
 
-## Compilar y revisar localmente
+## Compilar con Infisical
+
+Instala Infisical CLI y configura el acceso al proyecto de `.infisical.json`. En un equipo de
+desarrollo se usa `infisical login`; el entorno de despliegue debe proporcionar su propia
+autenticación de CLI. Agrega `VITE_API_URL` en la raíz `/` del entorno `prod` antes de compilar.
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm lint
 pnpm typecheck
 pnpm test:unit
-pnpm build
+pnpm build:prod
 pnpm preview
 ```
 
-`pnpm build` ejecuta TypeScript y Vite. `pnpm preview` sirve la carpeta compilada para revisar el artefacto local. Configura `VITE_API_URL` antes de compilar: su valor queda dentro de los archivos del cliente.
+`pnpm build` es un alias de `build:prod`; `pnpm build:dev` usa las variables de `dev` para
+una compilación de desarrollo. Ambos ejecutan TypeScript y Vite. `pnpm preview` carga `prod`
+y sirve la carpeta compilada para revisar el artefacto local. `VITE_API_URL` queda dentro de
+los archivos del cliente: cambiarla en Infisical exige volver a compilar.
+
+Para comprobar el código sin acceder a Infisical, usa `pnpm build:local` y
+`pnpm preview:local`, con el entorno del proceso o un `.env` local.
 
 ## Hosting
 
