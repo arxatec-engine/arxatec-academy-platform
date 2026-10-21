@@ -1,91 +1,88 @@
-# Arquitectura del frontend
+# Frontend architecture
 
-## Producto y estructura
+## Product and structure
 
-Academy es una SPA de React 19 y TypeScript estricto. Presenta cursos gratuitos de legal tech, lecciones en video o artículo, progreso del estudiante, comentarios y gestión de cuenta. Los cursos pueden consultarse sin sesión; las rutas privadas requieren una cuenta y el backend vuelve a comprobar cada operación.
+Academy is a React 19 SPA with strict TypeScript. It provides free legal tech courses, video or article lessons, student progress, comments, and account management. Courses can be browsed without signing in; private routes require an account, and the backend checks every operation again.
 
 ```text
 src/
 ├── components/{guards,layout,shared}/
-├── config/env/                 # lectura central de VITE_API_URL
-├── constants/                  # errores y claves del navegador
-├── hooks/                      # sesión, idioma, tema y título
-├── interceptors/               # axiosInstance y axiosPublicInstance
-├── locales/{es,en,pt}/         # common y auth
+├── config/env/                 # centralized VITE_API_URL reader
+├── constants/                  # errors and browser storage keys
+├── hooks/                      # session, language, theme, and title
+├── interceptors/               # axiosInstance and axiosPublicInstance
+├── locales/{es,en,pt}/         # common and auth
 ├── modules/
-│   ├── auth/                   # registro, login, Google, recuperación y correo
-│   ├── catalog/features/       # catálogo, ficha de curso y lección
-│   ├── progress/               # Mis cursos, inscripción y finalización
-│   ├── comments/               # hilos de lecciones
-│   ├── profile/                # datos, avatar, contraseña y baja
-│   ├── notifications/          # avisos y propuestas de temas
-│   └── admin/                  # contenido, moderación, estudiantes y avisos
-├── routes/                     # rutas centralizadas y carga diferida
-├── services/auth_storage/      # persistencia de sesión y retorno
-├── store/{user,theme}/         # estado mínimo del navegador
-├── types/                      # contratos comunes de API
-└── __tests__/                  # pruebas organizadas junto al módulo
+│   ├── auth/                   # registration, login, Google, recovery, and email
+│   ├── catalog/features/       # catalog, course details, and lessons
+│   ├── progress/               # My courses, enrollment, completion, exams, certificates
+│   ├── comments/               # lesson threads
+│   ├── profile/                # personal details, avatar, password, and deletion
+│   ├── notifications/          # notifications and topic proposals
+│   └── admin/                  # content, moderation, students, and notifications
+├── routes/                     # centralized routes and lazy loading
+├── services/auth_storage/      # session persistence and return destination
+├── store/{user,theme}/         # minimal browser state
+├── types/                      # shared API contracts
+└── __tests__/                  # tests organized by module
 ```
 
-Los directorios opcionales aparecen conforme el módulo los necesita. Una feature agrupa sus páginas, componentes, hooks, servicios, tipos, validación y documentación. Las páginas componen la pantalla; las lecturas y escrituras remotas pasan por hooks de React Query y servicios HTTP.
+Optional directories appear when a module needs them. A feature groups its pages, components, hooks, services, types, validation, and documentation. Pages compose the screen; remote reads and writes go through React Query hooks and HTTP services.
 
-## Camino de datos
+## Data flow
 
 ```text
-ruta → guardia → página → componente → hook de React Query → servicio → interceptor de Axios → API
+route → guard → page → component → React Query hook → service → Axios interceptor → API
 ```
 
-`src/types/services` define el sobre `Response<T>`. Los servicios comprueban que la respuesta incluya los datos requeridos y devuelven el contenido de `data`; los adaptadores de cada módulo convierten campos del API `snake_case` al formato que presenta la interfaz. La infraestructura normaliza fallos a `ApiError`, con estado, código y descripción. No hay peticiones a la API dentro de JSX ni de `useEffect`.
+`src/types/services` defines the `Response<T>` envelope. Services check that responses contain the required data and return the `data` payload. Module adapters convert API `snake_case` fields into the shape presented by the UI. Infrastructure normalizes failures into `ApiError`, including status, code, and description. There are no API requests inside JSX or `useEffect`.
 
-`axiosInstance` adjunta el token del usuario para operaciones autenticadas. `axiosPublicInstance` no adjunta credenciales y evita que una respuesta de acceso público cierre la sesión abierta. Ambas comparten el origen `ENV.API_URL`; los servicios eligen la instancia según el endpoint y el nivel de acceso.
+`axiosInstance` attaches the user's token for authenticated operations. `axiosPublicInstance` sends no credentials and prevents errors from public endpoints from terminating the active session. Both share `ENV.API_URL`; services select the client according to the endpoint and access level.
 
-React Query administra respuestas remotas. Sus valores predeterminados están en `src/utilities/query`: caché de 30 segundos, sin recarga por cambio de foco y hasta dos reintentos, salvo errores de cliente. Las claves se agrupan por módulo. Las mutaciones invalidan o actualizan las consultas relacionadas.
+React Query owns remote responses. Defaults in `src/utilities/query` use a 30-second freshness period, no refetch on window focus, and up to two retries except for client errors. Query keys are grouped by module. Mutations invalidate or update related queries.
 
-## Sesión, roles y rutas
+## Sessions, roles, and routes
 
-`src/routes/routes.ts` es la fuente única de rutas y helpers. `lazyPage` carga páginas bajo demanda. `Auth` protege Mis cursos, Perfil y la revisión de correo; `Admin` añade la comprobación de rol `ADMIN` para las herramientas de personal. Son controles de navegación, no un límite de seguridad: el servicio valida sesión, permisos, propiedad de datos y reglas de negocio.
+`src/routes/routes.ts` is the single source for routes and helpers. `lazyPage` loads pages on demand. `Auth` protects My courses, Profile, and email review; `Admin` additionally checks the `ADMIN` role for staff tools. These are navigation controls, not a security boundary: the service validates sessions, permissions, data ownership, and business rules.
 
-El inicio de sesión acepta correo y contraseña, con opción de recordar la sesión. El formulario de registro solicita nombre, correo y contraseña; el registro y Google crean una sesión. El acceso con contraseña y Google comparten la navegación de la cuenta. Los flujos de verificación de correo y recuperación usan enlaces con token; el correo sin verificar permite ver cursos, pero el backend exige verificación para comentar.
+Sign-in accepts email and password with an option to remember the session. Registration requests name, email, and password; both registration and Google create a session. Password and Google sign-in share account navigation. Email verification and recovery use token links. An unverified email can browse courses, but the backend requires verification to comment.
 
-El token y la vista pública del usuario se guardan en `localStorage` cuando se recuerda la sesión y en `sessionStorage` cuando dura solo la pestaña. Axios lee el token al enviar cada solicitud. No se guardan contraseñas. `redirect_to` se valida y conserva en almacenamiento de sesión para volver a la página solicitada después de autenticarse. La expiración de sesión limpia los datos y ofrece una ruta de retorno.
+The token and public user snapshot are stored in `localStorage` for remembered sessions and in `sessionStorage` for tab-only sessions. Axios reads the token when sending each request. Passwords are not stored. `redirect_to` is validated and retained in session storage so authentication can return to the requested page. Session expiration clears data and offers a return route.
 
-| Ruta                                                         | Acceso                             | Función                                                                      |
-| ------------------------------------------------------------ | ---------------------------------- | ---------------------------------------------------------------------------- |
-| `/`                                                          | Público                            | Catálogo con búsqueda y filtros de tema y nivel.                             |
-| `/cursos/:slug`                                              | Público                            | Descripción y temario de un curso.                                           |
-| `/cursos/:course_slug/lecciones/:lesson_slug`                | Público con contenido condicionado | Muestra una lección accesible o el estado bloqueado con el temario.          |
-| `/ingresar`                                                  | Invitado                           | Opciones de acceso, incluido Google.                                         |
-| `/ingresar/correo`, `/crear-cuenta`                          | Invitado                           | Login por correo y alta de estudiante.                                       |
-| `/recuperar-contrasena`, `/restablecer-contrasena`           | Invitado/enlace                    | Recuperación y cambio de contraseña.                                         |
-| `/verificar-correo`, `/revisa-tu-correo`                     | Enlace/sesión                      | Confirmación y estado del correo.                                            |
-| `/oauth/callback`                                            | Flujo Google                       | Intercambio del código de un solo uso.                                       |
-| `/mis-cursos`, `/perfil`                                     | Sesión                             | Aprendizaje y cuenta personal.                                               |
-| `/cursos/:slug/examen`                                      | Sesión                             | Examen final de 15 preguntas para obtener el certificado.                    |
-| `/admin/cursos`, `/admin/cursos/:id`, `/admin/lecciones/:id` | Rol ADMIN                          | Crear y mantener cursos y lecciones.                                         |
-| `/admin/comentarios`, `/admin/usuarios`, `/admin/avisos`     | Rol ADMIN                          | Moderar comentarios, consultar estudiantes y gestionar solicitudes de aviso. |
-| `/sesion-vencida` y `*`                                      | Público                            | Sesión cerrada y ruta no encontrada.                                         |
+| Route                                                        | Access                            | Purpose                                                           |
+| ------------------------------------------------------------ | --------------------------------- | ----------------------------------------------------------------- |
+| `/`                                                          | Public                            | Catalog with search, topic, and level filters.                    |
+| `/cursos/:slug`                                              | Public                            | Course description and syllabus.                                  |
+| `/cursos/:course_slug/lecciones/:lesson_slug`                | Public, content depends on access | Accessible lesson or locked state with syllabus.                  |
+| `/ingresar`                                                  | Guest                             | Sign-in options, including Google.                                |
+| `/ingresar/correo`, `/crear-cuenta`                          | Guest                             | Email sign-in and student registration.                           |
+| `/recuperar-contrasena`, `/restablecer-contrasena`           | Guest/link                        | Password recovery and reset.                                      |
+| `/verificar-correo`, `/revisa-tu-correo`                     | Link/session                      | Email confirmation and status.                                    |
+| `/oauth/callback`                                            | Google flow                       | One-time code exchange.                                           |
+| `/mis-cursos`, `/perfil`                                     | Session                           | Personal learning and account.                                    |
+| `/cursos/:slug/examen`                                       | Session                           | Final exam with 15 questions to earn a certificate.               |
+| `/admin/cursos`, `/admin/cursos/:id`, `/admin/lecciones/:id` | ADMIN role                        | Course and lesson creation and maintenance.                       |
+| `/admin/comentarios`, `/admin/usuarios`, `/admin/avisos`     | ADMIN role                        | Comment moderation, student directory, and notification requests. |
+| `/sesion-vencida` and `*`                                    | Public                            | Closed session and route not found.                               |
 
-`ROUTES` y `RouteHelpers` son la referencia final si una ruta cambia. Los títulos de las páginas se traducen y se actualizan con `useTitle`, que añade ` - Arxatec Academy`.
+`ROUTES` and `RouteHelpers` remain the final reference if a route changes. Page titles are translated and updated through `useTitle`, which appends ` - Arxatec Academy`.
 
-## Experiencia de aprendizaje
+## Learning experience
 
-El catálogo obtiene cursos publicados de `GET /courses`; búsqueda, tema y nivel se conservan en la URL y forman parte de la clave de consulta. La ficha pública presenta temario. El inicio de curso inscribe a un usuario autenticado; una persona visitante puede abrir una muestra y se le ofrece crear cuenta o entrar para continuar. `GET /courses/:course_slug/lessons/:lesson_slug` puede responder con `403 LESSON_LOCKED`; el servicio lo convierte a un estado de contenido bloqueado que conserva el contexto del curso.
+The catalog reads published courses from `GET /courses`; search, topic, and level are stored in the URL and included in the query key. Public course details present the syllabus. Starting a course enrolls an authenticated user. Visitors can open a sample and are offered registration or sign-in to continue. `GET /courses/:course_slug/lessons/:lesson_slug` may return `403 LESSON_LOCKED`; the service converts that response into a locked-content state retaining the course context.
 
-Las lecciones componen video de YouTube/Vimeo, artículo HTML saneado por el backend, transcripción y recursos. Los hilos de comentarios se pueden leer públicamente; el backend limita publicación y respuesta a cuentas con correo verificado. La página Mis cursos muestra cursos en progreso y completados. Una marca de lección invalida su consulta para reflejar el cambio al volver al listado.
+Lessons compose YouTube/Vimeo video, article HTML sanitized by the backend, transcripts, and resources. Comment threads are publicly readable; the backend restricts posting and replies to accounts with verified email. My courses displays courses in progress and completed courses. Marking a lesson invalidates that query so returning to the list reflects the change.
 
-Completar las lecciones habilita el examen final. El certificado requiere aprobar 15 preguntas,
-con 12 aciertos como mínimo inicial; administración configura las preguntas, opciones, respuesta
-correcta y activación dentro del editor de cada curso. El navegador solo envía versión y
-respuestas elegidas: el servicio corrige, guarda el intento y emite el certificado al aprobar.
+Completing the lessons unlocks the final exam. A certificate requires passing a 15-question exam, with 12 correct answers as the initial threshold. Administrators configure questions, options, correct answers, the passing threshold, and availability in each course editor. The browser submits only the version and selected answers; the service grades the exam, records the attempt, and issues a certificate on passing.
 
-Perfil permite editar datos personales, foto y contraseña en cuentas de contraseña, revisar un resumen y pedir la baja de cuenta. Las respuestas del servidor actualizan el usuario de sesión; la baja vacía la sesión y la caché. El backend decide las validaciones definitivas.
+Profile supports editing personal details, photos, passwords for password accounts, reviewing a summary, and requesting account deletion. Server responses update the session user; account deletion clears both session and cache. The backend owns final validation.
 
-## Internacionalización y presentación
+## Internationalization and presentation
 
-`i18next` ofrece español, inglés y portugués. Español es el idioma predeterminado y la preferencia se conserva en el navegador. Los recursos están divididos en los namespaces `common` y `auth`; TypeScript toma sus claves de los recursos en español y la prueba de recursos comprueba paridad entre idiomas.
+`i18next` provides Spanish, English, and Portuguese. Spanish is the default, and the browser retains the language preference. Resources are divided into `common` and `auth` namespaces; TypeScript derives keys from the Spanish resources, and the resource test checks parity across languages.
 
-La interfaz utiliza Tailwind CSS 4 y `arxatec-ui`. Tema claro, oscuro o del sistema e idioma se controlan desde Mi cuenta → Mi perfil (`/perfil`), con sesión iniciada. La cabecera no incluye estos controles. Las preferencias se conservan en este navegador. `src/index.css` importa el tema del paquete y define estilos de lectura para artículos. `vite.config.ts` adapta las familias tipográficas del CSS del paquete a la tipografía sans de Academy.
+The UI uses Tailwind CSS 4 and `arxatec-ui`. Light, dark, or system theme and language are controlled from My account → My profile (`/perfil`) while signed in. The header does not contain these controls. Preferences remain in this browser. `src/index.css` imports the package theme and defines article reading styles. `vite.config.ts` adapts font families in the package CSS to Academy's sans font.
 
-## Configuración y límites
+## Configuration and boundaries
 
-`src/config/env` es el único punto que lee variables `import.meta.env`; `VITE_API_URL` es pública y apunta al prefijo `/api/v1`. Vite y los scripts disponibles están descritos en `package.json`. Para el arranque, las pruebas y el build consulta [Entorno](ENV.md) y [Verificación](TESTING.md).
+`src/config/env` is the only reader of `import.meta.env`. `VITE_API_URL` is public and points to the `/api/v1` prefix. Vite and the available scripts are described in `package.json`. See [Environment](ENV.md) and [Testing](TESTING.md) for startup, checks, and builds.

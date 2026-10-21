@@ -1,7 +1,5 @@
 import {
   Button,
-  Card,
-  CardContent,
   Label,
   Progress,
   RadioGroup,
@@ -17,6 +15,7 @@ import { EXAM_TEXT } from "@/modules/progress/i18n/exams";
 import type { CourseExam } from "@/modules/progress/types/exams";
 import { cn } from "@/utilities/cn";
 import { useSubmitCourseExam } from "../../hooks";
+import { ExamIntro } from "../exam_intro";
 import { ExamResult } from "../exam_result";
 
 export const ExamForm = ({
@@ -70,29 +69,9 @@ export const ExamForm = ({
         }}
       />
     );
-  const intro = t(EXAM_TEXT.intro, {
-    total: exam.question_count,
-    required: exam.passing_score,
-    percent: Math.round((exam.passing_score / exam.question_count) * 100),
-  });
   if (!started)
     return (
-      <Card className="py-4 shadow-none">
-        <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">{intro}</p>
-          {exam.last_result?.score != null && (
-            <p className="text-sm">
-              {t(EXAM_TEXT.lastScore, {
-                score: exam.last_result.score,
-                total: exam.question_count,
-              })}
-            </p>
-          )}
-          <Button size="sm" type="button" onClick={() => setStarted(true)}>
-            {t(EXAM_TEXT.begin)}
-          </Button>
-        </CardContent>
-      </Card>
+      <ExamIntro exam={exam} onStart={() => setStarted(true)} />
     );
   if (!question) return null;
   const send = (event: FormEvent<HTMLFormElement>) => {
@@ -216,7 +195,7 @@ export const ExamForm = ({
           )}
         </div>
       )}
-      <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
+      <div className="-mx-4 flex items-center justify-between gap-3 border-t border-border px-4 pt-4 sm:-mx-6 sm:px-6">
         <Button
           size="sm"
           type="button"

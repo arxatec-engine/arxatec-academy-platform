@@ -14,9 +14,9 @@ borrador del formulario. Cada comentario se presenta en una fila sin tarjeta pro
 con el avatar del autor (o sus iniciales si no tiene foto), nombre, fecha y acciones.
 Los autores no disponibles usan un icono de usuario. Las respuestas comparten esa
 presentación con un avatar más pequeño, incluidos los distintivos del equipo.
-Los comentarios y las respuestas usan `divide-y divide-border` para separar cada
-elemento. Los separadores de los hilos abarcan el ancho del panel y el contenido
-conserva `px-4` de padding lateral.
+Los comentarios principales usan `divide-y divide-border` para separar cada hilo.
+Sus separadores abarcan el ancho del panel y el contenido conserva `px-4` de padding
+lateral. Las respuestas se separan solo con espacio vertical, sin líneas entre ellas.
 Cada hilo empieza con las respuestas plegadas; el botón «Ver N respuestas» permite
 mostrarlas y volver a ocultarlas. Se mantienen montadas al plegarse para conservar
 el estado de los reportes, fuera del foco y del árbol accesible mientras están ocultas.

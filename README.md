@@ -1,54 +1,52 @@
-# Arxatec Academy — frontend
+# Arxatec Academy Platform
 
-SPA educativa de React 19 y TypeScript sobre Vite. Se conecta por REST con `arxatec-academy-service` y ofrece catálogo público, cursos y lecciones, progreso, comentarios, gestión de cuenta y herramientas restringidas para administradores.
+A learning SPA built with React 19, TypeScript, and Vite. It connects to `arxatec-academy-service` over REST and provides a public catalog, courses and lessons, progress, comments, account management, and tools restricted to administrators.
 
-La documentación de esta aplicación empieza en [`docs/README.md`](docs/README.md). `src/` y los contratos del servicio definen el comportamiento implementado.
+Start with [`docs/README.md`](docs/README.md). The implementation in `src/` and the service contracts define the supported behavior.
 
-## Requisitos
+## Requirements
 
-- Node 24
-- **pnpm** (fijado en `packageManager`). Usa los scripts disponibles en `package.json`.
-- Infisical CLI con acceso al proyecto indicado en `.infisical.json`.
+- Node.js 24.
+- **pnpm**, pinned in `packageManager`. Use the scripts declared in `package.json`.
+- Infisical CLI >=0.43.145 with access to the project in `.infisical.yaml`.
 
-## Arranque
+## Getting started
 
-```bash
-pnpm install
+```sh
+pnpm install --frozen-lockfile
 infisical login
 pnpm dev
 ```
 
-Agrega `VITE_API_URL` al entorno `dev` de Infisical antes de arrancar; en local apunta a
-`http://localhost:3001/api/v1`. El frontend tiene un proyecto Infisical propio. Esta variable
-se lee solo desde `src/config/env`; su valor forma parte del bundle público.
+Set `VITE_API_URL` in the frontend project's Infisical `dev` environment before starting. For local development, use `http://localhost:3001/api/v1`. This frontend has its own Infisical project. The variable is read only through `src/config/env` and becomes part of the public browser bundle.
 
-`pnpm build:dev` compila con las variables de `dev`; `pnpm build:prod` y `pnpm build` usan
-`prod`. Las variantes `dev:local`, `build:local` y `preview:local` usan el entorno existente
-y los archivos `.env` de Vite. Más detalles en [Entorno](docs/ENV.md).
+`pnpm build:dev` builds with `dev` variables. `pnpm build:prod` and `pnpm build` use `prod`. The `dev:local`, `build:local`, and `preview:local` variants use variables already supplied to the process. Local environment files are not included in this repository. See [Environment](docs/ENV.md).
 
-## Verificación
+## Verification
 
-```bash
+```sh
 pnpm lint
 pnpm typecheck
 pnpm test:unit
-pnpm build:local
+VITE_API_URL=https://api.example.test/api/v1 pnpm build:local
 ```
 
-## Mapa rápido
+The example URL above is only for compilation checks. Set the actual production API URL in Infisical before creating a release. See [Deployment](docs/DEPLOYMENT.md).
 
-| Carpeta                     | Qué contiene                                        | Documentación                                             |
-| --------------------------- | --------------------------------------------------- | --------------------------------------------------------- |
-| `src/config/env`            | lectura única de configuración Vite                 | [`docs/ENV.md`](docs/ENV.md)                              |
-| `src/interceptors`          | instancias Axios autenticada y pública, errores API | `src/interceptors/docs/README.md`                         |
-| `src/services/auth_storage` | sesión y destino de retorno                         | `src/services/auth_storage/docs/README.md`                |
-| `src/routes`                | paths centralizados y árboles de rutas              | `src/routes/docs/README.md`                               |
-| `src/modules/auth`          | acceso, registro, correo y recuperación             | `src/modules/auth/docs/README.md`                         |
-| `src/modules/catalog`       | catálogo, fichas y lecciones                        | README en cada feature                                    |
-| `src/modules/progress`      | Mis cursos y progreso                               | `src/modules/progress/features/my_courses/docs/README.md` |
-| `src/modules/comments`      | conversación de lecciones                           | `src/modules/comments/docs/README.md`                     |
-| `src/modules/profile`       | perfil y cuenta                                     | `src/modules/profile/features/profile/docs/README.md`     |
-| `src/modules/admin`         | gestión de cursos, estudiantes, avisos y moderación | README en cada feature                                    |
-| `src/__tests__`             | pruebas unitarias de servicios, hooks, rutas y UI   | [`docs/TESTING.md`](docs/TESTING.md)                      |
+## Repository map
 
-Tailwind CSS 4 y `arxatec-ui` proporcionan estilos, componentes y tokens visuales. `src/index.css` carga primero el CSS del paquete; `@source "../node_modules/arxatec-ui/dist/**/*.js"` detecta las clases que usa la librería.
+| Directory                   | Contents                                           | Documentation                                             |
+| --------------------------- | -------------------------------------------------- | --------------------------------------------------------- |
+| `src/config/env`            | Centralized Vite configuration                     | [`docs/ENV.md`](docs/ENV.md)                              |
+| `src/interceptors`          | Authenticated and public Axios clients; API errors | `src/interceptors/docs/README.md`                         |
+| `src/services/auth_storage` | Session persistence and return destination         | `src/services/auth_storage/docs/README.md`                |
+| `src/routes`                | Centralized paths and route trees                  | `src/routes/docs/README.md`                               |
+| `src/modules/auth`          | Sign-in, registration, email, and recovery         | `src/modules/auth/docs/README.md`                         |
+| `src/modules/catalog`       | Catalog, course details, and lessons               | Each feature's README                                     |
+| `src/modules/progress`      | My courses, progress, exams, and certificates      | `src/modules/progress/features/my_courses/docs/README.md` |
+| `src/modules/comments`      | Lesson discussions                                 | `src/modules/comments/docs/README.md`                     |
+| `src/modules/profile`       | Profile and account                                | `src/modules/profile/features/profile/docs/README.md`     |
+| `src/modules/admin`         | Courses, students, notifications, and moderation   | Each feature's README                                     |
+| `src/__tests__`             | Service, hook, routing, and UI unit tests          | [`docs/TESTING.md`](docs/TESTING.md)                      |
+
+Tailwind CSS 4 and `arxatec-ui` supply styles, components, and visual tokens. `src/index.css` loads the package CSS first; `@source "../node_modules/arxatec-ui/dist/**/*.js"` detects classes used by the library.

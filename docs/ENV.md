@@ -1,43 +1,37 @@
-# Entorno
+# Environment
 
-El frontend solo lee `VITE_API_URL`, desde `src/config/env/index.ts`. Es configuración pública que se incorpora al bundle; apunta a la URL base de la API, incluido el prefijo `/api/v1`.
+The frontend reads only `VITE_API_URL`, through `src/config/env/index.ts`. It is public configuration embedded in the bundle and points to the API base URL, including `/api/v1`.
 
-```env
-VITE_API_URL=http://localhost:3001/api/v1
+```sh
+VITE_API_URL=http://localhost:3001/api/v1 pnpm dev:local
 ```
 
-Ese es el fallback local del código. La API local de Academy debe
-estar disponible en esa dirección.
+That address is the code's local fallback. The local Academy API must be available there. Production builds must explicitly receive their actual API URL; a successful compilation alone does not verify that endpoint.
 
 ## Infisical
 
-Los scripts leen el `workspaceId` de `.infisical.json`, igual que Admin, y lo pasan como
-`--projectId` al CLI. El proyecto del frontend es independiente del servicio. Configura
-`VITE_API_URL` en la raíz `/` de los entornos `dev` y `prod`, con la URL de API correspondiente.
-Es la única variable de aplicación que necesita este proyecto de Infisical.
+The `infisical` script reads `secrets-management.project-id` from `.infisical.yaml` with the `yaml` package and passes it to the CLI as `--projectId`, including with machine identity authentication. Infisical CLI >=0.43.145 is required for development, CI, and deployment.
 
-Desde la raíz del frontend:
+The frontend project is independent of the service. Set `VITE_API_URL` at `/` in `dev` and `prod`, using the API URL for each environment. It is the only application variable required by this Infisical project.
+
+From the frontend root:
 
 ```sh
-pnpm install
+pnpm install --frozen-lockfile
 infisical login
 pnpm dev
 ```
 
-| Comando                                                      | Configuración                                                          |
-| ------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| `pnpm dev`                                                   | Infisical `dev`, después Vite                                          |
-| `pnpm build:dev`                                             | Infisical `dev`, después TypeScript y Vite                             |
-| `pnpm build:prod` / `pnpm build`                             | Infisical `prod`, después TypeScript y Vite                            |
-| `pnpm preview`                                               | Infisical `prod`, sirve el `dist` ya compilado                         |
-| `pnpm dev:local` / `pnpm build:local` / `pnpm preview:local` | Sin consultar Infisical; entorno del proceso y archivos `.env` de Vite |
+| Command                                                      | Configuration                                      |
+| ------------------------------------------------------------ | -------------------------------------------------- |
+| `pnpm dev`                                                   | Infisical `dev`, then Vite.                        |
+| `pnpm build:dev`                                             | Infisical `dev`, then TypeScript and Vite.         |
+| `pnpm build:prod` / `pnpm build`                             | Infisical `prod`, then TypeScript and Vite.        |
+| `pnpm preview`                                               | Infisical `prod`; serves the existing `dist`.      |
+| `pnpm dev:local` / `pnpm build:local` / `pnpm preview:local` | No Infisical request; use the process environment. |
 
-Infisical inyecta variables antes de ejecutar Vite. Las variables del proceso tienen prioridad
-sobre los archivos `.env`; estos siguen sirviendo como configuración local para las ausentes.
-Para trabajar con archivos locales, crea un `.env` con `VITE_API_URL` y usa los scripts `:local`.
-Reinicia Vite al cambiar las variables. `preview` no vuelve a compilar ni cambia una URL ya
-incluida en el bundle: para eso ejecuta el build del entorno correspondiente.
+Infisical injects variables before launching Vite. Process variables take precedence over native Vite environment files. This repository does not include a local `.env`; supply configuration through Infisical or the process environment. Restart Vite after changing variables. `preview` neither rebuilds nor changes a URL already embedded in the bundle; run the matching build to do that.
 
-El nombre de variable no cambia entre desarrollo y build; Vite expone valores `VITE_*` al cliente. No pongas contraseñas, tokens de OAuth, claves de almacenamiento ni credenciales de servicio en esta variable ni en el bundle.
+The variable name is the same in development and builds. Vite exposes `VITE_*` values to the client. Never put passwords, OAuth secrets, storage keys, or service credentials in this variable or in the bundle.
 
-No hay otra variable `VITE_*` definida por el contrato actual. Consulta [`src/config/env`](../src/config/env/index.ts) y [Despliegue](DEPLOYMENT.md) al cambiar configuración.
+The current contract defines no other `VITE_*` variable. Check [`src/config/env`](../src/config/env/index.ts) and [Deployment](DEPLOYMENT.md) when changing configuration.

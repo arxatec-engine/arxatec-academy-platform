@@ -12,6 +12,10 @@ sobre un degradado en la parte inferior. En escritorio su altura sigue la del re
 en pantallas pequeñas se apilan. `LessonList` muestra el temario con filas completas que se pueden abrir y
 comparte su estructura con la lección bloqueada.
 
+Junto a «Curso gratuito», el resumen incluye un botón de atrás que abre el catálogo.
+Usa el mismo estilo outline, tamaño de 28 px y flecha que la cabecera de la lección,
+con la etiqueta accesible «Ir al catálogo».
+
 El nivel conserva su etiqueta traducida y añade un SVG de 20 px con tres barras gruesas,
 con una barra activa para Introductorio y dos para Intermedio. Usa el color de primer
 plano del tema y mantiene visibles las barras restantes al 25 % de opacidad. Es decorativo.
@@ -32,8 +36,11 @@ con iniciales como respaldo y la biografía conserva sus saltos de línea.
 
 ## Examen y certificado
 
-La ficha incluye `CourseCertification`, compartido con la lección. Con sesión y todas las
-lecciones completadas según Mis cursos, muestra «Dar examen para obtener mi certificado».
+Después del temario y antes del docente, la ficha incluye `CourseCertification` como sección
+«Examen», con un título `text-lg` igual a «Temario». Con sesión y todas las lecciones completadas
+según Mis cursos, muestra una tarjeta enteramente clickeable: «Examen final», información de
+las 15 preguntas y el certificado al aprobar, y «Dar examen» con flecha.
 Si el certificado ya fue emitido, muestra «Ver certificado». No ofrece el examen de otro curso
 ni considera terminado un curso sin lecciones. Las respuestas correctas nunca se consultan
 desde esta invitación.
+La última lección ofrece el mismo acceso en su navegación inferior mediante `useCompletedCourse`.

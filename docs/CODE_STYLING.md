@@ -1,19 +1,19 @@
-# Estilo de código
+# Code style
 
-Las reglas detalladas y numeradas del frontend viven en [CODE_STYLING.md](../CODE_STYLING.md). Este documento recoge las decisiones de producto y arquitectura que deben acompañar esos estilos.
+This guide records the frontend's code conventions and the product and architecture decisions that accompany them. ESLint enforces the configured rules in `eslint.config.js`.
 
-- Organiza el código en `modules/<dominio>/features/<feature>` y agrega solo las carpetas que usa la feature. Directorios en `snake_case`, componentes `PascalCase`, hooks `useCamelCase`.
-- Centraliza paths y generación de URLs en `src/routes/routes.ts`. Mantén las páginas ligeras y los títulos con `useTitle`.
-- Conserva el flujo de datos página/componente → hook → servicio → interceptor. Servicios HTTP sin React; consultas y escrituras con React Query. Ninguna petición desde `useEffect`.
-- Importa controles y tokens del design system `arxatec-ui`. Respeta las familias de letra, tamaños y tema de Academy; no introduzcas controles o paletas paralelas sin una necesidad de producto.
-- Usa `StatusMessage` de `arxatec-ui` para estados sin registros, errores de sección y avisos persistentes de la interfaz, incluidos validaciones y resultados. Usa `size="sm"`, `color="rose"` para errores dentro de una sección y `color="white"` para vacíos o información; conserva las acciones fuera del mensaje y los anuncios accesibles (`role="alert"` o `role="status"`) en el contenedor. **No uses `StatusMessage` en las páginas 404 ni de error de servidor o conexión**: comparten `ErrorScreen`, con `PageShell`, título y descripción centrados y botón compacto. Los fallos de carga de página se propagan al límite de rutas. Las cargas mantienen su `Skeleton` y las notificaciones transitorias de acciones mantienen el `Toaster` compartido.
-- Usa `size="sm"` en todos los `Input`, `PasswordInput` y `SelectTrigger`. Los campos de texto, áreas de texto y selectores deben incluir un `placeholder` traducido.
-- Reserva `LoaderSplash` para el fallback de rutas y el arranque previo a React. Las cargas de contenido y de sesión usan un único bloque simple de `Skeleton` de `arxatec-ui` por estado de carga.
-- Todo texto visible vive en los recursos i18n y mantiene la misma clave en español, inglés y portugués. Usa las claves tipadas y los namespaces centralizados.
-- Valida formularios y respuestas no confiables en sus límites. Conserva `snake_case` en los contratos del API y adapta a `camelCase` en el adaptador del módulo.
-- La instancia HTTP autenticada y la pública tienen propósitos distintos. El servicio decide cuál usar según el contrato; nunca construyas una instancia Axios en una feature.
-- El navegador contiene solo datos de sesión necesarios para enviar el token y preferencias de presentación. No guardes contraseñas ni escribas secretos en variables `VITE_`.
-- Las features mantienen `docs/README.md` junto con el código. Si una decisión funcional cambia, actualiza su documentación en el mismo cambio.
-- No uses `any`, `console.log` ni supresiones de tipos para ocultar errores. Usa pnpm y los scripts declarados en `package.json`.
+- Organize code under `modules/<domain>/features/<feature>` and add only the directories a feature uses. Use `snake_case` directories, `PascalCase` components, and `useCamelCase` hooks.
+- Centralize paths and URL generation in `src/routes/routes.ts`. Keep pages lightweight and manage titles with `useTitle`.
+- Preserve the page/component → hook → service → interceptor data flow. HTTP services do not use React; reads and writes use React Query. Do not issue requests from `useEffect`.
+- Import design system controls and tokens from `arxatec-ui`. Respect Academy's fonts, sizes, and theme; do not introduce parallel controls or palettes without a product need.
+- Use `StatusMessage` from `arxatec-ui` for empty states, section errors, and persistent notices, including validation and general results. Use `size="sm"`, `color="rose"` for section errors, and `color="white"` for empty or informational states. Keep actions outside the message and accessible announcements (`role="alert"` or `role="status"`) on its container. Custom exam introduction and score screens use their own documented presentation. **Do not use `StatusMessage` on 404, server error, or connection error pages**: these share `ErrorScreen`, with `PageShell`, centered title and description, and a compact button. Page-loading failures propagate to the route boundary. Loading states retain their `Skeleton`; transient action notifications retain the shared `Toaster`.
+- Use `size="sm"` on every `Input`, `PasswordInput`, and `SelectTrigger`. Text fields, textareas, and selectors must include translated placeholders.
+- Reserve `LoaderSplash` for route fallbacks and startup before React. Content and session loading use a single simple `Skeleton` block from `arxatec-ui` per loading state.
+- Visible copy lives in i18n resources with the same key in Spanish, English, and Portuguese. Use typed keys and centralized namespaces.
+- Validate forms and untrusted responses at their boundaries. Preserve `snake_case` in API contracts and adapt to `camelCase` in module adapters.
+- Authenticated and public HTTP clients have distinct purposes. The service selects one according to the contract; never construct an Axios client inside a feature.
+- The browser stores only session data required to send the token and presentation preferences. Never store passwords or place secrets in `VITE_` variables.
+- Features maintain `docs/README.md` alongside their code. Update documentation in the same change when functional decisions change.
+- Do not use `any`, `console.log`, or type suppressions to hide errors. Use pnpm and scripts declared in `package.json`.
 
-Las pruebas correspondientes a este repositorio están en [Verificación](TESTING.md); las reglas generales del código están en [CODE_STYLING.md](../CODE_STYLING.md).
+Repository checks are documented in [Testing](TESTING.md); module responsibilities are described in [Architecture](ARCHITECTURE.md).

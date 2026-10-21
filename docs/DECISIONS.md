@@ -1,20 +1,20 @@
-# Decisiones del frontend
+# Frontend decisions
 
-Este documento registra decisiones observables en la implementación actual. Las decisiones que cambien un contrato deben revisarse también en `arxatec-academy-service`.
+This document records decisions observable in the current implementation. Decisions that change a contract must also be reviewed in `arxatec-academy-service`.
 
-| Decisión vigente                                  | Motivo y consecuencia                                                                                                                 |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| React 19, TypeScript estricto y Vite              | SPA web con verificación de tipos en el build.                                                                                        |
-| `pnpm`                                            | Gestor fijado en `packageManager`; `pnpm-lock.yaml` es el lockfile del proyecto.                                                      |
-| Rutas centralizadas y carga diferida por pantalla | Paths en español y carga del código al abrir cada ruta.                                                                               |
-| Dos instancias Axios                              | Una adjunta el bearer token; la pública no envía sesión ni cierra sesión por errores públicos.                                        |
-| React Query para datos remotos                    | Comparte caché y limita reconsultas; el estado de UI no duplica el resultado del servidor.                                            |
-| Token almacenado según “recordarme”               | `localStorage` mantiene una sesión recordada; `sessionStorage` limita la otra a la pestaña. No se guardan credenciales de contraseña. |
-| Tres idiomas desde los recursos del frontend      | Español, inglés y portugués mantienen árboles de claves equivalentes.                                                                 |
-| Tema y lenguaje son preferencias del navegador    | El tema puede seguir al sistema; no se sincroniza con preferencias de cuenta en el servidor.                                          |
-| Academia y administración comparten una SPA       | Las herramientas bajo `/admin` requieren rol `ADMIN`; cursos y aprendizaje se mantienen en la navegación principal.                   |
-| `arxatec-ui` y tipografía sans                    | Los controles, el logo Academy y los tokens mantienen el sistema visual común.                                                        |
-| Catálogo y muestras públicos                      | La persona puede descubrir cursos antes de registrarse; el API resuelve qué lección está bloqueada.                                   |
-| Certificados públicos por URL                     | El servidor emite y verifica; `/certificados/:id` usa Axios público y enlaza al PDF con QR del backend.                                   |
+| Current decision                           | Rationale and consequence                                                                                                             |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| React 19, strict TypeScript, and Vite      | Web SPA with build-time type checking.                                                                                                |
+| `pnpm`                                     | Package manager pinned in `packageManager`; `pnpm-lock.yaml` is the project lockfile.                                                 |
+| Centralized routes and lazy page loading   | Spanish paths; page code loads when its route opens.                                                                                  |
+| Two Axios clients                          | One attaches the bearer token; the public client neither sends a session nor terminates one on public endpoint errors.                |
+| React Query for remote data                | Shared cache and bounded refetching; UI state does not duplicate server results.                                                      |
+| Token storage follows “remember me”        | `localStorage` retains remembered sessions; `sessionStorage` limits other sessions to the tab. Password credentials are never stored. |
+| Three languages in frontend resources      | Spanish, English, and Portuguese retain equivalent key trees.                                                                         |
+| Theme and language are browser preferences | Theme may follow the system; preferences are not synchronized to the server account.                                                  |
+| Academy and administration share one SPA   | `/admin` tools require `ADMIN`; courses and learning remain in primary navigation.                                                    |
+| `arxatec-ui` and sans typography           | Controls, the Academy logo, and tokens retain the shared visual system.                                                               |
+| Public catalog and samples                 | Visitors can discover courses before registering; the API decides which lesson is locked.                                             |
+| Public certificate URLs                    | The server issues and verifies certificates; `/certificados/:id` uses public Axios and links to the backend PDF with its QR code.     |
 
-Cambiar contrato de API, acceso de cuentas o persistencia requiere revisar también `arxatec-academy-service` y el harness, no solo esta tabla.
+Changing an API contract, account access, or persistence requires reviewing `arxatec-academy-service` and the harness as well as this table.

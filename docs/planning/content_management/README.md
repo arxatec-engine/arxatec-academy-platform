@@ -1,15 +1,15 @@
-# Herramientas de administración de Academy
+# Academy administration tools
 
-Las siguientes rutas ayudan al personal autorizado a mantener el contenido y atender a estudiantes. La guardia `Admin` comprueba el rol y la API vuelve a exigirlo en cada operación. Las herramientas están separadas del recorrido principal de aprendizaje.
+The following routes help authorized staff maintain content and support students. The `Admin` guard checks the role, and the API requires it again for every operation. Tools are separate from the primary learning flow.
 
-| Área        | Ruta                                 | Funciones presentes                                                                                                          |
-| ----------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| Cursos      | `/admin/cursos`, `/admin/cursos/:id` | Crear, editar, duplicar, ordenar, gestionar portada, publicar, retirar y archivar.                                           |
-| Lecciones   | `/admin/lecciones/:id`               | Crear/ordenar desde el curso; editar contenido video/artículo, transcripción y recursos; publicar o borrar con confirmación. |
-| Moderación  | `/admin/comentarios`                 | Consultar hilos, responder, ocultar/mostrar o borrar.                                                                        |
-| Estudiantes | `/admin/usuarios`                    | Buscar, filtrar el directorio y exportar CSV.                                                                                |
-| Avisos      | `/admin/avisos`                      | Revisar altas y temas, exportar, marcar un corte y borrar suscripciones.                                                     |
+| Area          | Route                                | Current features                                                                                                           |
+| ------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Courses       | `/admin/cursos`, `/admin/cursos/:id` | Create, edit, duplicate, reorder, manage covers and exams, publish, unpublish, and archive.                                |
+| Lessons       | `/admin/lecciones/:id`               | Create/reorder from a course; edit video/article content, transcripts, and resources; publish or delete with confirmation. |
+| Moderation    | `/admin/comentarios`                 | Inspect threads, reply, hide/restore, or delete.                                                                           |
+| Students      | `/admin/usuarios`                    | Search, filter the directory, and export CSV.                                                                              |
+| Notifications | `/admin/avisos`                      | Review signups and topics, export, mark a cutoff, and delete subscriptions.                                                |
 
-Algunas operaciones editoriales utilizan confirmación para cambios que afectan publicación o datos estudiantiles. Las actualizaciones de contenido refrescan las consultas de catálogo asociadas. Los listados privados deben conservar búsqueda/filtros según su contrato.
+Some editorial operations require confirmation when they affect publication or student data. Content updates refresh associated catalog queries. Private lists must retain search/filters according to their contracts.
 
-Para el comportamiento de cada feature, consulta los README locales bajo `src/modules/admin/features/`.
+See local READMEs under `src/modules/admin/features/` for each feature's behavior.

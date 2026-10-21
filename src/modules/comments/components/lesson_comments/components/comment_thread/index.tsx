@@ -94,7 +94,7 @@ export const CommentThread = ({
             >
               <div className={motion.persistentGrid}>
                 <div className={motion.persistentClip}>
-                  <ol className="divide-y divide-border pt-3">
+                  <ol className="pt-3">
                     {thread.replies.map((entry) => (
                       <li
                         key={entry.id}

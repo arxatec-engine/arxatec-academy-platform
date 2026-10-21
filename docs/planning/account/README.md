@@ -1,17 +1,17 @@
-# Cuenta y acceso
+# Account and access
 
-El módulo `src/modules/auth` cubre opciones de acceso (`/ingresar`), login por correo (`/ingresar/correo`), registro (`/crear-cuenta`), intercambio OAuth de Google, verificación/reenvío de correo, olvido y restablecimiento de contraseña, consulta de usuario y logout. Sus pantallas son públicas o de invitado salvo los estados que consumen un token o requieren sesión.
+`src/modules/auth` covers sign-in options (`/ingresar`), email sign-in (`/ingresar/correo`), registration (`/crear-cuenta`), Google OAuth exchange, email verification/resending, forgotten and reset passwords, current-user lookup, and sign-out. Screens are public or guest-only except states that consume a token or require a session.
 
-## Registro y sesión
+## Registration and sessions
 
-El formulario por correo solicita nombre completo, correo y contraseña. El schema normaliza el correo y adapta `fullName` a `full_name` para el servicio. El registro devuelve una sesión y conduce a la pantalla para revisar el correo. Google entra por `/auth/google`, vuelve con un código de un solo uso y el cliente lo canjea en `/auth/google/exchange`.
+Email registration requests full name, email, and password. The schema normalizes email and adapts `fullName` to the service's `full_name`. Registration returns a session and navigates to the email review screen. Google starts through `/auth/google`, returns a one-time code, and the client exchanges it at `/auth/google/exchange`.
 
-El correo sin verificar no bloquea el acceso a cursos; la API requiere correo verificado para crear o responder comentarios. El formulario de login permite recordar sesión: token/usuario se guardan en almacenamiento local o de pestaña, respectivamente. Ninguna contraseña se persiste.
+Unverified email does not block course access; the API requires verified email to post or reply to comments. Sign-in supports remembering the session: token/user are stored locally or for the tab, respectively. Passwords are never persisted.
 
-`redirect_to` conserva una ruta interna solicitada durante login, alta y OAuth. `sanitizeRedirectPath` limita el destino a una ruta relativa segura. Al vencer la sesión, Axios limpia su información y redirige una vez al estado de sesión vencida.
+`redirect_to` retains a requested internal route during sign-in, registration, and OAuth. `sanitizeRedirectPath` restricts it to a safe relative path. When a session expires, Axios clears its information and redirects once to the expired-session state.
 
-## Reglas para cambios
+## Rules for changes
 
-Usa la instancia Axios pública para acceso, alta, OAuth exchange y acciones de token sin credenciales; la instancia autenticada se usa para `/auth/me`, logout y reenvío autenticado. Los formularios validan con Zod, convierten mensajes de API a claves de i18n y conservan los datos cuando un envío falla. Backend sigue siendo responsable de validar credenciales, tokens, tasas e identidad.
+Use public Axios for sign-in, registration, OAuth exchange, and unauthenticated token actions. Use authenticated Axios for `/auth/me`, sign-out, and authenticated resending. Forms validate through Zod, convert API messages into i18n keys, and retain input when submission fails. The backend remains responsible for credentials, tokens, rate limits, and identity.
 
-Las rutas y los tipos de sesión están definidos en `src/routes/routes.ts` y `src/types/auth`. La arquitectura compartida se detalla en [`src/modules/auth/docs/README.md`](../../../src/modules/auth/docs/README.md); el contrato de auth se mantiene con el servicio.
+Routes and session types are defined in `src/routes/routes.ts` and `src/types/auth`. Shared architecture is detailed in [`src/modules/auth/docs/README.md`](../../../src/modules/auth/docs/README.md); maintain the auth contract together with the service.

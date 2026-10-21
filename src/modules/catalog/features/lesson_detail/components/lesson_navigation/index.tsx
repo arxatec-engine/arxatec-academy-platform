@@ -5,6 +5,9 @@ import { Link } from "react-router-dom";
 import { NS } from "@/locales/namespaces";
 import { LESSON_TEXT } from "@/modules/catalog/i18n";
 import type { LessonView } from "@/modules/catalog/types";
+import { CERTIFICATE_TEXT } from "@/modules/progress/features/certificate/i18n";
+import { useCompletedCourse } from "@/modules/progress/hooks/use_completed_course";
+import { EXAM_TEXT } from "@/modules/progress/i18n/exams";
 import { RouteHelpers } from "@/routes/routes";
 
 interface Props {
@@ -14,7 +17,28 @@ interface Props {
 
 export const LessonNavigation = ({ view, courseSlug }: Props) => {
   const { t } = useTranslation(NS.common);
-  if (!view.navigation.previous && !view.navigation.next) return null;
+  const completedCourse = useCompletedCourse(courseSlug);
+  const certificateId = completedCourse?.certificateId;
+  const nextAction = view.navigation.next
+    ? {
+        to: RouteHelpers.lesson(courseSlug, view.navigation.next.slug),
+        label: t(LESSON_TEXT.next),
+        description: view.navigation.next.title,
+      }
+    : completedCourse
+      ? {
+          to: certificateId
+            ? RouteHelpers.certificate(certificateId)
+            : RouteHelpers.exam(courseSlug),
+          label: t(certificateId ? CERTIFICATE_TEXT.view : EXAM_TEXT.take),
+          description: t(
+            certificateId
+              ? EXAM_TEXT.certificateAvailable
+              : EXAM_TEXT.takeForCertificate,
+          ),
+        }
+      : null;
+  if (!view.navigation.previous && !nextAction) return null;
   return (
     <nav
       aria-label={t(LESSON_TEXT.navigation)}
@@ -38,18 +62,18 @@ export const LessonNavigation = ({ view, courseSlug }: Props) => {
           </Link>
         </Button>
       )}
-      {view.navigation.next && (
+      {nextAction && (
         <Button
           asChild
           size="sm"
           className="h-auto min-w-0 justify-between gap-3 p-2 text-left whitespace-normal sm:col-start-2"
         >
-          <Link to={RouteHelpers.lesson(courseSlug, view.navigation.next.slug)}>
+          <Link to={nextAction.to}>
             <span className="min-w-0">
               <span className="block text-sm font-normal">
-                {t(LESSON_TEXT.next)}
+                {nextAction.label}
               </span>
-              <span className="text-sm text-muted-foreground">{view.navigation.next.title}</span>
+              <span className="text-sm text-muted-foreground">{nextAction.description}</span>
             </span>
             <ArrowRight aria-hidden="true" className="size-4 shrink-0" />
           </Link>

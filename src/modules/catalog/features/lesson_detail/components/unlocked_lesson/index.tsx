@@ -6,7 +6,6 @@ import { NS } from "@/locales/namespaces";
 import { LESSON_TEXT } from "@/modules/catalog/i18n";
 import type { LessonView } from "@/modules/catalog/types";
 import { LessonComments } from "@/modules/comments/components/lesson_comments";
-import { CourseCertification } from "@/modules/progress/components/course_certification";
 import { RouteHelpers } from "@/routes/routes";
 import { LessonCompletion } from "../lesson_completion";
 import { LessonMaterial } from "../lesson_material";
@@ -44,7 +43,6 @@ export const UnlockedLesson = ({ view, courseSlug }: Props) => {
           <LessonCompletion lessonId={lesson.id} courseSlug={courseSlug} />
         </div>
       </div>
-      <CourseCertification courseSlug={courseSlug} />
       <LessonMaterial lesson={lesson} />
       <Card className="mt-6 gap-0 divide-y divide-border overflow-hidden rounded-md py-0 shadow-none">
         {lesson.resources.length > 0 && (

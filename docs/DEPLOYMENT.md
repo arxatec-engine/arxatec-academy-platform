@@ -1,12 +1,12 @@
-# Despliegue
+# Deployment
 
-El frontend se compila como archivos estáticos en `dist/`. La API y sus secretos se configuran y despliegan por separado en `arxatec-academy-service`. El navegador recibe únicamente la dirección pública de la API.
+The frontend builds into static files under `dist/`. The API and its secrets are configured and deployed separately in `arxatec-academy-service`. The browser receives only the public API address.
 
-## Compilar con Infisical
+## Building with Infisical
 
-Instala Infisical CLI y configura el acceso al proyecto de `.infisical.json`. En un equipo de
-desarrollo se usa `infisical login`; el entorno de despliegue debe proporcionar su propia
-autenticación de CLI. Agrega `VITE_API_URL` en la raíz `/` del entorno `prod` antes de compilar.
+Install Infisical CLI >=0.43.145 and grant it access to the project in `.infisical.yaml`. Development machines use `infisical login`; deployment must supply its own CLI authentication. Set `VITE_API_URL` at `/` in the `prod` environment before building. Use the actual HTTPS API base URL, including `/api/v1`.
+
+Include `.infisical.yaml` in the build directory. The script passes its `project-id` explicitly to support machine identity authentication.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -17,18 +17,14 @@ pnpm build:prod
 pnpm preview
 ```
 
-`pnpm build` es un alias de `build:prod`; `pnpm build:dev` usa las variables de `dev` para
-una compilación de desarrollo. Ambos ejecutan TypeScript y Vite. `pnpm preview` carga `prod`
-y sirve la carpeta compilada para revisar el artefacto local. `VITE_API_URL` queda dentro de
-los archivos del cliente: cambiarla en Infisical exige volver a compilar.
+`pnpm build` aliases `build:prod`. `pnpm build:dev` uses `dev` variables for a development build. Both run TypeScript and Vite. `pnpm preview` loads `prod` and serves the existing compiled directory for local artifact review. `VITE_API_URL` is embedded in client files: changing it in Infisical requires rebuilding.
 
-Para comprobar el código sin acceder a Infisical, usa `pnpm build:local` y
-`pnpm preview:local`, con el entorno del proceso o un `.env` local.
+For code checks without Infisical, use `pnpm build:local` and `pnpm preview:local` with configuration injected into the process. For example, `VITE_API_URL=https://api.example.test/api/v1 pnpm build:local` checks compilation only. This example endpoint is not a production deployment. Local `.env` files are not shipped.
 
 ## Hosting
 
-Publica el contenido de `dist/` en un hosting HTTPS para SPA. El servidor estático debe devolver `index.html` para rutas de la aplicación como `/mis-cursos` y `/cursos/:slug`, y conservar respuestas 404 para archivos de recursos que no existen. Configura CORS en el servicio para los orígenes web autorizados y limita sus métodos según el contrato de API.
+Publish `dist/` to HTTPS hosting configured for an SPA. The static server must return `index.html` for application routes such as `/mis-cursos` and `/cursos/:slug`, while retaining 404 responses for missing asset files. Configure the service's CORS for the authorized web origin and its methods according to the API contract.
 
-Los archivos con hash se pueden cachear durante su vida versionada; `index.html` debe poder actualizarse para que el navegador descubra una compilación nueva. El dominio final, el proxy inverso, certificados, monitoreo y credenciales pertenecen a la infraestructura de despliegue, no a los documentos del cliente.
+Hashed assets can be cached for their versioned lifetime. `index.html` must remain refreshable so browsers discover new builds. The final domain, reverse proxy, certificates, monitoring, and credentials belong to deployment infrastructure.
 
-Tras publicar, valida el origen configurado, carga directa de rutas públicas y privadas, acceso sin y con cuenta, cierre de sesión, restablecimiento de contraseña, callback OAuth y temas/idiomas. No uses datos de producción para pruebas destructivas.
+After publishing, verify the configured origin, direct loading of public and private routes, guest and signed-in access, sign-out, password reset, OAuth callback, themes, and languages. Do not use production data for destructive tests.

@@ -1,12 +1,12 @@
-import { Button, StatusMessage } from "arxatec-ui";
+import { StatusMessage } from "arxatec-ui";
 import { LockKeyhole } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { LoadingScreen } from "@/components/shared/loading_screen";
 import { NS } from "@/locales/namespaces";
 import { EXAM_RULES } from "@/modules/progress/constants/exams";
 import { EXAM_TEXT } from "@/modules/progress/i18n/exams";
-import { ROUTE_PARAM_NAMES, RouteHelpers } from "@/routes/routes";
+import { ROUTE_PARAM_NAMES } from "@/routes/routes";
 import { useCourseExam } from "../../hooks";
 import { ExamForm } from "../exam_form";
 import { ExamResult } from "../exam_result";
@@ -56,9 +56,6 @@ export const ExamContent = () => {
           />
         </div>
       )}
-      <Button size="sm" asChild variant="outline" className="self-start">
-        <Link to={RouteHelpers.course(slug)}>{t(EXAM_TEXT.back)}</Link>
-      </Button>
     </div>
   );
 };

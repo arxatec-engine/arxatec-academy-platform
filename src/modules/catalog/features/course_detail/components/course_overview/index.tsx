@@ -1,7 +1,9 @@
-import { Badge, Card, CardContent } from "arxatec-ui";
-import { BookOpen, Clock3 } from "lucide-react";
+import { Badge, Button, Card, CardContent } from "arxatec-ui";
+import { ArrowLeft, BookOpen, Clock3 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { CourseCover } from "@/components/shared/course_cover";
+import { UI_TEXT } from "@/components/shared/i18n";
 import { NS } from "@/locales/namespaces";
 import {
   CATALOG_TEXT,
@@ -11,6 +13,7 @@ import {
 } from "@/modules/catalog/i18n";
 import type { CourseView } from "@/modules/catalog/types";
 import { formatDuration } from "@/modules/catalog/utils";
+import { RouteHelpers } from "@/routes/routes";
 import { CourseStart } from "../course_start";
 import { CourseLevelIcon } from "./components/course_level_icon";
 
@@ -25,9 +28,16 @@ export const CourseOverview = ({ view }: Props) => {
     <div className="grid items-start gap-8 lg:grid-cols-[1fr_21rem] lg:items-stretch lg:gap-12">
       <div className="py-2">
         <div className="flex flex-wrap items-center gap-3">
-          <Badge variant="secondary" className="text-sm font-normal">
-            {t(COURSE_TEXT.freeCourse)}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" className="size-7">
+              <Link to={RouteHelpers.home()} aria-label={t(UI_TEXT.goToCatalog)}>
+                <ArrowLeft aria-hidden="true" className="size-4 shrink-0" />
+              </Link>
+            </Button>
+            <Badge variant="secondary" className="text-sm font-normal">
+              {t(COURSE_TEXT.freeCourse)}
+            </Badge>
+          </div>
           <p className="text-sm text-muted-foreground">
             {t(COURSE_TOPIC_LABELS[course.topic])}
           </p>

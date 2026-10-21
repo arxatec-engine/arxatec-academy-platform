@@ -1,5 +1,5 @@
-import { Button, StatusMessage } from "arxatec-ui";
-import { CircleAlert, CircleCheck } from "lucide-react";
+import { Button } from "arxatec-ui";
+import { CircleCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { NS } from "@/locales/namespaces";
@@ -15,40 +15,49 @@ export const ExamResult = ({
   result: Result;
   onRetry?: () => void;
 }) => {
-  const { t } = useTranslation(NS.common);
+  const { t, i18n } = useTranslation(NS.common);
+  const grade =
+    result.score !== null && result.question_count > 0
+      ? new Intl.NumberFormat(i18n.resolvedLanguage, {
+          maximumFractionDigits: 1,
+        }).format((result.score / result.question_count) * 10)
+      : null;
   return (
-    <div className="space-y-3" role="status">
-      <StatusMessage
-        size="sm"
-        color={result.passed ? "white" : "rose"}
-        icon={result.passed ? CircleCheck : CircleAlert}
-        title={t(
-          result.passed
-            ? result.score === null
-              ? EXAM_TEXT.certificateAvailable
-              : EXAM_TEXT.passed
-            : EXAM_TEXT.failed,
-        )}
-        description={
-          result.score === null
+    <div
+      className="flex flex-1 flex-col items-center justify-center gap-6 py-12 text-center sm:py-16"
+      role="status"
+    >
+      <div
+        className="flex size-44 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/30 sm:size-48"
+        aria-label={
+          grade === null
             ? t(CERTIFICATE_TEXT.verified)
             : t(EXAM_TEXT.score, {
                 score: result.score,
                 total: result.question_count,
               })
         }
-      />
-      {!result.passed && (
-        <p className="text-sm text-muted-foreground">
-          {t(EXAM_TEXT.intro, {
-            total: result.question_count,
-            required: result.passing_score,
-            percent: Math.round(
-              (result.passing_score / result.question_count) * 100,
-            ),
-          })}
-        </p>
-      )}
+      >
+        {grade === null ? (
+          <CircleCheck aria-hidden="true" className="size-14" />
+        ) : (
+          <span
+            aria-hidden="true"
+            className="text-5xl font-medium tracking-tight tabular-nums sm:text-6xl"
+          >
+            {grade}<span className="text-2xl text-muted-foreground sm:text-3xl">/10</span>
+          </span>
+        )}
+      </div>
+      <h2 className="max-w-sm text-base font-medium">
+        {t(
+          result.passed
+            ? result.score === null
+              ? EXAM_TEXT.certificateAvailable
+              : EXAM_TEXT.passed
+            : EXAM_TEXT.retryHint,
+        )}
+      </h2>
       {result.certificate_id && (
         <Button size="sm" asChild>
           <Link to={RouteHelpers.certificate(result.certificate_id)}>

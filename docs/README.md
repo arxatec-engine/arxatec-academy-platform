@@ -1,20 +1,20 @@
-# Documentación de Arxatec Academy
+# Arxatec Academy documentation
 
-Arxatec Academy es la plataforma de formación de sus estudiantes. Esta documentación describe el código que vive en este repositorio: catálogo público, cursos y lecciones, progreso, comentarios, perfil y las herramientas disponibles para el personal administrador. Las cuentas y el aprendizaje son el centro del producto.
+Arxatec Academy is a learning platform for its students. This documentation describes the code in this repository: the public catalog, courses and lessons, progress, comments, profiles, and tools available to administrators. Accounts and learning are the core of the product.
 
-| Documento                                          | Contenido                                                     |
-| -------------------------------------------------- | ------------------------------------------------------------- |
-| [Arquitectura](ARCHITECTURE.md)                    | Organización del frontend, navegación, sesión y datos.        |
-| [Estilo de código](CODE_STYLING.md)                | Convenciones para cambios nuevos.                             |
-| [Decisiones](DECISIONS.md)                         | Decisiones vigentes del frontend.                             |
-| [Entorno](ENV.md)                                  | Configuración pública y arranque local.                       |
-| [Despliegue](DEPLOYMENT.md)                        | Build y requisitos de hosting estático.                       |
-| [Rendimiento](PERFORMANCE.md)                      | Carga por rutas, imágenes y caché.                            |
-| [Verificación](TESTING.md)                         | Comandos disponibles y cobertura observada en el repositorio. |
-| [Idiomas](I18N.md)                                 | Español, inglés y portugués.                                  |
-| [Planes de producto y módulos](planning/README.md) | Alcance actual de Academy y siguientes consideraciones.       |
-| [Entrega](shipped/README.md)                       | Registro de cambios de este repositorio.                      |
+| Document                                       | Contents                                                   |
+| ---------------------------------------------- | ---------------------------------------------------------- |
+| [Architecture](ARCHITECTURE.md)                | Frontend organization, navigation, sessions, and data.     |
+| [Code style](CODE_STYLING.md)                  | Conventions for new changes.                               |
+| [Decisions](DECISIONS.md)                      | Current frontend decisions.                                |
+| [Environment](ENV.md)                          | Public configuration and local startup.                    |
+| [Deployment](DEPLOYMENT.md)                    | Builds and static hosting requirements.                    |
+| [Performance](PERFORMANCE.md)                  | Route loading, images, and caching.                        |
+| [Testing](TESTING.md)                          | Available commands and coverage present in the repository. |
+| [Internationalization](I18N.md)                | Spanish, English, and Portuguese.                          |
+| [Product and module plans](planning/README.md) | Academy's current scope and next considerations.           |
+| [Shipped changes](shipped/README.md)           | Change history for this repository.                        |
 
-La implementación comprobable está en `src/` y `package.json`. Los documentos de feature dentro de `src/modules/**/docs/README.md` explican el comportamiento particular y se actualizan con su código. Las especificaciones describen alcance; contrasta el comportamiento actual con `src/` y los contratos del servicio.
+Verifiable implementation lives in `src/` and `package.json`. Feature documents under `src/modules/**/docs/README.md` explain specific behavior and evolve with their code. Specifications describe scope; compare current behavior against `src/` and the service contracts.
 
-Este proyecto incluye una zona de administración de cursos, moderación, directorio de estudiantes y avisos, restringida por rol. Esas herramientas apoyan la experiencia Academy; no convierten el producto en un panel de gestión empresarial.
+This project includes course administration, moderation, a student directory, and notification tools restricted by role. These tools support the Academy experience; they do not turn the product into an enterprise management dashboard.

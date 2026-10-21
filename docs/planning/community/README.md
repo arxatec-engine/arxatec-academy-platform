@@ -1,9 +1,9 @@
-# Comentarios y moderación
+# Comments and moderation
 
-Los hilos de comentarios de lecciones se pueden leer públicamente. Crear un comentario o una respuesta requiere sesión y correo verificado, regla que el servicio vuelve a comprobar. Los cuerpos de la conversación son texto, no HTML proporcionado por el usuario.
+Lesson comment threads are publicly readable. Posting comments or replies requires a session and verified email, which the service checks again. Discussion bodies are text, not user-supplied HTML.
 
-Cada hilo consulta `GET /lessons/:id/comments`. Crear, responder y reportar un comentario usan endpoints autenticados. Los hooks actualizan el hilo luego de creación/respuesta; el reporte se refleja deshabilitando esa acción localmente después del éxito.
+Each thread is read through `GET /lessons/:id/comments`. Creating, replying, and reporting use authenticated endpoints. Hooks refresh the thread after creation/reply; a successful report disables that action locally.
 
-El área `/admin/comentarios`, accesible por rol `ADMIN`, ofrece listas de moderación, recuentos y acciones para responder, ocultar, volver a mostrar o borrar. El backend conserva la autoridad sobre estado, rol y restricciones.
+`/admin/comentarios`, available to `ADMIN`, provides moderation lists, counts, and actions to reply, hide, restore, or delete. The backend remains authoritative for state, roles, and restrictions.
 
-Revisa `src/modules/comments/docs/README.md`, `src/modules/admin/features/moderation/docs/README.md` y el servicio al modificar políticas, texto o retención.
+Review `src/modules/comments/docs/README.md`, `src/modules/admin/features/moderation/docs/README.md`, and the service when changing policies, copy, or retention.

@@ -1,9 +1,9 @@
-# Progreso del estudiante
+# Student progress
 
-`/mis-cursos` requiere sesión y consulta `GET /me/courses`. Presenta cursos en progreso y terminados, cantidad de lecciones completadas y la siguiente lección disponible.
+`/mis-cursos` requires a session and reads `GET /me/courses`. It displays in-progress and completed courses, completed lesson counts, and the next available lesson.
 
-Desde la ficha de curso, la cuenta puede inscribirse antes de empezar. En una lección, puede marcar o desmarcar la finalización. Los hooks llaman a los servicios autenticados y invalidan `PROGRESS_KEYS.all` para mantener sincronizada la lista de cursos.
+From course details, accounts can enroll before starting. Within lessons, they can mark or unmark completion. Hooks call authenticated services and invalidate `PROGRESS_KEYS.all` to keep the course list synchronized.
 
-El contrato muestra totales devueltos por el backend. El cliente no calcula matrícula, certificaciones ni métricas de consumo. `saveLessonPosition` existe en servicios, pero no se consume desde un hook o reproductor hoy.
+The contract displays totals returned by the backend. The client does not determine enrollment, certificate eligibility, or consumption metrics. `saveLessonPosition` exists in services but is not currently consumed by a hook or player.
 
-Detalle en `src/modules/progress/features/my_courses/docs/README.md` y pruebas relacionadas bajo `src/__tests__/modules/progress/`.
+See `src/modules/progress/features/my_courses/docs/README.md` and related tests under `src/__tests__/modules/progress/`.

@@ -1,19 +1,19 @@
-# Producto y módulos de Academy
+# Academy product and modules
 
-Estos documentos describen la experiencia educativa y las funciones que existen en este frontend. La aplicación está dirigida a estudiantes de cursos de legal tech y a las personas que administran el contenido. Catálogo, fichas y muestras son públicos; Mis cursos y Perfil requieren sesión; las herramientas de `/admin` requieren rol `ADMIN`.
+These documents describe the learning experience and features present in this frontend. The application serves legal tech students and the people who administer content. The catalog, course details, and samples are public; My courses and Profile require a session; `/admin` tools require `ADMIN`.
 
-| Documento                                                      | Área                                                         |
-| -------------------------------------------------------------- | ------------------------------------------------------------ |
-| [Fundamentos](foundations/README.md)                           | Usuarios, límites de producto y papel del frontend.          |
-| [Sistema visual](arxatec_ui/README.md)                         | `arxatec-ui`, navegación, tema y tipografía.                 |
-| [Cuenta y acceso](account/README.md)                           | Registro, login, Google, correo y seguridad de sesión.       |
-| [Catálogo y cursos](catalog/README.md)                         | Descubrimiento, fichas e inscripción.                        |
-| [Lecciones](lessons/README.md)                                 | Muestras, acceso, video, artículo, transcripción y recursos. |
-| [Progreso](progress/README.md)                                 | Mis cursos, completar lecciones y continuar aprendiendo.     |
-| [Comentarios](community/README.md)                             | Lectura, publicación, respuestas y moderación.               |
-| [Perfil](profile/README.md)                                    | Datos, avatar, contraseña y baja.                            |
-| [Avisos de cursos](notifications/README.md)                    | Suscripciones y propuestas de temas.                         |
-| [Herramientas de administración](content_management/README.md) | Cursos, estudiantes y operación editorial disponibles.       |
-| [Criterios de verificación](delivery/README.md)                | Revisión práctica de los flujos educativos.                  |
+| Document                                             | Area                                                          |
+| ---------------------------------------------------- | ------------------------------------------------------------- |
+| [Foundations](foundations/README.md)                 | Users, product boundaries, and frontend responsibilities.     |
+| [Visual system](arxatec_ui/README.md)                | `arxatec-ui`, navigation, themes, and typography.             |
+| [Account and access](account/README.md)              | Registration, sign-in, Google, email, and session security.   |
+| [Catalog and courses](catalog/README.md)             | Discovery, course details, and enrollment.                    |
+| [Lessons](lessons/README.md)                         | Samples, access, video, articles, transcripts, and resources. |
+| [Progress](progress/README.md)                       | My courses, lesson completion, and continuing learning.       |
+| [Comments](community/README.md)                      | Reading, posting, replies, and moderation.                    |
+| [Profile](profile/README.md)                         | Personal details, avatars, passwords, and account deletion.   |
+| [Course notifications](notifications/README.md)      | Subscriptions and topic proposals.                            |
+| [Administration tools](content_management/README.md) | Courses, students, and editorial operations.                  |
+| [Verification criteria](delivery/README.md)          | Practical review of learning flows.                           |
 
-El estado indicado aquí se refiere al frontend que existe en `src/`, no a una promesa de disponibilidad del backend ni a una especificación completa de producto. Las funcionalidades futuras se identifican como tales. Para detalles de endpoints y decisiones compartidas, contrasta `arxatec-academy-service`.
+Status here refers to the frontend implemented in `src/`, not a guarantee of backend availability or a complete product specification. Future capabilities are identified explicitly. Compare `arxatec-academy-service` for endpoint details and shared decisions.

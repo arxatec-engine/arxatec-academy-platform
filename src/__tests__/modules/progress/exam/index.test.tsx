@@ -142,8 +142,8 @@ describe("examen final", () => {
       await screen.findByRole("heading", { name: "Examen aprobado" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("12 de 15 respuestas correctas."),
-    ).toBeInTheDocument();
+      screen.getByLabelText("12 de 15 respuestas correctas."),
+    ).toHaveTextContent("8/10");
     expect(
       screen.getByRole("link", { name: "Ver certificado" }),
     ).toHaveAttribute("href", "/certificados/certificate-1");
@@ -161,9 +161,12 @@ describe("examen final", () => {
     await user.click(screen.getByRole("button", { name: "Enviar examen" }));
     expect(
       await screen.findByRole("heading", {
-        name: "No alcanzaste la nota mínima",
+        name: "Aún puedes volver a intentarlo",
       }),
     ).toBeInTheDocument();
+    expect(screen.getByLabelText("11 de 15 respuestas correctas.")).toHaveTextContent(
+      "7,3/10",
+    );
     expect(
       screen.queryByRole("link", { name: "Ver certificado" }),
     ).not.toBeInTheDocument();

@@ -1,7 +1,7 @@
-# Perfil y cuenta
+# Profile and account
 
-`/perfil` requiere sesión. Presenta datos personales y resumen de cursos completados y permite actualizar nombre, organización/independencia y ciudad. El usuario puede subir o retirar su avatar. Una cuenta con contraseña puede cambiarla; una cuenta Google no muestra ese formulario como una cuenta de contraseña.
+`/perfil` requires a session. It presents personal details and completed-course totals. Profile updates accept only the name; organization/independent status and city are not editable through this form or the profile update API. Users can upload or remove an avatar. Password accounts can change passwords; Google accounts do not show that form as though they were password accounts.
 
-El flujo de baja de cuenta solicita la confirmación de interfaz y puede pedir contraseña cuando corresponde. La mutación usa `DELETE /me`; luego limpia usuario y caché remota. La API valida la petición y aplica los efectos de datos y archivos.
+Account deletion requests UI confirmation and may require a password where applicable. The mutation uses `DELETE /me`, then clears the user and remote cache. The API validates the request and applies its data and file effects.
 
-Las mutaciones de perfil y avatar actualizan el usuario de la sesión con la respuesta del backend. Servicios, tipos y detalle de validación se explican en `src/modules/profile/features/profile/docs/README.md`.
+Profile and avatar mutations update the session user from the backend response. Services, types, and validation details are documented in `src/modules/profile/features/profile/docs/README.md`.

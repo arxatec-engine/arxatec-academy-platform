@@ -1,9 +1,9 @@
-# Avisos y propuestas de temas
+# Notifications and topic proposals
 
-La experiencia educativa permite dejar email para recibir avisos generales o de un curso y proponer un tema que se desea estudiar. Los formularios se abren bajo demanda en diálogos de `arxatec-ui`. El API admite sesión opcional: con cuenta toma el correo de la cuenta; sin cuenta, solicita correo.
+The learning experience lets users leave an email for general or course-specific notifications and propose a topic they want to study. Forms open on demand in `arxatec-ui` dialogs. The API supports optional sessions: signed-in users use their account email; guests provide an email.
 
-Los servicios usan `POST /notifications/signups` y `POST /notifications/topics`; limitación de frecuencia e idempotencia se aplican en el backend. Las solicitudes no implican que el curso vaya a crearse ni que se haya enviado un aviso.
+Services call `POST /notifications/signups` and `POST /notifications/topics`; the backend owns rate limiting and idempotency. A request does not imply that a course will be created or a notification has been sent.
 
-En `/admin/avisos`, rol `ADMIN` puede revisar solicitudes, exportar altas, marcar grupos según una fecha de corte y borrar una suscripción. Marcar destinatarios registra una acción administrativa; la pantalla no envía correos en masa.
+At `/admin/avisos`, `ADMIN` can review requests, export signups, mark groups by a cutoff date, and delete a subscription. Marking recipients records an administrative action; the screen does not send bulk email.
 
-Más detalle en `src/modules/notifications/features/interest/docs/README.md` y `src/modules/admin/features/notifications/docs/README.md`.
+See `src/modules/notifications/features/interest/docs/README.md` and `src/modules/admin/features/notifications/docs/README.md`.

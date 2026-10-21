@@ -17,10 +17,11 @@ temario de la ficha y la pantalla bloqueada. La finalización es un botón de so
 al título de la lección. Su tooltip explica la acción al pasar el cursor o recibir foco
 con el teclado. El mismo botón permite marcar y desmarcar la lección; el icono cambia
 de círculo vacío a círculo con marca y expone su estado con `aria-pressed`. Se deshabilita
-mientras se guarda el cambio. Al completar todas las lecciones, `CourseCertification` muestra un aviso y el botón con texto
-«Dar examen para obtener mi certificado». La disponibilidad se consulta en el progreso guardado
-de Mis cursos y se conserva al recargar o volver a la lección. La misma invitación aparece
-en la ficha del curso. El botón de marca recupera su estado cuando el curso está completo. Si ya existe un certificado se conserva el acceso a él; la marca de
+mientras se guarda el cambio. Al completar todas las lecciones, la última lección muestra
+«Dar examen» en el lugar de «Siguiente lección», con el mismo estilo y flecha de navegación.
+No se muestra el aviso de finalización encima del contenido. La disponibilidad se consulta
+en el progreso guardado de Mis cursos y se conserva al recargar o volver a la lección.
+La ficha del curso conserva `CourseCertification`. El botón de marca recupera su estado cuando el curso está completo. Si ya existe un certificado se conserva el acceso a él en la navegación; la marca de
 una lección no emite certificados nuevos.
 Recursos y Comentarios forman un único
 bloque plegable con borde exterior y esquinas comunes, sin espacio entre paneles. Cada panel
@@ -28,7 +29,8 @@ se abre de forma independiente. El contenedor de `UnlockedLesson` dibuja las div
 paneles reciben `grouped` para omitir sus bordes, esquinas y márgenes exteriores. Si no hay
 recursos, el bloque conserva el mismo contorno. El botón de finalización se muestra solo con sesión.
 Dentro del desplegable, Recursos usa una tabla de archivo y enlace.
-Navegación muestra solo los botones de lección anterior y siguiente, siempre visibles.
+Navegación mantiene los botones de lección anterior y siguiente; en la última lección,
+la acción siguiente abre el examen o el certificado si el curso está completo.
 El formulario de comentarios conserva el borrador al cerrar y volver a abrir la tarjeta.
 Los paneles de Recursos, Comentarios y Transcripción se abren y cierran con una
 transición breve de altura y opacidad; esta animación se desactiva si el sistema prefiere

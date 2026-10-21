@@ -1,16 +1,16 @@
-# Sistema visual y componentes
+# Visual system and components
 
-La aplicación usa `arxatec-ui` para logo, controles, menús, diálogos, tarjetas, tablas y estados. `src/index.css` carga primero el CSS del paquete y luego establece los estilos propios de Academy. El plugin de Vite ajusta el CSS de dependencia para conservar la tipografía sans de la plataforma.
+The application uses `arxatec-ui` for the logo, controls, menus, dialogs, cards, tables, and states. `src/index.css` loads the package CSS first, then Academy-specific styles. The Vite plugin adjusts dependency CSS to retain the platform's sans typography.
 
-## Patrones visibles
+## Visible patterns
 
-- `BrandLink` presenta el logo Academy y regresa al catálogo.
-- `SiteHeader` ofrece catálogo, Mis cursos cuando hay sesión, idioma y tema; `AccountMenu` enlaza Perfil y las herramientas de administración para rol `ADMIN`.
-- `PageShell` reúne cabecera, contenido y pie; acepta un ancho de lectura menor en lecciones.
-- `AuthLayout` y `AuthCard` comparten presentación de las pantallas de acceso.
-- `CourseCover` prioriza la imagen suministrada por el servicio y usa imágenes WebP locales como respaldo.
-- `AsyncBoundary`, `ErrorScreen`, `LoadingScreen` y `StatusMessage` presentan los estados asíncronos de la interfaz.
+- `BrandLink` presents the Academy logo and returns to the catalog.
+- `SiteHeader` offers catalog navigation and My courses when signed in; `AccountMenu` links to Profile and administration tools for `ADMIN`. Language and theme settings are available in Profile.
+- `PageShell` combines header, content, and footer, with a reading width suitable for lessons.
+- `AuthLayout` and `AuthCard` share the presentation of access screens.
+- `CourseCover` prioritizes service-provided images and uses local WebP fallbacks.
+- `AsyncBoundary`, `ErrorScreen`, `LoadingScreen`, and `StatusMessage` present asynchronous UI states. Exam introduction and results have dedicated centered components.
 
-Los textos visibles se traducen con `i18next`; los controles conservan estados de foco y las etiquetas accesibles de los componentes. Las páginas deben funcionar con el tema claro y oscuro y adaptarse a ancho móvil. Evita recrear con HTML y CSS propios un control que ya ofrece `arxatec-ui`.
+Visible copy is translated through `i18next`; controls retain focus states and accessible labels. Pages must support light/dark themes and mobile widths. Avoid rebuilding controls in custom HTML/CSS when `arxatec-ui` already provides them.
 
-El detalle sobre el header, el salto al contenido, la tarjeta de auth, el layout y estilos de lectura se mantiene en los documentos cercanos a sus componentes, por ejemplo `src/components/layout/page_shell/docs/README.md` y `src/components/shared/course_cover/docs/README.md`.
+Header details, skip links, authentication cards, layout, and reading styles are documented beside their components, for example `src/components/layout/page_shell/docs/README.md` and `src/components/shared/course_cover/docs/README.md`.

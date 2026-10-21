@@ -1,25 +1,25 @@
-# Fundamentos del producto
+# Product foundations
 
-## Para quién
+## Audience
 
-Academy ofrece formación gratuita en legal tech, especialmente para profesionales del derecho en Perú. La experiencia empieza en el catálogo público: permite descubrir y abrir cursos antes de crear una cuenta. La cuenta permite inscribirse, avanzar, consultar Mis cursos y comentar cuando el correo está verificado.
+Academy provides free legal tech education, particularly for legal professionals in Peru. The journey starts at the public catalog, where visitors can discover and open courses before creating an account. Accounts support enrollment, progress, My courses, and commenting after email verification.
 
-La plataforma combina un espacio de aprendizaje con herramientas de personal administrador. Las páginas `/admin` organizan cursos y lecciones, moderan la conversación, consultan el directorio de estudiantes y gestionan solicitudes de avisos. No se ofrecen en las cuentas `STUDENT` y no definen la navegación principal de estudiantes.
+The platform combines a learning space with administration tools. `/admin` pages organize courses and lessons, moderate discussions, provide a student directory, and manage notification requests. They are unavailable to `STUDENT` accounts and do not define primary student navigation.
 
-## Responsabilidades del frontend
+## Frontend responsibilities
 
-- Mostrar las respuestas del servicio Academy mediante contratos tipados y estados de carga, error y ausencia de resultados.
-- Guiar el acceso de visitante, el alta de cuenta y el retorno al contenido que intentaba abrir.
-- Enviar cambios de progreso o perfil a la API autenticada y reflejar las respuestas confirmadas.
-- Traducir toda la interfaz a español, inglés y portugués.
-- Respetar roles y presentar acciones disponibles. La autorización y las reglas de negocio también las aplica el backend.
+- Present Academy service responses through typed contracts and loading, error, and empty states.
+- Guide guest access, registration, and return navigation to requested content.
+- Send progress and profile changes to the authenticated API and reflect confirmed responses.
+- Translate the entire interface into Spanish, English, and Portuguese.
+- Respect roles and present available actions. The backend also enforces authorization and business rules.
 
-El cliente no es fuente de verdad para permisos, inscripción, publicación, moderación ni verificación de correo. Ocultar un enlace o cubrir una ruta con un guard no reemplaza la autorización del servicio.
+The client is not the source of truth for permissions, enrollment, publication, moderation, or email verification. Hiding a link or guarding a route does not replace service authorization.
 
-## Fuentes
+## Sources
 
-- Pantallas y módulos reales: `src/routes`, `src/modules` y sus documentos de feature.
-- Contratos de servicio: repositorio hermano `arxatec-academy-service`.
-- Variables de arranque: [Entorno](../../ENV.md), `.infisical.json` y `src/config/env`.
+- Actual screens and modules: `src/routes`, `src/modules`, and feature documentation.
+- Service contracts: sibling repository `arxatec-academy-service`.
+- Startup variables: [Environment](../../ENV.md), `.infisical.yaml`, and `src/config/env`.
 
-Si un documento planea una capacidad y el código no la implementa, debe presentarla como pendiente.
+A documented capability that the code does not implement must be identified as pending.

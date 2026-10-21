@@ -23,7 +23,7 @@ vi.mock(
 );
 
 const course = { slug: "curso-completo", title: "Curso completo" };
-const label = "Dar examen para obtener mi certificado";
+const label = "Dar examen";
 const progress = (
   completed: boolean,
   certificate_id: string | null = null,
@@ -55,7 +55,7 @@ beforeEach(() => {
 });
 
 describe("invitación al examen y certificado", () => {
-  it("muestra un botón con texto al cargar el progreso completo guardado", async () => {
+  it("muestra la sección Examen con una tarjeta clickeable al cargar el progreso completo guardado", async () => {
     axiosInstanceMock.get.mockResolvedValue({ data: { data: progress(true) } });
     renderWithProviders(<CourseCertification courseSlug={course.slug} />, {
       user: buildApiUser(),
@@ -64,7 +64,10 @@ describe("invitación al examen y certificado", () => {
       "href",
       RouteHelpers.exam(course.slug),
     );
-    expect(screen.getByText("Completaste todas las lecciones")).toBeVisible();
+    expect(screen.getByRole("heading", { level: 2, name: "Examen" })).toBeVisible();
+    expect(screen.getByRole("link", { name: label })).toHaveTextContent("Examen final");
+    expect(screen.getByRole("link", { name: label })).toHaveTextContent("15 preguntas");
+    expect(screen.queryByText("Completaste todas las lecciones")).not.toBeInTheDocument();
   });
 
   it("no ofrece examen cuando todavía faltan lecciones", async () => {

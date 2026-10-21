@@ -1,11 +1,11 @@
-# Catálogo y cursos
+# Catalog and courses
 
-El catálogo en `/` permite encontrar cursos publicados sin autenticarse. `GET /courses` recibe búsqueda, tema y nivel; las opciones y facetas proceden del servicio. El estado de búsqueda se conserva con parámetros URL y la consulta de React Query incluye todos los filtros.
+The catalog at `/` lets visitors discover published courses without authentication. `GET /courses` accepts search, topic, and level; options and facets come from the service. Search state remains in URL parameters, and the React Query key includes every filter.
 
-La tarjeta completa del curso abre `/cursos/:slug`. La ficha muestra descripción, tema, nivel, duración y temario. Una cuenta inscrita inicia el curso con una inscripción API antes de abrir la primera lección. Una persona visitante puede acceder a la primera lección; esa ruta permite muestras y presenta el estado bloqueado si el backend niega el contenido.
+The entire course card opens `/cursos/:slug`. Course details display description, topic, level, duration, and syllabus. A signed-in user starts through an API enrollment before opening the first lesson. Visitors can open the first lesson; that route supports samples and presents a locked state when the backend denies content.
 
-Los formularios públicos de avisos y sugerencias aparecen como acciones secundarias del catálogo y de fichas sin lecciones. No se mezcla el formulario con los resultados de búsqueda.
+Public notification and suggestion forms appear as secondary actions in the catalog and on course details without lessons. Forms are separate from search results.
 
-El catálogo actual presenta cursos gratuitos y no incluye un flujo de compra.
+The current catalog offers free courses and has no purchase flow. Completed courses show an Exam section after the syllabus, with a clickable exam or certificate card.
 
-Más detalle en `src/modules/catalog/features/course_catalog/docs/README.md` y `course_detail/docs/README.md`.
+See `src/modules/catalog/features/course_catalog/docs/README.md` and `course_detail/docs/README.md` for more detail.

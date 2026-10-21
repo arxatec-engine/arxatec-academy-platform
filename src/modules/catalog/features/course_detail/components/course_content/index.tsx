@@ -22,8 +22,8 @@ export const CourseContent = () => {
       {(view) => (
         <>
           <CourseOverview view={view} />
-          <CourseCertification courseSlug={slug} />
           <CourseSyllabus view={view} />
+          <CourseCertification courseSlug={slug} />
           <CourseTeacher teacher={view.course.teacher} />
         </>
       )}
